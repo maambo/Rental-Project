@@ -1,0 +1,213 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "name": "John phiri",
+      "email": "john.phiri@example.com",
+      "role": "tenant"
+    },
+    {
+      "id": "user-2",
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "role": "landlord"
+    },
+    {
+      "id": "user-3",
+      "name": "Admin User",
+      "email": "admin@rentalapp.com",
+      "role": "admin"
+    }
+  ],
+  "properties": [
+    {
+      "id": "prop-1",
+      "landlordId": "user-2",
+      "title": "Modern Downtown Apartment",
+      "location": "Downtown, Lusaka",
+      "pricePerMonth": 8500.0,
+      "beds": 2,
+      "baths": 2,
+      "sqft": 1200,
+      "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop",
+      "rating": 4.8,
+      "reviews": 24,
+      "type": "Apartment",
+      "description": "Beautiful modern apartment in the heart of downtown Lusaka. Features an open floor plan with high ceilings, premium finishes, and large windows with city views. Close to shopping centers, restaurants, and public transport.",
+      "amenities": [
+        "WiFi",
+        "Parking",
+        "Security",
+        "Gym",
+        "Pool",
+        "AC"
+      ],
+      "landlord": "John Mwansa",
+      "landlordPhone": "+260 977 123 456",
+      "landlordEmail": "john@rentals.zm",
+      "occupied": true,
+      "latitude": -15.4167,
+      "longitude": 28.2833
+    },
+    {
+      "id": "prop-2",
+      "landlordId": "user-2",
+      "title": "Cozy Garden House",
+      "location": "Kabulonga, Lusaka",
+      "pricePerMonth": 12000.0,
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1800,
+      "image": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
+      "rating": 4.9,
+      "reviews": 18,
+      "type": "House",
+      "description": "Spacious family home with a beautiful garden in the prestigious Kabulonga area. Features include a modern kitchen, master bedroom with ensuite, and a large backyard perfect for children and pets.",
+      "amenities": [
+        "WiFi",
+        "Parking",
+        "Security",
+        "Garden",
+        "Generator",
+        "DSTV"
+      ],
+      "landlord": "Sarah Banda",
+      "landlordPhone": "+260 966 789 012",
+      "landlordEmail": "sarah@rentals.zm",
+      "occupied": true,
+      "latitude": -15.4000,
+      "longitude": 28.3000
+    },
+    {
+      "id": "prop-3",
+      "landlordId": "user-2",
+      "title": "Studio with City View",
+      "location": "Longacres, Lusaka",
+      "pricePerMonth": 4500.0,
+      "beds": 1,
+      "baths": 1,
+      "sqft": 600,
+      "image": "https://images.unsplash.com/photo-1502672260066-6bc35f0a1036?w=800&h=600&fit=crop",
+      "rating": 4.6,
+      "reviews": 31,
+      "type": "Studio",
+      "description": "Affordable studio apartment perfect for young professionals or students. Efficient layout with modern amenities and stunning city views from the balcony. Walking distance to the CBD.",
+      "amenities": [
+        "WiFi",
+        "Parking",
+        "Security",
+        "AC"
+      ],
+      "landlord": "Mike Phiri",
+      "landlordPhone": "+260 955 345 678",
+      "landlordEmail": "mike@rentals.zm",
+      "occupied": false,
+      "latitude": -15.3900,
+      "longitude": 28.3100
+    },
+    {
+      "id": "prop-4",
+      "landlordId": "user-2",
+      "title": "Luxury Penthouse Suite",
+      "location": "Rhodes Park, Lusaka",
+      "pricePerMonth": 25000.0,
+      "beds": 4,
+      "baths": 3,
+      "sqft": 2800,
+      "image": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop",
+      "rating": 5.0,
+      "reviews": 12,
+      "type": "Penthouse",
+      "description": "Stunning penthouse with panoramic views of Lusaka. Features include a gourmet kitchen, spa-like bathrooms, walk-in closets, and a private rooftop terrace. Premium finishes throughout.",
+      "amenities": [
+        "WiFi",
+        "Parking",
+        "Security",
+        "Gym",
+        "Pool",
+        "AC",
+        "Generator",
+        "DSTV",
+        "Concierge"
+      ],
+      "landlord": "Grace Tembo",
+      "landlordPhone": "+260 977 901 234",
+      "landlordEmail": "grace@rentals.zm",
+      "occupied": true,
+      "latitude": -15.4200,
+      "longitude": 28.2900
+    },
+    {
+      "id": "prop-5",
+      "landlordId": "user-2",
+      "title": "Family Townhouse",
+      "location": "Avondale, Lusaka",
+      "pricePerMonth": 9800.0,
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1600,
+      "image": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop",
+      "rating": 4.7,
+      "reviews": 22,
+      "type": "Townhouse",
+      "description": "Modern townhouse in a safe, gated community. Perfect for families with children. Features include an open-plan living area, fitted kitchen, and small private garden. Close to schools and shops.",
+      "amenities": [
+        "WiFi",
+        "Parking",
+        "Security",
+        "Garden",
+        "Playground"
+      ],
+      "landlord": "Peter Musonda",
+      "landlordPhone": "+260 966 567 890",
+      "landlordEmail": "peter@rentals.zm",
+      "occupied": false,
+      "latitude": -15.4100,
+      "longitude": 28.3300
+    },
+    {
+      "id": "prop-6",
+      "landlordId": "user-2",
+      "title": "Executive Bachelor Flat",
+      "location": "Meanwood, Lusaka",
+      "pricePerMonth": 5200.0,
+      "beds": 1,
+      "baths": 1,
+      "sqft": 750,
+      "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+      "rating": 4.5,
+      "reviews": 28,
+      "type": "Apartment",
+      "description": "Well-maintained bachelor flat in a quiet neighborhood. Ideal for single professionals. Features include built-in wardrobes, modern bathroom, and secure parking. Water and power backup available.",
+      "amenities": [
+        "WiFi",
+        "Parking",
+        "Security",
+        "Generator",
+        "Water Tank"
+      ],
+      "landlord": "Alice Lungu",
+      "landlordPhone": "+260 977 234 567",
+      "landlordEmail": "alice@rentals.zm",
+      "occupied": true,
+      "latitude": -15.3800,
+      "longitude": 28.3200
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-1",
+      "propertyId": "prop-1",
+      "tenantId": "user-1",
+      "rating": 5,
+      "comment": "Amazing place! The location is perfect and Jane was a very responsive landlord."
+    },
+    {
+      "id": "rev-2",
+      "propertyId": "prop-1",
+      "tenantId": "user-3",
+      "rating": 4,
+      "comment": "Great apartment, but can be a bit noisy on weekends."
+    }
+  ]
+}
