@@ -26,6 +26,8 @@ import 'package:rental_app/screens/public/property_detail_screen.dart';
 import 'package:rental_app/screens/public/review_submission_screen.dart';
 import 'package:rental_app/screens/public/tour_scheduling_screen.dart';
 import 'package:rental_app/screens/public/property_application_screen.dart';
+import 'package:rental_app/screens/public/public_dashboard_screen.dart';
+import 'package:rental_app/models/property_model.dart';
 import 'package:rental_app/utils/constants.dart';
 
 void main() {
@@ -71,8 +73,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/landing',
+      initialRoute: '/public',
       routes: {
+        '/public': (context) => const PublicDashboardScreen(),
         '/landing': (context) => const LandingScreen(),
         '/': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),

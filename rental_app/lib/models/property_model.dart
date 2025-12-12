@@ -61,6 +61,14 @@ class Property {
     this.likeCount = 0,
   });
 
+  // Getter aliases for backward compatibility
+  double get price => pricePerMonth;
+  int get bedrooms => beds;
+  int get bathrooms => baths;
+
+  // Getter for primary image (first image)
+  String get primaryImage => imageUrls.isNotEmpty ? imageUrls[0] : '';
+
   factory Property.fromJson(Map<String, dynamic> json) {
     // Handle both single image (legacy) and multiple images
     List<String> images = [];
@@ -137,7 +145,4 @@ class Property {
       'likeCount': likeCount,
     };
   }
-
-  // Getter for primary image (first image)
-  String get primaryImage => imageUrls.isNotEmpty ? imageUrls[0] : '';
 }
