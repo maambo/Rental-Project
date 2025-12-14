@@ -230,17 +230,17 @@ class _PublicDashboardScreenState extends State<PublicDashboardScreen> {
           const SizedBox(height: 16),
           TextField(
             controller: _searchController,
-            style: const TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: 'Search by location, property name...',
-              hintStyle: TextStyle(color: Colors.grey[600]),
+              hintStyle: TextStyle(color: Colors.grey[400]),
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: kBackgroundColorDark,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
           ),
@@ -250,18 +250,18 @@ class _PublicDashboardScreenState extends State<PublicDashboardScreen> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   value: _selectedLocation,
-                  style: const TextStyle(color: Colors.black, fontSize: 16),
-                  dropdownColor: Colors.white,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  dropdownColor: kBackgroundColorDark,
                   icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
                   decoration: InputDecoration(
                     labelText: 'Location',
-                    labelStyle: TextStyle(color: Colors.grey[700]),
+                    labelStyle: TextStyle(color: Colors.grey[400]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: kBackgroundColorDark,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   ),
                   items: ['All Locations', 'Lusaka', 'Ndola', 'Kitwe', 'Livingstone']
@@ -269,7 +269,7 @@ class _PublicDashboardScreenState extends State<PublicDashboardScreen> {
                             value: location,
                             child: Text(
                               location,
-                              style: const TextStyle(color: Colors.black),
+                              style: const TextStyle(color: Colors.white),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ))
@@ -285,18 +285,18 @@ class _PublicDashboardScreenState extends State<PublicDashboardScreen> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   value: _selectedPropertyType,
-                  style: const TextStyle(color: Colors.black, fontSize: 16),
-                  dropdownColor: Colors.white,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  dropdownColor: kBackgroundColorDark,
                   icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
                   decoration: InputDecoration(
                     labelText: 'Type',
-                    labelStyle: TextStyle(color: Colors.grey[700]),
+                    labelStyle: TextStyle(color: Colors.grey[400]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: kBackgroundColorDark,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   ),
                   items: ['All Types', 'Apartment', 'House', 'Studio', 'Villa']
@@ -304,7 +304,7 @@ class _PublicDashboardScreenState extends State<PublicDashboardScreen> {
                             value: type,
                             child: Text(
                               type,
-                              style: const TextStyle(color: Colors.black),
+                              style: const TextStyle(color: Colors.white),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ))
