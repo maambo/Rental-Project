@@ -24,7 +24,7 @@ class _TenantDashboardScreenState extends State<TenantDashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // TODO: Navigate to notifications
+              Navigator.pushNamed(context, '/notifications');
             },
           ),
         ],
@@ -128,7 +128,7 @@ class _TenantDashboardScreenState extends State<TenantDashboardScreen> {
           trend: '2 new',
           trendUp: false,
           onTap: () {
-            Navigator.pushNamed(context, '/tenant/messages');
+            Navigator.pushNamed(context, '/chat');
           },
         ),
         const SizedBox(height: 16),
@@ -189,7 +189,7 @@ class _TenantDashboardScreenState extends State<TenantDashboardScreen> {
               Icons.message,
               Colors.blue,
               () {
-                Navigator.pushNamed(context, '/tenant/messages');
+                Navigator.pushNamed(context, '/chat');
               },
             ),
             _buildActionButton(

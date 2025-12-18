@@ -5,7 +5,9 @@ import 'package:rental_app/models/application_status.dart';
 import 'package:rental_app/utils/constants.dart';
 
 class ManageUsersScreen extends StatefulWidget {
-  const ManageUsersScreen({super.key});
+  final UserRole? initialFilterRole;
+
+  const ManageUsersScreen({super.key, this.initialFilterRole});
 
   @override
   State<ManageUsersScreen> createState() => _ManageUsersScreenState();
@@ -16,6 +18,13 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   
   // TODO: Replace with actual data
   final List<User> _mockUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filterRole = widget.initialFilterRole;
+  }
+
 
   @override
   Widget build(BuildContext context) {

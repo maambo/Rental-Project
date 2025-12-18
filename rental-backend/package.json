@@ -23,6 +23,7 @@
         "vue-tsc": "^2.0.24"
     },
     "dependencies": {
+        "@heroicons/vue": "^2.2.0",
         "@nodelib/fs.scandir": "^4.0.1",
         "@nodelib/fs.stat": "^4.0.0",
         "@nodelib/fs.walk": "^3.0.1"

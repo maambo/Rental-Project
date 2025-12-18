@@ -142,7 +142,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 trend: '+5% new this week',
                 trendUp: true,
                 onTap: () {
-                  // TODO: Navigate to landlords list
+                  Navigator.pushNamed(
+                    context,
+                    '/admin/manage-users',
+                    arguments: {'role': UserRole.landlord},
+                  );
                 },
               ),
               const SizedBox(height: 16),
@@ -154,7 +158,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 trend: '+8% active users',
                 trendUp: true,
                 onTap: () {
-                  // TODO: Navigate to tenants list
+                  Navigator.pushNamed(
+                    context,
+                    '/admin/manage-users',
+                    arguments: {'role': UserRole.tenant},
+                  );
                 },
               ),
               const SizedBox(height: 16),
@@ -179,7 +187,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 trend: '+15% revenue growth',
                 trendUp: true,
                 onTap: () {
-                  // TODO: Navigate to revenue report
+                  Navigator.pushNamed(context, '/admin/revenue');
                 },
               ),
               const SizedBox(height: 16),

@@ -25,7 +25,7 @@ class _LandlordDashboardScreenState extends State<LandlordDashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // TODO: Navigate to notifications
+              Navigator.pushNamed(context, '/notifications');
             },
           ),
         ],
@@ -198,7 +198,7 @@ class _LandlordDashboardScreenState extends State<LandlordDashboardScreen> {
           trend: '4 new',
           trendUp: false,
           onTap: () {
-            Navigator.pushNamed(context, '/landlord/messages');
+            Navigator.pushNamed(context, '/chat');
           },
         ),
       ],
