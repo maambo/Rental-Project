@@ -13,7 +13,7 @@ class PropertyController extends Controller
      */
     public function show($id)
     {
-        $property = Property::with(['images', 'landlord'])
+        $property = Property::with(['images', 'landlord', 'reviews.user'])
             ->withCount('reviews')
             ->findOrFail($id);
 

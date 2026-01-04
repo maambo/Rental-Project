@@ -14,6 +14,9 @@ class _LandlordRegistrationScreenState extends State<LandlordRegistrationScreen>
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _provinceController = TextEditingController();
+  final _townController = TextEditingController();
   
   LandlordTier _selectedTier = LandlordTier.small;
   bool _acceptedTerms = false;
@@ -24,6 +27,9 @@ class _LandlordRegistrationScreenState extends State<LandlordRegistrationScreen>
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _addressController.dispose();
+    _provinceController.dispose();
+    _townController.dispose();
     super.dispose();
   }
 

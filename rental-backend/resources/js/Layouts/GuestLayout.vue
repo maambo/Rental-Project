@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import { Link } from '@inertiajs/vue3';
+import { HomeIcon } from '@heroicons/vue/24/solid';
 </script>
 
 <template>
@@ -9,7 +9,7 @@ import { Link } from '@inertiajs/vue3';
     >
         <div>
             <Link href="/">
-                <ApplicationLogo class="h-20 w-20 fill-current text-brand-red" />
+                <HomeIcon class="h-20 w-20 fill-current text-brand-red" />
             </Link>
         </div>
 

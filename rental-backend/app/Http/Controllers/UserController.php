@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,7 @@ class UserController extends Controller
     public function index(Request $request): Response
     {
         $users = User::query()
+            ->with('roleModel')
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -26,15 +28,20 @@ class UserController extends Controller
             })
             ->when($request->role, function ($query, $role) {
                 if ($role !== 'all') {
-                    $query->where('role', $role);
+                    $query->whereHas('roleModel', function($q) use ($role) {
+                        $q->where('name', $role);
+                    });
                 }
             })
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
+        $roles = Role::all();
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
+            'roles' => $roles,
             'filters' => $request->only(['search', 'role']),
         ]);
     }
@@ -44,7 +51,11 @@ class UserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/Users/Create');
+        $roles = Role::all();
+        
+        return Inertia::render('Admin/Users/Create', [
+            'roles' => $roles,
+        ]);
     }
 
     /**
@@ -55,14 +66,14 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'role' => ['required', 'string', 'in:admin,landlord,tenant'],
+            'role_id' => ['required', 'exists:roles,id'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
+            'role_id' => $request->role_id,
             'password' => Hash::make($request->password),
         ]);
 
@@ -82,8 +93,12 @@ class UserController extends Controller
      */
     public function edit(User $user): Response
     {
+        $user->load('roleModel');
+        $roles = Role::all();
+        
         return Inertia::render('Admin/Users/Edit', [
             'user' => $user,
+            'roles' => $roles,
         ]);
     }
 
@@ -95,14 +110,14 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
-            'role' => ['required', 'string', 'in:admin,landlord,tenant'],
+            'role_id' => ['required', 'exists:roles,id'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user->forceFill([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
+            'role_id' => $request->role_id,
         ]);
 
         if ($request->filled('password')) {

@@ -8,6 +8,9 @@ class LandlordApplication extends Model
 {
     protected $fillable = [
         'user_id',
+        'address',
+        'province',
+        'town',
         'tier',
         'status',
         'id_document_url',

@@ -6,6 +6,9 @@ class LandlordApplication {
   final String userId;
   final String userName;
   final String email;
+  final String? address;
+  final String? province;
+  final String? town;
   final LandlordTier tier;
   final ApplicationStatus status;
   final List<String> documents; // URLs or paths to uploaded documents
@@ -20,6 +23,9 @@ class LandlordApplication {
     required this.userId,
     required this.userName,
     required this.email,
+    this.address,
+    this.province,
+    this.town,
     required this.tier,
     required this.status,
     required this.documents,
@@ -36,6 +42,9 @@ class LandlordApplication {
       userId: json['userId'] as String,
       userName: json['userName'] as String,
       email: json['email'] as String,
+      address: json['address'] as String?,
+      province: json['province'] as String?,
+      town: json['town'] as String?,
       tier: LandlordTierExtension.fromString(json['tier'] as String),
       status: ApplicationStatusExtension.fromString(json['status'] as String),
       documents: List<String>.from(json['documents'] as List<dynamic>),
@@ -55,6 +64,9 @@ class LandlordApplication {
       'userId': userId,
       'userName': userName,
       'email': email,
+      'address': address,
+      'province': province,
+      'town': town,
       'tier': tier.toString().split('.').last,
       'status': status.toString().split('.').last,
       'documents': documents,
@@ -71,6 +83,9 @@ class LandlordApplication {
     String? userId,
     String? userName,
     String? email,
+    String? address,
+    String? province,
+    String? town,
     LandlordTier? tier,
     ApplicationStatus? status,
     List<String>? documents,
@@ -85,6 +100,9 @@ class LandlordApplication {
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       email: email ?? this.email,
+      address: address ?? this.address,
+      province: province ?? this.province,
+      town: town ?? this.town,
       tier: tier ?? this.tier,
       status: status ?? this.status,
       documents: documents ?? this.documents,

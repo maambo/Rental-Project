@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import DashboardCard from '@/Components/DashboardCard.vue';
-import { MapPinIcon, HomeIcon, ArrowRightIcon } from '@heroicons/vue/24/outline';
+import { MapPinIcon, HomeIcon, ArrowRightIcon, EyeIcon, UsersIcon, ChartBarIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
 import { StarIcon } from '@heroicons/vue/24/solid';
 
 defineProps<{
@@ -66,7 +66,7 @@ defineProps<{
                          <a href="#properties" class="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-brand-red bg-white hover:bg-gray-50 md:text-lg">
                             Browse Properties
                         </a>
-                        <Link :href="route('register')" class="inline-flex justify-center items-center px-6 py-3 border border-white text-base font-medium rounded-full text-white hover:bg-white/10 md:text-lg">
+                        <Link :href="route('landlord.apply')" class="inline-flex justify-center items-center px-6 py-3 border border-white text-base font-medium rounded-full text-white hover:bg-white/10 md:text-lg">
                             Become a Landlord
                         </Link>
                     </div>

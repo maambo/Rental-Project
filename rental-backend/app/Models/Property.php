@@ -17,9 +17,13 @@ class Property extends Model
         'description',
         'price',
         'location',
+        'province',
+        'town',
         'bedrooms',
         'bathrooms',
         'sqft',
+        'square_feet',
+        'amenities',
         'is_approved',
         'approval_status',
         'submitted_date',
@@ -32,9 +36,37 @@ class Property extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'is_approved' => 'boolean',
+        'amenities' => 'array',
         'submitted_date' => 'datetime',
         'approved_date' => 'datetime',
     ];
+
+    /**
+     * Boot method to generate property code
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($property) {
+            if (!$property->code) {
+                $property->code = self::generatePropertyCode();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique property code in format PIV####
+     */
+    private static function generatePropertyCode()
+    {
+        do {
+            $number = str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $code = 'PIV' . $number;
+        } while (self::where('code', $code)->exists());
+
+        return $code;
+    }
 
     /**
      * Relationships

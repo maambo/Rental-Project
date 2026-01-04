@@ -7,11 +7,12 @@ import { HeartIcon as HeartIconSolid, StarIcon } from '@heroicons/vue/24/solid';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps<{
-    property: Object;
+    property: any;
 }>();
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+const isOwner = computed(() => user.value && user.value.id === props.property.landlord_id);
 
 const currentImageIndex = ref(0);
 const isLiked = ref(false); 
@@ -44,6 +45,10 @@ const applyNow = () => {
         window.location.href = route('login');
         return;
     }
+    if (isOwner.value) {
+        alert('You cannot apply to your own property.');
+        return;
+    }
     window.location.href = route('properties.apply', props.property.id);
 };
 
@@ -57,6 +62,10 @@ const tourForm = useForm({
 const scheduleTour = () => {
     if (!user.value) {
         window.location.href = route('login');
+        return;
+    }
+    if (isOwner.value) {
+        alert('You cannot schedule a tour for your own property.');
         return;
     }
     showTourModal.value = true;
@@ -96,28 +105,12 @@ const submitReview = () => {
 <template>
     <Head :title="property.title" />
 
-    <div class="min-h-screen bg-gray-50 dark:bg-black">
-         <nav class="bg-white dark:bg-light-bg shadow sticky top-0 z-50">
+    <!-- Use AuthenticatedLayout when logged in -->
+    <AuthenticatedLayout v-if="user">
+        <div class="py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <Link :href="route('dashboard')" v-if="user" class="text-brand-red font-bold text-xl">RENTALAPP</Link>
-                        <Link href="/" v-else class="text-brand-red font-bold text-xl">RENTALAPP</Link>
-                    </div>
-                     <div class="flex items-center gap-4">
-                        <template v-if="!user">
-                            <Link :href="route('login')" class="text-gray-500 hover:text-gray-700 dark:text-gray-300">Log in</Link>
-                            <Link :href="route('register')" class="text-brand-red font-semibold">Register</Link>
-                        </template>
-                        <template v-else>
-                             <Link :href="route('dashboard')" class="text-gray-500 hover:text-gray-700 dark:text-gray-300">Dashboard</Link>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </nav>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
                     <div class="relative bg-black rounded-2xl overflow-hidden aspect-video group">
@@ -178,7 +171,7 @@ const submitReview = () => {
                                 <div class="text-xs uppercase tracking-wide text-gray-500">Bathrooms</div>
                             </div>
                              <div class="text-center">
-                                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ property.sqft }}</div>
+                                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ property.square_feet || property.sqft }}</div>
                                 <div class="text-xs uppercase tracking-wide text-gray-500">Sq Ft</div>
                             </div>
                         </div>
@@ -203,7 +196,7 @@ const submitReview = () => {
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Reviews ({{ property.reviews_count }})</h2>
                         
                         <!-- Review Form -->
-                        <div v-if="user" class="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                        <div v-if="user && !isOwner" class="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                             <h3 class="text-md font-semibold mb-3 dark:text-gray-200">Write a Review</h3>
                             <form @submit.prevent="submitReview">
                                 <div class="flex items-center gap-2 mb-3">
@@ -226,6 +219,9 @@ const submitReview = () => {
                                     <PrimaryButton :disabled="reviewForm.processing">Post Review</PrimaryButton>
                                 </div>
                             </form>
+                        </div>
+                        <div v-else-if="isOwner" class="mb-8 text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <p class="text-gray-600 dark:text-gray-400">You cannot review your own property.</p>
                         </div>
                         <div v-else class="mb-8 text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                             <Link :href="route('login')" class="text-brand-red font-semibold hover:underline">Log in</Link> to write a review.
@@ -273,13 +269,18 @@ const submitReview = () => {
                                 </button>
                             </div>
 
-                            <div class="space-y-4">
+                            <div v-if="!isOwner" class="space-y-4">
                                 <PrimaryButton @click="scheduleTour" class="w-full justify-center py-3 text-lg">
                                     Schedule Tour
                                 </PrimaryButton>
                                 <button @click="applyNow" class="w-full flex justify-center py-3 px-4 border border-brand-red text-lg font-medium rounded-md text-brand-red bg-white hover:bg-brand-red/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition">
                                     Apply Now
                                 </button>
+                            </div>
+                            <div v-else class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                                <p class="text-sm text-blue-800 dark:text-blue-200 text-center">
+                                    This is your property
+                                </p>
                             </div>
 
                              <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
@@ -298,6 +299,29 @@ const submitReview = () => {
                     </div>
                 </div>
             </div>
+        </div>
+        </div>
+    </AuthenticatedLayout>
+
+    <!-- Use simple layout when not logged in -->
+    <div v-else class="min-h-screen bg-gray-50 dark:bg-black">
+         <nav class="bg-white dark:bg-light-bg shadow sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <Link href="/" class="text-brand-red font-bold text-xl">RENTALAPP</Link>
+                    </div>
+                     <div class="flex items-center gap-4">
+                        <Link :href="route('login')" class="text-gray-500 hover:text-gray-700 dark:text-gray-300">Log in</Link>
+                        <Link :href="route('register')" class="text-brand-red font-semibold">Register</Link>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Same content here -->
+            <p class="text-center text-gray-600 dark:text-gray-400">Please <Link :href="route('login')" class="text-brand-red font-semibold hover:underline">log in</Link> to view property details.</p>
         </main>
     </div>
 

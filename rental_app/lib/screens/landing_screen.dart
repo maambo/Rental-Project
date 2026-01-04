@@ -100,6 +100,16 @@ class _LandingScreenState extends State<LandingScreen> {
                 actions: [
                   TextButton(
                     onPressed: () {
+                      Navigator.pushNamed(context, '/landlord/register');
+                    },
+                    child: const Text(
+                      'Become a Landlord',
+                      style: TextStyle(color: kTextColorWhite, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
                       Navigator.pushReplacementNamed(context, '/'); // Navigate to login
                     },
                     child: const Text(
@@ -163,6 +173,128 @@ class _LandingScreenState extends State<LandingScreen> {
                     ),
                   ),
                 ),
+              // Landlord CTA Section
+              SliverToBoxAdapter(
+                child: Container(
+                  margin: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(24.0),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFE21608), Color(0xFFFF6B35)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kPrimaryRed.withAlpha((255 * 0.3).round()),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: kTextColorWhite.withAlpha((255 * 0.2).round()),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.business,
+                              color: kTextColorWhite,
+                              size: 32,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Own Properties?',
+                                  style: TextStyle(
+                                    color: kTextColorWhite,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Join our platform and start earning',
+                                  style: TextStyle(
+                                    color: kTextColorWhite,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildBenefitItem(
+                              Icons.visibility,
+                              'Maximum\nVisibility',
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildBenefitItem(
+                              Icons.people,
+                              'Quality\nTenants',
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildBenefitItem(
+                              Icons.analytics,
+                              'Property\nAnalytics',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/landlord/register');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kTextColorWhite,
+                            foregroundColor: kPrimaryRed,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Become a Landlord',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward, size: 20),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               SliverPersistentHeader(
                 delegate: _FilterBarDelegate(),
                 pinned: true,
@@ -582,7 +714,27 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  
+  Widget _buildBenefitItem(IconData icon, String text) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          color: kTextColorWhite,
+          size: 28,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: kTextColorWhite,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _FilterBarDelegate extends SliverPersistentHeaderDelegate {

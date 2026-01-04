@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { CheckCircleIcon } from '@heroicons/vue/24/solid';
+import { CheckCircleIcon, HomeIcon } from '@heroicons/vue/24/solid';
 
 const form = useForm({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+    phone: '',
+    nrc_passport: '',
+    address: '',
+    province: '',
+    town: '',
     tier: '',
     id_document: null,
     proof_of_address: null,
@@ -37,12 +45,15 @@ const tiers = [
     },
 ];
 
-const selectTier = (tierId) => {
+const selectTier = (tierId: string) => {
     form.tier = tierId;
 };
 
-const handleFileChange = (e, field) => {
-    form[field] = e.target.files[0];
+const handleFileChange = (e: Event, field: 'id_document' | 'proof_of_address' | 'tax_certificate') => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+        form[field] = target.files[0] as any;
+    }
 };
 
 const submit = () => {
@@ -55,18 +66,157 @@ const submit = () => {
 <template>
     <Head title="Become a Landlord" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Become a Landlord</h2>
-        </template>
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <!-- Logo and Back to Home -->
+        <div class="absolute top-4 left-4 z-10">
+            <Link href="/" class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-brand-red transition">
+                <HomeIcon class="h-8 w-8" />
+                <span class="font-medium">Back to Home</span>
+            </Link>
+        </div>
+        
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+            <!-- Header -->
+            <div class="bg-white dark:bg-gray-800 shadow">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Become a Landlord</h1>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">Join our platform and start earning from your properties</p>
+                </div>
+            </div>
 
-        <div class="py-12">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                <form @submit.prevent="submit" class="space-y-8">
+            <!-- Form Content -->
+            <div class="py-12">
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <form @submit.prevent="submit" class="space-y-8">
                     
+                    <!-- Personal Information -->
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">1. Personal Information</h3>
+                        
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <InputLabel for="name" value="Full Name *" />
+                                <input 
+                                    id="name"
+                                    v-model="form.name"
+                                    type="text"
+                                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                    required
+                                />
+                                <InputError :message="form.errors.name" class="mt-2" />
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <InputLabel for="email" value="Email Address *" />
+                                    <input 
+                                        id="email"
+                                        v-model="form.email"
+                                        type="email"
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                        required
+                                    />
+                                    <InputError :message="form.errors.email" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel for="phone" value="Phone Number *" />
+                                    <input 
+                                        id="phone"
+                                        v-model="form.phone"
+                                        type="tel"
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                        placeholder="+260 XXX XXX XXX"
+                                        required
+                                    />
+                                    <InputError :message="form.errors.phone" class="mt-2" />
+                                </div>
+                            </div>
+
+                            <!-- NRC/Passport Number -->
+                            <div>
+                                <InputLabel for="nrc_passport" value="NRC / Passport Number *" />
+                                <input 
+                                    id="nrc_passport"
+                                    v-model="form.nrc_passport"
+                                    type="text"
+                                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                    placeholder="123456/78/1 or AB1234567"
+                                    required
+                                />
+                                <InputError :message="form.errors.nrc_passport" class="mt-2" />
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">National Registration Card or Passport number</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <InputLabel for="password" value="Password *" />
+                                    <input 
+                                        id="password"
+                                        v-model="form.password"
+                                        type="password"
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                        required
+                                    />
+                                    <InputError :message="form.errors.password" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel for="password_confirmation" value="Confirm Password *" />
+                                    <input 
+                                        id="password_confirmation"
+                                        v-model="form.password_confirmation"
+                                        type="password"
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                        required
+                                    />
+                                    <InputError :message="form.errors.password_confirmation" class="mt-2" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <InputLabel for="address" value="Street Address *" />
+                                <input 
+                                    id="address"
+                                    v-model="form.address"
+                                    type="text"
+                                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                    required
+                                />
+                                <InputError :message="form.errors.address" class="mt-2" />
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <InputLabel for="province" value="Province/State *" />
+                                    <input 
+                                        id="province"
+                                        v-model="form.province"
+                                        type="text"
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                        required
+                                    />
+                                    <InputError :message="form.errors.province" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel for="town" value="Town/City *" />
+                                    <input 
+                                        id="town"
+                                        v-model="form.town"
+                                        type="text"
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
+                                        required
+                                    />
+                                    <InputError :message="form.errors.town" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Tier Selection -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">1. Select your Tier</h3>
+                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">2. Select your Tier</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div 
                                 v-for="tier in tiers" 
@@ -92,7 +242,7 @@ const submit = () => {
 
                     <!-- Documents -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">2. Upload Documents</h3>
+                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">3. Upload Documents</h3>
                         
                         <div class="grid grid-cols-1 gap-6">
                             <div>
@@ -136,8 +286,9 @@ const submit = () => {
                         </PrimaryButton>
                     </div>
 
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </div>
 </template>

@@ -15,13 +15,15 @@ import {
     CurrencyDollarIcon,
     CheckBadgeIcon,
     UsersIcon,
-    FolderIcon
+    FolderIcon,
+    ShieldCheckIcon,
+    DocumentTextIcon,
+    ClockIcon
 } from '@heroicons/vue/24/outline';
 
 const page = usePage();
-// Assuming user prop might be passed, but page.props is safer for global access
 const user = computed(() => page.props.auth.user);
-const role = computed(() => user.value?.role || 'tenant'); // default to tenant
+const role = computed(() => user.value?.roleModel?.name || 'tenant');
 
 const isActive = (routePattern: string) => {
     return route().current(routePattern);
@@ -51,7 +53,7 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
                 </div>
                 <div class="overflow-hidden">
                     <p class="truncate text-sm font-medium text-white">{{ user.name }}</p>
-                    <p class="truncate text-xs text-gray-500 capitalize">{{ role }}</p>
+                    <p class="truncate text-xs text-gray-500 capitalize">{{ role.replace('_', ' ') }}</p>
                 </div>
             </div>
         </div>
@@ -66,15 +68,15 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
                     Dashboard
                 </Link>
                 <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quick Actions</div>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
+                <Link :href="route('admin.applications.index')" :class="[commonClasses, isActive('admin.applications.*') ? activeClasses : inactiveClasses]">
                     <ClipboardDocumentListIcon class="mr-3 h-5 w-5" />
                     Applications
                 </Link>
-                 <Link href="#" :class="[commonClasses, inactiveClasses]">
+                 <Link :href="route('admin.properties.index')" :class="[commonClasses, isActive('admin.properties.*') ? activeClasses : inactiveClasses]">
                     <CheckBadgeIcon class="mr-3 h-5 w-5" />
                     Approve Properties
                 </Link>
-                 <Link href="#" :class="[commonClasses, inactiveClasses]">
+                 <Link :href="route('admin.statistics.index')" :class="[commonClasses, isActive('admin.statistics.*') ? activeClasses : inactiveClasses]">
                     <ChartBarIcon class="mr-3 h-5 w-5" />
                     Statistics
                 </Link>
@@ -83,19 +85,50 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
                     <UsersIcon class="mr-3 h-5 w-5" />
                     Manage Users
                 </Link>
-                 <Link href="#" :class="[commonClasses, inactiveClasses]">
+                <Link :href="route('admin.roles.index')" :class="[commonClasses, isActive('admin.roles.*') ? activeClasses : inactiveClasses]">
+                    <ShieldCheckIcon class="mr-3 h-5 w-5" />
+                    Roles & Permissions
+                </Link>
+                 <Link :href="route('admin.landlords.index')" :class="[commonClasses, isActive('admin.landlords.*') ? activeClasses : inactiveClasses]">
                     <BuildingOfficeIcon class="mr-3 h-5 w-5" />
                     Landlord Profiles
                 </Link>
             </template>
 
-            <!-- LANDLORD MENU -->
-            <template v-else-if="role === 'landlord'">
-                 <Link :href="route('dashboard')" :class="[commonClasses, isActive('dashboard') ? activeClasses : inactiveClasses]">
+            <!-- APPLICANT LANDLORD MENU -->
+            <template v-else-if="role === 'applicant_landlord'">
+                <Link :href="route('dashboard')" :class="[commonClasses, isActive('dashboard') ? activeClasses : inactiveClasses]">
                     <HomeIcon class="mr-3 h-5 w-5" />
                     Dashboard
                 </Link>
+                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Application</div>
+                <Link :href="route('landlord.status')" :class="[commonClasses, isActive('landlord.status') ? activeClasses : inactiveClasses]">
+                    <ClockIcon class="mr-3 h-5 w-5" />
+                    Application Status
+                </Link>
+                <Link :href="route('landlord.application.edit')" :class="[commonClasses, isActive('landlord.application.edit') ? activeClasses : inactiveClasses]">
+                    <DocumentTextIcon class="mr-3 h-5 w-5" />
+                    Update Application
+                </Link>
+                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Information</div>
                 <Link href="#" :class="[commonClasses, inactiveClasses]">
+                    <BuildingOfficeIcon class="mr-3 h-5 w-5" />
+                    Tier Benefits
+                </Link>
+                <Link href="#" :class="[commonClasses, inactiveClasses]">
+                    <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5" />
+                    Help & Support
+                </Link>
+            </template>
+
+            <!-- LANDLORD MENU -->
+            <template v-else-if="role === 'landlord'">
+                 <Link :href="route('landlord.dashboard')" :class="[commonClasses, isActive('landlord.dashboard') ? activeClasses : inactiveClasses]">
+                    <HomeIcon class="mr-3 h-5 w-5" />
+                    Dashboard
+                </Link>
+                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Property Management</div>
+                <Link :href="route('landlord.properties.index')" :class="[commonClasses, isActive('landlord.properties.*') ? activeClasses : inactiveClasses]">
                     <BuildingOfficeIcon class="mr-3 h-5 w-5" />
                     My Properties
                 </Link>
@@ -143,7 +176,7 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
                 <UserIcon class="mr-3 h-5 w-5" />
                 Profile
             </Link>
-             <Link href="#" :class="[commonClasses, inactiveClasses]">
+             <Link v-if="role === 'admin'" :href="route('admin.settings.index')" :class="[commonClasses, isActive('admin.settings.*') ? activeClasses : inactiveClasses]">
                 <Cog6ToothIcon class="mr-3 h-5 w-5" />
                 Settings
             </Link>

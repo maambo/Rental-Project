@@ -22,7 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
         'landlord_tier',
         'application_status',
         'approved_date',
@@ -64,6 +64,11 @@ class User extends Authenticatable
     public function landlordApplication()
     {
         return $this->hasOne(LandlordApplication::class);
+    }
+
+    public function roleModel()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function reviews()

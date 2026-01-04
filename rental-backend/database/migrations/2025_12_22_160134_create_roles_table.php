@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_reviews', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('rating'); // 1-5 stars
-            $table->text('comment')->nullable();
+            $table->string('name')->unique(); // e.g., 'admin', 'landlord', 'tenant'
+            $table->string('display_name'); // e.g., 'Administrator', 'Landlord'
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('property_reviews');
+        Schema::dropIfExists('roles');
     }
 };

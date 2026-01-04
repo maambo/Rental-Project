@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tour_requests', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('properties', function (Blueprint $table) {
+            $table->integer('sqft')->nullable()->change();
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tour_requests');
+        Schema::table('properties', function (Blueprint $table) {
+            $table->integer('sqft')->nullable(false)->change();
+        });
     }
 };

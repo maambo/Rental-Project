@@ -15,6 +15,7 @@ import 'package:rental_app/screens/admin/landlord_profiles_screen.dart';
 import 'package:rental_app/screens/admin/manage_users_screen.dart';
 import 'package:rental_app/screens/landlord/landlord_dashboard_screen.dart';
 import 'package:rental_app/screens/landlord/landlord_properties_screen.dart';
+import 'package:rental_app/screens/landlord/landlord_registration_screen.dart';
 import 'package:rental_app/screens/landlord/tour_requests_screen.dart';
 import 'package:rental_app/screens/landlord/maintenance_plans_screen.dart';
 import 'package:rental_app/screens/landlord/landlord_rental_history_screen.dart';
@@ -95,6 +96,7 @@ class MyApp extends StatelessWidget {
         '/admin/landlord-profiles': (context) => const LandlordProfilesScreen(),
 
         // '/admin/manage-users' handled in onGenerateRoute
+        '/landlord/register': (context) => const LandlordRegistrationScreen(),
         '/landlord/dashboard': (context) => const LandlordDashboardScreen(),
         '/landlord/properties': (context) => const LandlordPropertiesScreen(),
         '/landlord/tours': (context) => const TourRequestsScreen(),

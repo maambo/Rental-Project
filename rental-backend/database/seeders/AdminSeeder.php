@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\UserRole; // Assuming UserRole is an enum or string, need to check User model first.
 
 class AdminSeeder extends Seeder
 {
@@ -14,12 +14,17 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
+        // Get the admin role
+        $adminRole = Role::where('name', 'admin')->first();
+
+        // Create admin user
+        $admin = User::updateOrCreate(
             ['email' => 'admin@rentalapp.com'],
             [
                 'name' => 'Admin User',
                 'password' => Hash::make('password'),
-                'role' => 'admin',
+                'role' => 'admin', // Keep string role for backward compatibility
+                'role_id' => $adminRole?->id,
             ]
         );
     }
