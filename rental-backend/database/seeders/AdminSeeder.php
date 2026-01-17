@@ -23,7 +23,6 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'password' => Hash::make('password'),
-                'role' => 'admin', // Keep string role for backward compatibility
                 'role_id' => $adminRole?->id,
             ]
         );
