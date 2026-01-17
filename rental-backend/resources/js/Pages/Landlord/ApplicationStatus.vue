@@ -7,7 +7,7 @@ import VerificationBadge from '@/Components/VerificationBadge.vue';
 const props = defineProps<{
     application: {
         id: number;
-        verification_level: string;
+        verification_level: 'basic' | 'trusted' | 'premium';
         status: string;
         address: string;
         province: string;

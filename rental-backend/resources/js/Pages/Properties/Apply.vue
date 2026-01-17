@@ -8,7 +8,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 
 const props = defineProps<{
-    property: Object;
+    property: any;
 }>();
 
 // Form matching fields in migration
