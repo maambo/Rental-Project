@@ -43,6 +43,11 @@ Route::post('/landlord/apply', [\App\Http\Controllers\LandlordApplicationControl
 Route::middleware('auth')->group(function () {
     Route::get('/landlord/application-status', [\App\Http\Controllers\LandlordApplicationController::class, 'status'])->name('landlord.status');
     Route::get('/landlord/application/edit', [\App\Http\Controllers\LandlordApplicationController::class, 'edit'])->name('landlord.application.edit');
+     Route::get('/landlord/benefits', function () {
+        return Inertia::render('Landlord/Benefits', [
+            'tiers' => \App\Models\VerificationTier::where('is_active', true)->orderBy('price_amount')->get()
+        ]);
+    })->name('landlord.benefits');
     Route::put('/landlord/application/update', [\App\Http\Controllers\LandlordApplicationController::class, 'update'])->name('landlord.application.update');
 });
 
@@ -65,11 +70,14 @@ Route::get('/dashboard', function () {
                 ->where('user_id', $user->id)
                 ->first();
             
-            $tierInfo = [
-                'small' => ['properties' => 10, 'fee' => 500],
-                'medium' => ['properties' => 50, 'fee' => 2000],
-                'large' => ['properties' => 'Unlimited', 'fee' => 5000],
-            ];
+            $tiers = \App\Models\VerificationTier::where('is_active', true)->get();
+            $tierInfo = [];
+            foreach ($tiers as $tier) {
+                $tierInfo[$tier->name] = [
+                    'properties' => $tier->property_limit == -1 ? 'Unlimited' : $tier->property_limit,
+                    'fee' => $tier->price_display
+                ];
+            }
             
             return Inertia::render('ApplicantLandlord/Dashboard', [
                 'application' => $application,
@@ -117,14 +125,25 @@ Route::middleware('auth')->group(function () {
         
         Route::get('/statistics', [\App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics.index');
         Route::get('/landlords', [\App\Http\Controllers\Admin\LandlordProfileController::class, 'index'])->name('landlords.index');
-        Route::get('/settings', function () {
-            return Inertia::render('Admin/Settings/Index');
-        })->name('settings.index');
+        Route::get('/landlords/{id}', [\App\Http\Controllers\Admin\LandlordProfileController::class, 'show'])->name('landlords.show');
+
+        // Fraud Prevention
+        Route::resource('blacklist', \App\Http\Controllers\Admin\BlacklistController::class)->only(['index', 'store', 'destroy']);
+        Route::get('/reports', [\App\Http\Controllers\Api\PropertyReportController::class, 'index'])->name('reports.index'); // Reusing API controller for index for now
+        
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     });
 });
 
 // Property routes
 Route::get('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'show'])->name('properties.show');
+
+// Chat Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{user}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+});
 
 require __DIR__.'/auth.php';
 

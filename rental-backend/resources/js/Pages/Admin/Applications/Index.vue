@@ -8,6 +8,8 @@ const props = defineProps<{
     currentStatus: string;
 }>();
 
+import VerificationBadge from '@/Components/VerificationBadge.vue';
+
 const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800',
     under_review: 'bg-blue-100 text-blue-800',
@@ -58,7 +60,8 @@ const statusColors = {
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Applicant</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tier</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verification</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Applied</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
@@ -68,7 +71,12 @@ const statusColors = {
                                 <tr v-for="app in applications" :key="app.id" class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                                     <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ app.user_name }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ app.user_email }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 capitalize">{{ app.tier }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        <VerificationBadge :level="app.verification_level" />
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 capitalize">
+                                        {{ app.landlord_type?.replace('_', ' ') }}
+                                    </td>
                                     <td class="px-6 py-4">
                                         <span :class="['px-2 py-1 text-xs rounded-full', statusColors[app.status]]">
                                             {{ app.status.replace('_', ' ') }}

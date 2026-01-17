@@ -2,11 +2,12 @@
 import { Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { CheckCircleIcon, ClockIcon, XCircleIcon, EyeIcon } from '@heroicons/vue/24/solid';
+import VerificationBadge from '@/Components/VerificationBadge.vue';
 
 const props = defineProps<{
     application: {
         id: number;
-        tier: string;
+        verification_level: string;
         status: string;
         address: string;
         province: string;
@@ -51,10 +52,10 @@ const statusConfig = {
 
 const currentStatus = statusConfig[props.application.status as keyof typeof statusConfig];
 
-const tierLabels = {
-    small: 'Small Landlord',
-    medium: 'Medium Landlord',
-    large: 'Enterprise'
+const verificationLabels = {
+    basic: 'Basic (Free)',
+    trusted: 'Trusted Landlord',
+    premium: 'Premium Landlord'
 };
 </script>
 
@@ -101,8 +102,10 @@ const tierLabels = {
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Tier</label>
-                            <p class="text-gray-900 dark:text-white font-semibold">{{ tierLabels[application.tier as keyof typeof tierLabels] }}</p>
+                            <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Verification Level</label>
+                            <p class="text-gray-900 dark:text-white font-semibold">
+                                <VerificationBadge :level="application.verification_level" />
+                            </p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Submitted On</label>

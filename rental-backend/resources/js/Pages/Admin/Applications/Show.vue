@@ -3,8 +3,34 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ArrowLeftIcon, CheckIcon, XMarkIcon, ClockIcon } from '@heroicons/vue/24/outline';
 
+import VerificationBadge from '@/Components/VerificationBadge.vue';
+
+type ApplicationStatus = 'pending' | 'under_review' | 'approved' | 'rejected';
+
+interface LandlordApplication {
+    id: number;
+    status: ApplicationStatus;
+    user_name: string;
+    user_email: string;
+    nrc_passport: string;
+    verification_level: 'basic' | 'trusted' | 'premium';
+    landlord_type: string;
+    address: string;
+    town: string;
+    province: string;
+    id_document_url: string;
+    proof_of_address_url: string;
+    tax_certificate_url?: string;
+    selfie_url?: string;
+    video_walkthrough_url?: string;
+    business_registration_url?: string;
+    created_at: string;
+    reviewed_at?: string;
+    rejection_reason?: string;
+}
+
 const props = defineProps<{
-    application: any;
+    application: LandlordApplication;
 }>();
 
 const statusColors = {
@@ -71,10 +97,16 @@ const reject = () => {
                                         <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.nrc_passport }}</p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-500">Tier Selection</label>
+                                        <label class="block text-sm font-medium text-gray-500">Landlord Type</label>
                                         <p class="mt-1 text-lg text-gray-900 dark:text-white capitalize">
-                                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full">{{ application.tier }}</span>
+                                            {{ application.landlord_type ? application.landlord_type.replace('_', ' ') : '—' }}
                                         </p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-500">Verification Level</label>
+                                        <div class="mt-1">
+                                            <VerificationBadge :level="application.verification_level" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -20,7 +20,7 @@ class LandlordProfileController extends Controller
             ->where('roles.name', 'landlord')
             ->select(
                 'users.*',
-                'landlord_applications.tier',
+                'landlord_applications.verification_level',
                 'landlord_applications.status as application_status'
             )
             ->orderBy('users.created_at', 'desc')
@@ -35,6 +35,41 @@ class LandlordProfileController extends Controller
 
         return Inertia::render('Admin/Landlords/Index', [
             'landlords' => $landlords,
+        ]);
+    }
+
+    /**
+     * Display the specified landlord profile.
+     */
+    public function show($id)
+    {
+        $landlord = DB::table('users')
+            ->leftJoin('landlord_applications', 'users.id', '=', 'landlord_applications.user_id')
+            ->select(
+                'users.*',
+                'landlord_applications.verification_level',
+                'landlord_applications.status as application_status',
+                'landlord_applications.landlord_type',
+                'landlord_applications.id_document_url',
+                'landlord_applications.selfie_url',
+                'landlord_applications.business_registration_url',
+                'landlord_applications.video_walkthrough_url'
+            )
+            ->where('users.id', $id)
+            ->first();
+
+        if (!$landlord) {
+            abort(404);
+        }
+
+        $properties = DB::table('properties')
+            ->where('landlord_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('Admin/Landlords/Show', [
+            'landlord' => $landlord,
+            'properties' => $properties,
         ]);
     }
 }

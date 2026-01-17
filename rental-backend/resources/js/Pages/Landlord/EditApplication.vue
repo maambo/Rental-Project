@@ -13,11 +13,49 @@ const form = useForm({
     address: props.application.address,
     province: props.application.province,
     town: props.application.town,
-    tier: props.application.tier,
+    landlord_type: props.application.landlord_type,
+    verification_level: props.application.verification_level,
     id_document: null as File | null,
     proof_of_address: null as File | null,
     tax_certificate: null as File | null,
+    selfie: null as File | null,
+    video_walkthrough: null as File | null,
+    business_registration: null as File | null,
 });
+
+const tiers = [
+    {
+        id: 'basic',
+        name: 'Basic (Free)',
+        price: 'Free',
+        features: ['Up to 5 Properties', 'Basic Support', 'Standard Listings'],
+        color: 'border-gray-200 hover:border-brand-blue',
+        bg: 'bg-white dark:bg-gray-800',
+        checkColor: 'text-gray-400'
+    },
+    {
+        id: 'trusted',
+        name: 'Trusted Landlord',
+        price: 'Verified',
+        features: ['Unlimited Properties', 'Verified Badge', 'Priority Reviews', 'Common Listings'],
+        color: 'border-brand-blue ring-1 ring-brand-blue',
+        bg: 'bg-blue-50 dark:bg-blue-900/10',
+        checkColor: 'text-brand-blue'
+    },
+    {
+        id: 'premium',
+        name: 'Premium Landlord',
+        price: 'K300/mo',
+        features: ['Unlimited Properties', 'Premium Badge', 'Top Placement', 'Video Tours'],
+        color: 'border-brand-gold ring-1 ring-brand-gold',
+        bg: 'bg-yellow-50 dark:bg-yellow-900/10',
+        checkColor: 'text-brand-gold'
+    },
+];
+
+const selectTier = (tierId: string) => {
+    form.verification_level = tierId;
+};
 
 const submit = () => {
     form.transform((data) => ({
@@ -137,42 +175,49 @@ const handleFile = (field: string, event: Event) => {
                                 </div>
                             </div>
 
-                            <!-- Tier Selection -->
+                            <!-- Landlord Type Selection -->
                             <div class="mb-8">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Landlord Tier *</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <label class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
-                                           :class="form.tier === 'small' ? 'border-brand-red bg-brand-red/10' : 'border-gray-300 dark:border-gray-600'">
-                                        <input v-model="form.tier" type="radio" value="small" class="sr-only" />
-                                        <div class="flex w-full items-center justify-between">
-                                            <div>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">Small</p>
-                                                <p class="text-xs text-gray-500">Up to 10 properties</p>
-                                            </div>
-                                        </div>
-                                    </label>
-                                    <label class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
-                                           :class="form.tier === 'medium' ? 'border-brand-red bg-brand-red/10' : 'border-gray-300 dark:border-gray-600'">
-                                        <input v-model="form.tier" type="radio" value="medium" class="sr-only" />
-                                        <div class="flex w-full items-center justify-between">
-                                            <div>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">Medium</p>
-                                                <p class="text-xs text-gray-500">Up to 50 properties</p>
-                                            </div>
-                                        </div>
-                                    </label>
-                                    <label class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
-                                           :class="form.tier === 'large' ? 'border-brand-red bg-brand-red/10' : 'border-gray-300 dark:border-gray-600'">
-                                        <input v-model="form.tier" type="radio" value="large" class="sr-only" />
-                                        <div class="flex w-full items-center justify-between">
-                                            <div>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">Large</p>
-                                                <p class="text-xs text-gray-500">Unlimited properties</p>
-                                            </div>
-                                        </div>
-                                    </label>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Landlord Type</h3>
+                                <div class="space-y-4">
+                                     <div class="flex items-center">
+                                        <input id="private" type="radio" value="private_landlord" v-model="form.landlord_type" name="landlord_type" class="w-4 h-4 text-brand-blue border-gray-300 focus:ring-brand-blue" />
+                                        <label for="private" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Private Landlord (I own the properties)
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="agent" type="radio" value="agent" v-model="form.landlord_type" name="landlord_type" class="w-4 h-4 text-brand-blue border-gray-300 focus:ring-brand-blue" />
+                                        <label for="agent" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Real Estate Agent / Property Manager
+                                        </label>
+                                    </div>
                                 </div>
-                                <p v-if="form.errors.tier" class="mt-1 text-sm text-red-600">{{ form.errors.tier }}</p>
+                            </div>
+
+                            <!-- Verification Level Selection -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Verification Level</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div 
+                                        v-for="tier in tiers" 
+                                        :key="tier.id"
+                                        @click="selectTier(tier.id)"
+                                        class="cursor-pointer border-2 rounded-xl p-6 transition relative"
+                                        :class="[form.verification_level === tier.id ? (tier.color + ' ' + tier.bg) : 'border-gray-200 dark:border-gray-700 hover:border-brand-blue/50']"
+                                    >
+                                        <div v-if="form.verification_level === tier.id" class="absolute top-2 right-2 text-brand-blue">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                        </div>
+                                        <h4 class="font-bold text-xl mb-2 dark:text-white">{{ tier.name }}</h4>
+                                        <div class="text-2xl font-bold text-gray-900 dark:text-gray-200 mb-4">{{ tier.price }}</div>
+                                        <ul class="space-y-2 mb-4">
+                                            <li v-for="feature in tier.features" :key="feature" class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                                                <span class="mr-2" :class="tier.checkColor">✓</span> {{ feature }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <p v-if="form.errors.verification_level" class="mt-1 text-sm text-red-600">{{ form.errors.verification_level }}</p>
                             </div>
 
                             <!-- Document Uploads -->
@@ -200,6 +245,37 @@ const handleFile = (field: string, event: Event) => {
                                         />
                                         <p class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.proof_of_address_url}`" target="_blank" class="text-blue-600 hover:underline">View Document</a></p>
                                     </div>
+
+                                    <!-- Trusted Tier Docs -->
+                                    <div v-if="form.verification_level === 'trusted' || form.verification_level === 'premium'" class="border-t pt-4 mt-4">
+                                        <h4 class="font-medium text-gray-900 dark:text-white mb-4">Required for Trusted Status</h4>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Selfie with ID</label>
+                                            <input type="file" @change="handleFile('selfie', $event)" class="mt-1 block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-brand-red file:text-white
+                                            hover:file:bg-red-700" accept=".jpg,.png" />
+                                            <p v-if="application.selfie_url" class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.selfie_url}`" target="_blank" class="text-blue-600 hover:underline">View Selfie</a></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Agent Docs -->
+                                    <div v-if="form.landlord_type === 'agent'" class="border-t pt-4 mt-4">
+                                        <h4 class="font-medium text-gray-900 dark:text-white mb-4">Required for Agents</h4>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Business Registration/Pacra Certificate</label>
+                                            <input type="file" @change="handleFile('business_registration', $event)" class="mt-1 block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-brand-red file:text-white
+                                            hover:file:bg-red-700" accept=".pdf,.jpg,.png" />
+                                            <p v-if="application.business_registration_url" class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.business_registration_url}`" target="_blank" class="text-blue-600 hover:underline">View Certificate</a></p>
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tax Certificate (Optional)</label>
                                         <input

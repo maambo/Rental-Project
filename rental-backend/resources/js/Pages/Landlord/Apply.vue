@@ -15,41 +15,47 @@ const form = useForm({
     address: '',
     province: '',
     town: '',
-    tier: '',
+    tier: '', // kept for compatibility if needed, but we used verification_level in backend
+    verification_level: 'basic',
+    landlord_type: 'private_landlord',
     id_document: null,
     proof_of_address: null,
     tax_certificate: null,
+    selfie: null,
+    video_walkthrough: null,
+    business_registration: null,
 });
 
 const tiers = [
     {
-        id: 'small',
-        name: 'Small Landlord',
-        price: 'K200/mo',
-        features: ['Up to 3 Properties', 'Basic Support', 'Standard Analytics'],
-        color: 'border-gray-200 hover:border-brand-red',
+        id: 'basic',
+        name: 'Basic (Free)',
+        price: 'Free',
+        features: ['Up to 5 Properties', 'Basic Support', 'Standard Listings'],
+        color: 'border-gray-200 hover:border-brand-blue',
     },
     {
-        id: 'medium',
-        name: 'Medium Landlord',
-        price: 'K500/mo',
-        features: ['Up to 10 Properties', 'Priority Support', 'Advanced Analytics', 'Featured Listings'],
-        color: 'border-brand-red ring-1 ring-brand-red',
+        id: 'trusted',
+        name: 'Trusted Landlord',
+        price: 'Verified',
+        features: ['Unlimited Properties', 'Verified Badge', 'Priority Reviews', 'Common Listings'],
+        color: 'border-brand-blue ring-1 ring-brand-blue',
     },
     {
-        id: 'large',
-        name: 'Enterprise',
-        price: 'K1000/mo',
-        features: ['Unlimited Properties', '24/7 Support', 'Custom Analytics', 'Top Placement'],
-        color: 'border-gray-200 hover:border-brand-red',
+        id: 'premium',
+        name: 'Premium Landlord',
+        price: 'K300/mo',
+        features: ['Unlimited Properties', 'Premium Badge', 'Top Placement', 'Video Tours'],
+        color: 'border-brand-gold ring-1 ring-brand-gold',
     },
 ];
 
 const selectTier = (tierId: string) => {
-    form.tier = tierId;
+    form.verification_level = tierId;
+    form.tier = tierId; // populate legacy field temporarily
 };
 
-const handleFileChange = (e: Event, field: 'id_document' | 'proof_of_address' | 'tax_certificate') => {
+const handleFileChange = (e: Event, field: 'id_document' | 'proof_of_address' | 'tax_certificate' | 'selfie' | 'video_walkthrough' | 'business_registration') => {
     const target = e.target as HTMLInputElement;
     if (target.files && target.files[0]) {
         form[field] = target.files[0] as any;
@@ -214,18 +220,37 @@ const submit = () => {
                         </div>
                     </div>
 
+                    <!-- Landlord Type Selection -->
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">2. Landlord Type</h3>
+                        <div class="space-y-4">
+                             <div class="flex items-center">
+                                <input id="private" type="radio" value="private_landlord" v-model="form.landlord_type" name="landlord_type" class="w-4 h-4 text-brand-blue border-gray-300 focus:ring-brand-blue" />
+                                <label for="private" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Private Landlord (I own the properties)
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="agent" type="radio" value="agent" v-model="form.landlord_type" name="landlord_type" class="w-4 h-4 text-brand-blue border-gray-300 focus:ring-brand-blue" />
+                                <label for="agent" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Real Estate Agent / Property Manager
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Tier Selection -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">2. Select your Tier</h3>
+                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">3. Select Verification Level</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div 
                                 v-for="tier in tiers" 
                                 :key="tier.id"
                                 @click="selectTier(tier.id)"
                                 class="cursor-pointer border-2 rounded-xl p-6 transition relative"
-                                :class="[form.tier === tier.id ? 'border-brand-red bg-brand-red/5' : 'border-gray-200 dark:border-gray-700 hover:border-brand-red/50']"
+                                :class="[form.verification_level === tier.id ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-200 dark:border-gray-700 hover:border-brand-blue/50']"
                             >
-                                <div v-if="form.tier === tier.id" class="absolute top-2 right-2 text-brand-red">
+                                <div v-if="form.verification_level === tier.id" class="absolute top-2 right-2 text-brand-blue">
                                     <CheckCircleIcon class="h-6 w-6" />
                                 </div>
                                 <h4 class="font-bold text-xl mb-2 dark:text-white">{{ tier.name }}</h4>
@@ -237,22 +262,23 @@ const submit = () => {
                                 </ul>
                             </div>
                         </div>
-                        <InputError :message="form.errors.tier" class="mt-2" />
+                        <InputError :message="form.errors.verification_level" class="mt-2" />
                     </div>
 
                     <!-- Documents -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">3. Upload Documents</h3>
+                        <h3 class="text-lg font-medium mb-6 text-gray-900 dark:text-white">4. Upload Documents</h3>
                         
                         <div class="grid grid-cols-1 gap-6">
+                            <!-- Basic Docs -->
                             <div>
                                 <InputLabel value="ID Document (Passport/NRC) *" />
                                 <input type="file" @change="(e) => handleFileChange(e, 'id_document')" class="mt-1 block w-full text-sm text-gray-500
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
-                                file:bg-brand-red/10 file:text-brand-red
-                                hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" required />
+                                file:bg-brand-blue/10 file:text-brand-blue
+                                hover:file:bg-brand-blue/20" accept=".pdf,.jpg,.png" required />
                                 <InputError :message="form.errors.id_document" class="mt-2" />
                             </div>
 
@@ -262,9 +288,40 @@ const submit = () => {
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
-                                file:bg-brand-red/10 file:text-brand-red
-                                hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" required />
+                                file:bg-brand-blue/10 file:text-brand-blue
+                                hover:file:bg-brand-blue/20" accept=".pdf,.jpg,.png" required />
                                 <InputError :message="form.errors.proof_of_address" class="mt-2" />
+                            </div>
+
+                            <!-- Trusted Tier Docs -->
+                            <div v-if="form.verification_level === 'trusted' || form.verification_level === 'premium'" class="border-t pt-4 mt-4">
+                                <h4 class="font-medium text-gray-900 dark:text-white mb-4">Required for Trusted Status</h4>
+                                <div>
+                                    <InputLabel value="Selfie with ID *" />
+                                    <p class="text-xs text-gray-500 mb-2">Please take a clear photo of yourself holding your ID card next to your face.</p>
+                                    <input type="file" @change="(e) => handleFileChange(e, 'selfie')" class="mt-1 block w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-full file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-brand-blue/10 file:text-brand-blue
+                                    hover:file:bg-brand-blue/20" accept=".jpg,.png" />
+                                    <InputError :message="form.errors.selfie" class="mt-2" />
+                                </div>
+                            </div>
+                            
+                            <!-- Agent Docs -->
+                             <div v-if="form.landlord_type === 'agent'" class="border-t pt-4 mt-4">
+                                <h4 class="font-medium text-gray-900 dark:text-white mb-4">Required for Agents</h4>
+                                <div>
+                                    <InputLabel value="Business Registration/Pacra Certificate *" />
+                                    <input type="file" @change="(e) => handleFileChange(e, 'business_registration')" class="mt-1 block w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-full file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-brand-blue/10 file:text-brand-blue
+                                    hover:file:bg-brand-blue/20" accept=".pdf,.jpg,.png" />
+                                    <InputError :message="form.errors.business_registration" class="mt-2" />
+                                </div>
                             </div>
 
                             <div>
@@ -273,8 +330,8 @@ const submit = () => {
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
-                                file:bg-brand-red/10 file:text-brand-red
-                                hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" />
+                                file:bg-brand-blue/10 file:text-brand-blue
+                                hover:file:bg-brand-blue/20" accept=".pdf,.jpg,.png" />
                                 <InputError :message="form.errors.tax_certificate" class="mt-2" />
                             </div>
                         </div>

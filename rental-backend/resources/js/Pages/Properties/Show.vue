@@ -2,9 +2,12 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'; 
-import { MapPinIcon, HomeIcon, ShareIcon, HeartIcon } from '@heroicons/vue/24/outline';
+import { MapPinIcon, HomeIcon, ShareIcon, HeartIcon, FlagIcon } from '@heroicons/vue/24/outline';
 import { HeartIcon as HeartIconSolid, StarIcon } from '@heroicons/vue/24/solid';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import ScamWarningBanner from '@/Components/ScamWarningBanner.vue';
+import VerificationBadge from '@/Components/VerificationBadge.vue';
+import ReportListingModal from '@/Components/ReportListingModal.vue';
 
 const props = defineProps<{
     property: any;
@@ -99,7 +102,11 @@ const submitReview = () => {
     });
 };
 
-
+// Report Logic
+const showReportModal = ref(false);
+const handleReportSubmitted = () => {
+    alert('Thank you for your report. We will review this listing shortly.');
+};
 </script>
 
 <template>
@@ -109,7 +116,8 @@ const submitReview = () => {
     <AuthenticatedLayout v-if="user">
         <div class="py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+                
+                <ScamWarningBanner />
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
@@ -267,6 +275,10 @@ const submitReview = () => {
                                     <ShareIcon class="h-6 w-6" />
                                     Share
                                 </button>
+                                <button @click="showReportModal = true" class="flex items-center gap-2 text-gray-400 hover:text-red-500 transition text-sm">
+                                    <FlagIcon class="h-5 w-5" />
+                                    Report
+                                </button>
                             </div>
 
                             <div v-if="!isOwner" class="space-y-4">
@@ -291,7 +303,13 @@ const submitReview = () => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <div class="font-bold text-gray-900 dark:text-white">{{ property.landlord?.name || 'Landlord' }}</div>
+                                        <div class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            {{ property.landlord?.name || 'Landlord' }}
+                                            <VerificationBadge v-if="property.landlord?.verification_level" :level="property.landlord.verification_level" />
+                                        </div>
+                                        <div v-if="property.landlord?.landlord_type === 'agent'" class="text-xs text-gray-500 font-medium uppercase mt-0.5">
+                                            Verified Agent
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -373,4 +391,12 @@ const submitReview = () => {
             </div>
         </div>
     </div>
+
+    
+    <ReportListingModal 
+        :show="showReportModal" 
+        :property-id="property.id" 
+        @close="showReportModal = false"
+        @submitted="handleReportSubmitted"
+    />
 </template>

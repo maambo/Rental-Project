@@ -25,7 +25,13 @@ class Property extends Model
         'square_feet',
         'amenities',
         'is_approved',
+        'reviews_count',
         'approval_status',
+        'is_visible_in_search',
+        'report_count',
+        'is_auto_suspended',
+        'requires_real_time_photo',
+        'real_time_photo_url',
         'submitted_date',
         'approved_date',
         'rejection_reason',
@@ -84,6 +90,23 @@ class Property extends Model
     public function reviews()
     {
         return $this->hasMany(PropertyReview::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(PropertyReport::class);
+    }
+
+    public function viewingConfirmations()
+    {
+        return $this->hasMany(ViewingConfirmation::class);
+    }
+
+    public function scopeVisibleInSearch($query)
+    {
+        return $query->where('is_visible_in_search', true)
+                     ->where('is_auto_suspended', false)
+                     ->where('approval_status', 'approved');
     }
 
     public function tourRequests()

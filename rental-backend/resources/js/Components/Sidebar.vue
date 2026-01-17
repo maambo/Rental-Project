@@ -111,8 +111,8 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
                     Update Application
                 </Link>
                 <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Information</div>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <BuildingOfficeIcon class="mr-3 h-5 w-5" />
+                <Link :href="route('landlord.benefits')" :class="[commonClasses, isActive('landlord.benefits') ? activeClasses : inactiveClasses]">
+                    <ShieldCheckIcon class="mr-3 h-5 w-5" />
                     Tier Benefits
                 </Link>
                 <Link href="#" :class="[commonClasses, inactiveClasses]">

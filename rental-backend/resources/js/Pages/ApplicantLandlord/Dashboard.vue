@@ -9,6 +9,7 @@ import {
     BanknotesIcon,
     BuildingOfficeIcon 
 } from '@heroicons/vue/24/outline';
+import VerificationBadge from '@/Components/VerificationBadge.vue';
 
 const props = defineProps<{
     application: any;
@@ -42,7 +43,13 @@ const statusConfig = {
     }
 };
 
-const currentStatus = props.application ? statusConfig[props.application.status] : null;
+const currentStatus = props.application ? statusConfig[props.application.status as keyof typeof statusConfig] : null;
+
+const verificationLabels: Record<string, string> = {
+    basic: 'Basic',
+    trusted: 'Trusted',
+    premium: 'Premium'
+};
 </script>
 
 <template>
@@ -79,8 +86,10 @@ const currentStatus = props.application ? statusConfig[props.application.status]
                                 <!-- Application Details -->
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                                     <div>
-                                        <p class="text-xs text-gray-500">Tier</p>
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-white capitalize">{{ application.tier }}</p>
+                                        <p class="text-xs text-gray-500">Verification Level</p>
+                                        <p class="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                                            <VerificationBadge :level="application.verification_level" />
+                                        </p>
                                     </div>
                                     <div>
                                         <p class="text-xs text-gray-500">Applied On</p>
@@ -148,10 +157,12 @@ const currentStatus = props.application ? statusConfig[props.application.status]
                                 <div class="p-2 bg-blue-100 rounded-lg">
                                     <BuildingOfficeIcon class="w-6 h-6 text-blue-600" />
                                 </div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">Your Tier</h3>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Your Level</h3>
                             </div>
-                            <p class="text-3xl font-bold text-brand-red capitalize">{{ application.tier }}</p>
-                            <p class="text-sm text-gray-500 mt-1">Landlord Tier</p>
+                            <p class="text-3xl font-bold text-brand-red capitalize">
+                                {{ verificationLabels[application.verification_level] || application.verification_level }}
+                            </p>
+                            <p class="text-sm text-gray-500 mt-1">Verification Status</p>
                         </div>
                     </div>
 
@@ -164,7 +175,7 @@ const currentStatus = props.application ? statusConfig[props.application.status]
                                 <h3 class="font-semibold text-gray-900 dark:text-white">Property Limit</h3>
                             </div>
                             <p class="text-3xl font-bold text-gray-900 dark:text-white">
-                                {{ tierInfo && tierInfo[application.tier] ? tierInfo[application.tier].properties : '—' }}
+                                {{ tierInfo && tierInfo[application.verification_level] ? tierInfo[application.verification_level].properties : '—' }}
                             </p>
                             <p class="text-sm text-gray-500 mt-1">Properties allowed</p>
                         </div>
@@ -179,7 +190,7 @@ const currentStatus = props.application ? statusConfig[props.application.status]
                                 <h3 class="font-semibold text-gray-900 dark:text-white">Application Fee</h3>
                             </div>
                             <p class="text-3xl font-bold text-gray-900 dark:text-white">
-                                K{{ tierInfo && tierInfo[application.tier] ? tierInfo[application.tier].fee : '—' }}
+                                {{ tierInfo && tierInfo[application.verification_level] ? tierInfo[application.verification_level].fee : '—' }}
                             </p>
                             <p class="text-sm text-gray-500 mt-1">One-time payment</p>
                         </div>

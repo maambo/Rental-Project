@@ -13,6 +13,7 @@ const props = defineProps<{
         data: Array<any>;
         links: Array<any>;
     };
+    roles: Array<any>;
     filters: {
         search: string;
         role: string;
@@ -21,6 +22,7 @@ const props = defineProps<{
 
 const search = ref(props.filters.search || '');
 const role = ref(props.filters.role || 'all');
+const roles = props.roles; // Make roles available to template explicitly if needed, or use props.roles in template
 
 watch([search, role], debounce(() => {
     router.get(
@@ -70,9 +72,7 @@ const deleteUser = (id: number) => {
                         class="block w-full max-w-[150px] rounded-md border-gray-300 shadow-sm focus:border-brand-orange focus:ring-brand-orange dark:border-gray-700 dark:bg-dark-bg dark:text-gray-300 dark:focus:border-brand-orange dark:focus:ring-brand-orange"
                     >
                         <option value="all">All Roles</option>
-                        <option value="admin">Admin</option>
-                        <option value="landlord">Landlord</option>
-                        <option value="tenant">Tenant</option>
+                        <option v-for="r in props.roles" :key="r.id" :value="r.name">{{ r.name.charAt(0).toUpperCase() + r.name.slice(1) }}</option>
                     </select>
                 </div>
 
@@ -107,12 +107,13 @@ const deleteUser = (id: number) => {
                             <td class="whitespace-nowrap px-6 py-4">
                                 <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 capitalize"
                                     :class="{
-                                        'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300': user.role === 'admin',
-                                        'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300': user.role === 'landlord',
-                                        'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300': user.role === 'tenant',
+                                        'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300': user.role_model?.name === 'admin',
+                                        'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300': user.role_model?.name === 'landlord',
+                                        'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300': user.role_model?.name === 'tenant',
+                                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': !['admin', 'landlord', 'tenant'].includes(user.role_model?.name)
                                     }"
                                 >
-                                    {{ user.role }}
+                                    {{ user.role_model?.name || 'No Role' }}
                                 </span>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">

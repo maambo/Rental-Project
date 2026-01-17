@@ -39,34 +39,32 @@ class PropertyController extends Controller
      */
     public function create()
     {
-        // Check tier limits
-        $landlordApplication = DB::table('landlord_applications')
-            ->where('user_id', auth()->id())
+        // Check verification and limits
+        $application = \App\Models\LandlordApplication::where('user_id', auth()->id())
             ->where('status', 'approved')
             ->first();
 
-        if (!$landlordApplication) {
+        if (!$application) {
             return redirect()->route('dashboard')
                 ->with('error', 'You must be an approved landlord to add properties.');
         }
 
-        $tier = $landlordApplication->tier;
-        $tierLimits = [
-            'small' => 10,
-            'medium' => 50,
-            'large' => null,
-        ];
-
         $currentPropertyCount = Property::where('landlord_id', auth()->id())->count();
-        $limit = $tierLimits[$tier];
+        $limit = $application->listing_limit;
 
-        if ($limit && $currentPropertyCount >= $limit) {
+        // If limit is 0 or null, we might consider it unlimited (Premium), 
+        // but based on migration defaults, it's an integer. 
+        // Let's assume -1 or a high number could be unlimited, but for now we rely on the DB value.
+        // If the user is Premium, the limit should be set high in the DB or handled here.
+        // For now, respect the DB value.
+        
+        if ($currentPropertyCount >= $limit) {
             return redirect()->route('landlord.properties.index')
-                ->with('error', "You have reached your tier limit of {$limit} properties. Upgrade your tier to add more.");
+                ->with('error', "You have reached your listing limit of {$limit} properties. Upgrade your verification level to add more.");
         }
 
         return Inertia::render('Landlord/Properties/Create', [
-            'tier' => $tier,
+            'verification_level' => $application->verification_level,
             'currentCount' => $currentPropertyCount,
             'limit' => $limit,
         ]);
@@ -92,6 +90,13 @@ class PropertyController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
+        // Determine visibility based on verification level
+        $application = \App\Models\LandlordApplication::where('user_id', auth()->id())->first();
+        
+        // Basic tier listings are hidden by default (require manual approval)
+        // Trusted/Premium are auto-visible
+        $isVisible = $application && in_array($application->verification_level, ['trusted', 'premium']);
+
         // Create property
         $property = Property::create([
             'landlord_id' => auth()->id(),
@@ -105,7 +110,16 @@ class PropertyController extends Controller
             'bathrooms' => $validated['bathrooms'],
             'square_feet' => $validated['square_feet'],
             'amenities' => $validated['amenities'] ?? [],
-            'approval_status' => 'pending',
+            'approval_status' => 'pending', // Always pending first? Or auto-approved? 
+            // Stick to 'pending' for admin review of content, but 'is_visible_in_search' controls public search.
+            // If we want trusted landlords to bypass "pending" status, we can change this.
+            // For now, let's keep approval_status as 'pending' for content review, 
+            // but set is_visible_in_search. actually if approval_status is pending it won't show anyway due to scope.
+            // So let's make trusted landlords auto-approved?
+            // "Existing properties -> Remain visible"
+            // Let's set auto-approve for Trusted/Premium to reduce friction.
+            'approval_status' => $isVisible ? 'approved' : 'pending',
+            'is_visible_in_search' => $isVisible,
         ]);
 
         // Upload images
