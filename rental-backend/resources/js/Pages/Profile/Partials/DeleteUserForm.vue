@@ -6,7 +6,11 @@ import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const isGoogleUser = computed(() => !!page.props.auth.user.google_id);
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref<HTMLInputElement | null>(null);
@@ -18,7 +22,9 @@ const form = useForm({
 const confirmUserDeletion = () => {
     confirmingUserDeletion.value = true;
 
-    nextTick(() => passwordInput.value?.focus());
+    if (!isGoogleUser.value) {
+        nextTick(() => passwordInput.value?.focus());
+    }
 };
 
 const deleteUser = () => {
@@ -66,11 +72,12 @@ const closeModal = () => {
 
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Please enter your password to
-                    confirm you would like to permanently delete your account.
+                    will be permanently deleted.
+                    <span v-if="!isGoogleUser">Please enter your password to
+                    confirm you would like to permanently delete your account.</span>
                 </p>
 
-                <div class="mt-6">
+                <div class="mt-6" v-if="!isGoogleUser">
                     <InputLabel
                         for="password"
                         value="Password"

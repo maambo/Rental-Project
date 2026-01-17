@@ -11,6 +11,7 @@ export interface User {
     email_verified_at?: string;
     role_id?: number;
     roleModel?: Role | null;
+    google_id?: string | null;
 }
 
 export type PageProps<
