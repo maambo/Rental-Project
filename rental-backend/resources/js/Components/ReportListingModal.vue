@@ -39,7 +39,7 @@ const submit = () => {
     }).then(() => {
         emit('submitted');
         close();
-    }).catch(err => {
+    }).catch((err: any) => {
         console.error(err);
     }).finally(() => {
         processing.value = false;

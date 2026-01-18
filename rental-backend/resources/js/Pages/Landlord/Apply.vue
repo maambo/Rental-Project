@@ -74,17 +74,18 @@ const submit = () => {
 
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <!-- Logo and Back to Home -->
-        <div class="absolute top-4 left-4 z-10">
-            <Link href="/" class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-brand-red transition">
-                <HomeIcon class="h-8 w-8" />
-                <span class="font-medium">Back to Home</span>
-            </Link>
-        </div>
+
         
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             <!-- Header -->
             <div class="bg-white dark:bg-gray-800 shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <div class="mb-4">
+                        <Link href="/" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-brand-red transition">
+                            <HomeIcon class="h-6 w-6" /> <!-- Reduced size slightly for better proportion -->
+                            <span class="font-medium">Back to Home</span>
+                        </Link>
+                    </div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Become a Landlord</h1>
                     <p class="mt-2 text-gray-600 dark:text-gray-400">Join our platform and start earning from your properties</p>
                 </div>
