@@ -12,14 +12,19 @@ const props = defineProps<{
         id: number;
         name: string;
         email: string;
-        role: string;
+        role_id: number;
     };
+    roles: Array<{
+        id: number;
+        name: string;
+        display_name: string;
+    }>;
 }>();
 
 const form = useForm({
     name: props.user.name,
     email: props.user.email,
-    role: props.user.role,
+    role_id: props.user.role_id,
     password: '',
     password_confirmation: '',
 });
@@ -78,17 +83,17 @@ const submit = () => {
                         </div>
 
                          <div>
-                            <InputLabel for="role" value="Role" />
+                            <InputLabel for="role_id" value="Role" />
                             <select
-                                id="role"
-                                v-model="form.role"
+                                id="role_id"
+                                v-model="form.role_id"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-orange focus:ring-brand-orange dark:border-gray-700 dark:bg-dark-bg dark:text-gray-300 dark:focus:border-brand-orange dark:focus:ring-brand-orange"
                             >
-                                <option value="admin">Admin</option>
-                                <option value="landlord">Landlord</option>
-                                <option value="tenant">Tenant</option>
+                                <option v-for="role in roles" :key="role.id" :value="role.id">
+                                    {{ role.display_name || role.name }}
+                                </option>
                             </select>
-                            <InputError class="mt-2" :message="form.errors.role" />
+                            <InputError class="mt-2" :message="form.errors.role_id" />
                         </div>
 
                         <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
