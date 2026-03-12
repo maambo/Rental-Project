@@ -31,6 +31,8 @@ Route::get('/', function () {
         ->get();
         
    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
         'properties' => $properties,
     ]);
 })->name('landing');
