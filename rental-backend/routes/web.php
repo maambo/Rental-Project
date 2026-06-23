@@ -4,7 +4,6 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
 
 // Debug route
 Route::get('/debug-user', function () {
@@ -86,12 +85,27 @@ Route::get('/dashboard', function () {
                 'tierInfo' => $tierInfo,
             ]);
         } elseif ($user->roleModel->name === 'landlord') {
-            // Redirect to landlord dashboard
             return redirect()->route('landlord.dashboard');
         }
     }
     
-    return Inertia::render('Dashboard');
+    // Default/Tenant Dashboard Data
+    $tenantStats = [
+        'activeRentals' => \App\Models\RentalHistory::where('tenant_id', $user->id)->active()->count(),
+        'unreadMessages' => \App\Models\Message::where('receiver_id', $user->id)->where('is_read', false)->count(),
+        'maintenanceRequests' => \App\Models\MaintenancePlan::whereHas('property', function($q) use ($user) {
+            $q->whereHas('tenantRentals', function($sq) use ($user) {
+                $sq->where('tenant_id', $user->id)->active();
+            });
+        })->where('status', 'scheduled')->count(),
+        'rentDue' => \App\Models\Billing::where('UserID', $user->id)
+            ->where('status', '!=', 'paid')
+            ->sum('Amount'),
+    ];
+    
+    return Inertia::render('Dashboard', [
+        'tenantStats' => $tenantStats,
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -99,19 +113,42 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Rental History (shared)
+    Route::get('/rental-history', [\App\Http\Controllers\RentalHistoryController::class, 'index'])->name('rental-history.index');
+    Route::get('/rental-history/{rentalHistory}', [\App\Http\Controllers\RentalHistoryController::class, 'show'])->name('rental-history.show');
+
     // User Management
     Route::resource('users', \App\Http\Controllers\UserController::class);
 
     // Landlord Routes
-    Route::prefix('landlord')->name('landlord.')->group(function () {
+    Route::prefix('landlord')->name('landlord.')->middleware('role:landlord')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
         Route::resource('properties', \App\Http\Controllers\Landlord\PropertyController::class);
+        Route::resource('property-applications', \App\Http\Controllers\Landlord\PropertyApplicationController::class)->only(['index', 'show', 'update']);
+        Route::post('/property-applications/{application}/approve', [\App\Http\Controllers\Landlord\PropertyApplicationController::class, 'approve'])->name('property-applications.approve');
+        Route::post('/property-applications/{application}/reject', [\App\Http\Controllers\Landlord\PropertyApplicationController::class, 'reject'])->name('property-applications.reject');
+        
+        Route::resource('leases', \App\Http\Controllers\Landlord\LeaseController::class)->except(['index']);
+        Route::get('/leases/{lease}/print', [\App\Http\Controllers\Landlord\LeaseController::class, 'print'])->name('leases.print');
+        
+        Route::resource('billing', \App\Http\Controllers\Landlord\BillingController::class)->only(['index', 'show']);
+        Route::post('/billing/{billing}/verify', [\App\Http\Controllers\Landlord\BillingController::class, 'verifyPayment'])->name('billing.verify');
+    });
+
+    // Tenant Routes
+    Route::prefix('tenant')->name('tenant.')->middleware('role:tenant')->group(function () {
+        Route::resource('billing', \App\Http\Controllers\Tenant\BillingController::class)->only(['index', 'show']);
+        Route::post('/billing/{billing}/confirm', [\App\Http\Controllers\Tenant\BillingController::class, 'confirmPayment'])->name('billing.confirm');
+        Route::get('/ledger', [\App\Http\Controllers\Tenant\LedgerController::class, 'index'])->name('ledger.index');
     });
 
     // Admin - Role & Permission Management
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
         Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
         Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->except(['create', 'edit']);
+        
+        // User Impersonation
+        Route::post('/users/{user}/login-as', [\App\Http\Controllers\UserController::class, 'loginAs'])->name('users.login-as');
         
         // Admin Dashboard Pages
         Route::get('/applications', [\App\Http\Controllers\Admin\LandlordApplicationAdminController::class, 'index'])->name('applications.index');
@@ -135,6 +172,9 @@ Route::middleware('auth')->group(function () {
         
         Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+
+        // Audit Logs
+        Route::get('/audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit-logs.index');
     });
 });
 

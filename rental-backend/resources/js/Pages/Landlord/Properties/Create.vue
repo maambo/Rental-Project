@@ -158,6 +158,7 @@ const submit = () => {
                                     <div class="md:col-span-2">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Street Address *</label>
                                         <input
+                                            id="location"
                                             v-model="form.location"
                                             type="text"
                                             required
@@ -168,6 +169,7 @@ const submit = () => {
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Town/City *</label>
                                         <input
+                                            id="town"
                                             v-model="form.town"
                                             type="text"
                                             required
@@ -178,6 +180,7 @@ const submit = () => {
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Province *</label>
                                         <input
+                                            id="province"
                                             v-model="form.province"
                                             type="text"
                                             required
@@ -195,6 +198,7 @@ const submit = () => {
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bedrooms *</label>
                                         <input
+                                            id="bedrooms"
                                             v-model.number="form.bedrooms"
                                             type="number"
                                             min="0"
@@ -205,6 +209,7 @@ const submit = () => {
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bathrooms *</label>
                                         <input
+                                            id="bathrooms"
                                             v-model.number="form.bathrooms"
                                             type="number"
                                             min="0"
@@ -215,6 +220,7 @@ const submit = () => {
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Square Feet *</label>
                                         <input
+                                            id="square_feet"
                                             v-model.number="form.square_feet"
                                             type="number"
                                             min="0"

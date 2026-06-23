@@ -37,6 +37,8 @@ class Property extends Model
         'rejection_reason',
         'view_count',
         'like_count',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
@@ -124,6 +126,11 @@ class Property extends Model
         return $this->hasMany(RentalHistory::class);
     }
 
+    public function tenantRentals()
+    {
+        return $this->hasMany(RentalHistory::class);
+    }
+
     /**
      * Accessors
      */
@@ -141,5 +148,35 @@ class Property extends Model
     public function getReviewCountAttribute()
     {
         return $this->reviews()->count();
+    }
+
+    /**
+     * Scope for advanced search
+     */
+    public function scopeSearch($query, array $filters)
+    {
+        return $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('location', 'like', '%' . $search . '%');
+            });
+        })->when($filters['province'] ?? null, function ($query, $province) {
+            $query->where('province', $province);
+        })->when($filters['town'] ?? null, function ($query, $town) {
+            $query->where('town', $town);
+        })->when($filters['min_price'] ?? null, function ($query, $minPrice) {
+            $query->where('price', '>=', $minPrice);
+        })->when($filters['max_price'] ?? null, function ($query, $maxPrice) {
+            $query->where('price', '<=', $maxPrice);
+        })->when($filters['bedrooms'] ?? null, function ($query, $bedrooms) {
+            $query->where('bedrooms', $bedrooms);
+        })->when($filters['bathrooms'] ?? null, function ($query, $bathrooms) {
+            $query->where('bathrooms', $bathrooms);
+        })->when($filters['amenities'] ?? null, function ($query, $amenities) {
+            foreach (explode(',', $amenities) as $amenity) {
+                $query->whereJsonContains('amenities', trim($amenity));
+            }
+        });
     }
 }

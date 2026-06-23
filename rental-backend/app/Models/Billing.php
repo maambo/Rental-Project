@@ -17,10 +17,14 @@ class Billing extends Model
         'Approval',
         'Year',
         'lease_agreement_id',
+        'status',
+        'proof_of_payment',
+        'paid_at',
     ];
 
     protected $casts = [
         'Date' => 'datetime',
+        'paid_at' => 'datetime',
         'Amount' => 'float',
     ];
 

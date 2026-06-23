@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes - No authentication required
 Route::get('/properties', [PropertyController::class, 'index']);
+Route::get('/properties/map', [PropertyController::class, 'map']);
 Route::get('/properties/{id}', [PropertyController::class, 'show']);
 
 // Protected routes - Require authentication
@@ -29,6 +30,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Tour Requests
     Route::post('/properties/{id}/tour-requests', [TourRequestController::class, 'store']);
+
+    // Wishlist (Saved Properties)
+    Route::get('/wishlist', [\App\Http\Controllers\Api\SavedPropertyController::class, 'index']);
+    Route::post('/wishlist', [\App\Http\Controllers\Api\SavedPropertyController::class, 'store']);
+    Route::delete('/wishlist/{property_id}', [\App\Http\Controllers\Api\SavedPropertyController::class, 'destroy']);
+
+    // Transactions / Payments
+    Route::post('/transactions', [\App\Http\Controllers\Api\TransactionController::class, 'store']);
 
     // Landlord routes
     Route::middleware('role:landlord')->prefix('landlord')->group(function () {

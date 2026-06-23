@@ -100,4 +100,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(RentalHistory::class, 'landlord_id');
     }
+
+    public function savedProperties()
+    {
+        return $this->hasMany(SavedProperty::class);
+    }
+
+    /**
+     * Check if user has a specific role.
+     */
+    public function hasRole(string $roleName): bool
+    {
+        return $this->roleModel && $this->roleModel->name === $roleName;
+    }
 }

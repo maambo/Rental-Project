@@ -5,7 +5,7 @@ import Pagination from '@/Components/Pagination.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref, watch } from 'vue';
-import { MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, UserPlusIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, UserPlusIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline';
 import { debounce } from 'lodash';
 
 const props = defineProps<{
@@ -35,6 +35,12 @@ watch([search, role], debounce(() => {
 const deleteUser = (id: number) => {
     if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
         router.delete(route('users.destroy', id));
+    }
+};
+
+const loginAs = (id: number) => {
+    if (confirm('Are you sure you want to log in as this user?')) {
+        router.post(route('admin.users.login-as', id));
     }
 };
 </script>
@@ -121,10 +127,13 @@ const deleteUser = (id: number) => {
                             </td>
                              <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                                 <div class="flex justify-end gap-3">
-                                    <Link :href="route('users.edit', user.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                    <button @click="loginAs(user.id)" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" title="Login As User">
+                                        <ArrowRightOnRectangleIcon class="h-5 w-5" />
+                                    </button>
+                                    <Link :href="route('users.edit', user.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-blue-400 dark:hover:text-blue-300" title="Edit User">
                                         <PencilSquareIcon class="h-5 w-5" />
                                     </Link>
-                                    <button @click="deleteUser(user.id)" class="text-brand-red hover:text-red-900 dark:hover:text-red-300">
+                                    <button @click="deleteUser(user.id)" class="text-brand-red hover:text-red-900 dark:hover:text-red-300" title="Delete User">
                                         <TrashIcon class="h-5 w-5" />
                                     </button>
                                 </div>

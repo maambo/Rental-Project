@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        /* Brand Colors */
+        --color-brand-red: #E21608;
+        --color-brand-orange: #FF4520;
+
+        /* Semantic State Colors */
+        --color-success: #10b981;
+        --color-danger: #ef4444;
+        --color-warning: #f59e0b;
+        --color-info: #3b82f6;
+
+        /* System Background Colors */
+        --color-dark-bg: #111827;
+        --color-light-bg: #1F2937;
+    }
+}

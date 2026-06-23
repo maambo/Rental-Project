@@ -160,7 +160,7 @@ const handleReportSubmitted = () => {
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-3xl font-bold text-brand-red">K{{ property.price.toLocaleString() }}<span class="text-lg text-gray-500 font-normal">/mo</span></div>
+                                <div class="text-3xl font-bold text-brand-red">K{{ Number(property.price).toLocaleString() }}<span class="text-lg text-gray-500 font-normal">/mo</span></div>
                                 <div class="flex items-center justify-end gap-1 mt-1">
                                     <StarIcon class="h-5 w-5 text-amber-500" />
                                     <span class="font-bold text-gray-900 dark:text-white">{{ parseFloat(property.average_rating).toFixed(1) }}</span>

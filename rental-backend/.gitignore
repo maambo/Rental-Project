@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Cypress and PHPUnit Tests
+/cypress
+/cypress.config.ts
+**/*.cy.ts
+**/*.cy.js
+/tests

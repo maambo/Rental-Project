@@ -22,6 +22,22 @@ class RentalHistory extends Model
         'monthly_rent' => 'decimal:2',
     ];
 
+    /**
+     * Scope a query to only include active rentals.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope a query to only include past (completed/terminated) rentals.
+     */
+    public function scopePast($query)
+    {
+        return $query->where('status', 'completed')->orWhere('status', 'terminated');
+    }
+
     public function property()
     {
         return $this->belongsTo(Property::class);

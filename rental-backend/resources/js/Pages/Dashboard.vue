@@ -7,8 +7,7 @@ import LandlordDashboard from '@/Pages/Dashboards/LandlordDashboard.vue';
 import TenantDashboard from '@/Pages/Dashboards/TenantDashboard.vue';
 
 const page = usePage();
-// @ts-ignore
-const user = computed(() => page.props.auth.user);
+const user = computed(() => (page.props as any).auth.user);
 const role = computed(() => (user.value as any)?.role || 'tenant');
 
 const welcomeMessage = computed(() => {
@@ -42,7 +41,7 @@ const welcomeMessage = computed(() => {
             <!-- Role Dashboards -->
             <AdminDashboard v-if="role === 'admin'" />
             <LandlordDashboard v-else-if="role === 'landlord'" />
-            <TenantDashboard v-else />
+            <TenantDashboard v-else :stats="($page.props as any).tenantStats" />
         </div>
     </AuthenticatedLayout>
 </template>

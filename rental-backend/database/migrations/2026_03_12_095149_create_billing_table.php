@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('Description', 255);
             $table->integer('Year')->nullable();
             $table->foreignId('lease_agreement_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('status')->default('pending');
+            $table->string('proof_of_payment')->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
             $table->unique(['UserID', 'Year'], 'billing_unique_user_year');
         });

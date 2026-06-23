@@ -108,7 +108,7 @@ defineProps<{
                         
                         <!-- Price Tag -->
                         <div class="absolute top-4 left-4 bg-brand-red text-white px-3 py-1 rounded-full text-sm font-bold shadow-md">
-                            K{{ property.price.toLocaleString() }}/mo
+                            K{{ Number(property.price).toLocaleString() }}/mo
                         </div>
                         
                          <!-- Type Tag -->

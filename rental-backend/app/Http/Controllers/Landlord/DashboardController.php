@@ -59,14 +59,8 @@ class DashboardController extends Controller
             ->where('status', 'approved')
             ->first();
 
-        $tierLimits = [
-            'small' => 10,
-            'medium' => 50,
-            'large' => null, // unlimited
-        ];
-
-        $tier = $landlordApplication ? $landlordApplication->tier : 'small';
-        $propertyLimit = $tierLimits[$tier];
+        $tier = $landlordApplication ? $landlordApplication->verification_level : 'basic';
+        $propertyLimit = $landlordApplication ? $landlordApplication->listing_limit : 5;
 
         return Inertia::render('Landlord/Dashboard', [
             'stats' => $stats,

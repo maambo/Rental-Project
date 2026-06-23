@@ -138,4 +138,28 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
+
+    /**
+     * Login as the specified user.
+     */
+    public function loginAs(User $user)
+    {
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'You are already logged in as this user.');
+        }
+
+        auth()->login($user);
+        session()->flash('success', "Logged in as {$user->name}");
+
+        $user->load('roleModel');
+        $role = $user->roleModel ? $user->roleModel->name : null;
+
+        if ($role === 'landlord') {
+            return Inertia::location(route('landlord.dashboard'));
+        } elseif ($role === 'admin') {
+            return Inertia::location(route('admin.users.index'));
+        }
+
+        return Inertia::location(route('dashboard'));
+    }
 }

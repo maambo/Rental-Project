@@ -11,12 +11,28 @@ class PropertyController extends Controller
     /**
      * Display a listing of approved properties.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $properties = Property::with(['images', 'landlord'])
+        $properties = Property::search($request->all())
+            ->with(['images', 'landlord'])
             ->where('is_approved', true)
+            ->where('is_visible_in_search', true)
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate($request->get('per_page', 20));
+
+        return response()->json($properties);
+    }
+
+    /**
+     * Get properties for map display.
+     */
+    public function map(Request $request)
+    {
+        $properties = Property::search($request->all())
+            ->where('is_approved', true)
+            ->where('is_visible_in_search', true)
+            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'location'])
+            ->get();
 
         return response()->json($properties);
     }

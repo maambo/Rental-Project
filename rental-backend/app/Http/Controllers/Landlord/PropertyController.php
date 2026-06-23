@@ -26,7 +26,7 @@ class PropertyController extends Controller
             ->where('status', 'approved')
             ->first();
 
-        $tier = $landlordApplication ? $landlordApplication->tier : 'small';
+        $tier = $landlordApplication ? $landlordApplication->verification_level : 'basic';
 
         return Inertia::render('Landlord/Properties/Index', [
             'properties' => $properties,

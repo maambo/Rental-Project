@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\AuditLogMiddleware::class,
         ]);
 
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
     })->create();
