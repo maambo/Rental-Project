@@ -77,15 +77,7 @@ const handleFile = (field: string, event: Event) => {
 <template>
     <Head title="Edit Application" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <div class="flex items-center gap-4">
-                <Link :href="route('landlord.status')" class="text-gray-600 hover:text-gray-900">
-                    <ArrowLeftIcon class="w-6 h-6" />
-                </Link>
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">Edit Application</h2>
-            </div>
-        </template>
+    <AuthenticatedLayout header="Edit Application" :back-url="route('landlord.status')">
 
         <div class="py-12">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">

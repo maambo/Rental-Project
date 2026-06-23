@@ -20,12 +20,7 @@ const welcomeMessage = computed(() => {
 <template>
     <Head title="Dashboard" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                Dashboard
-            </h2>
-        </template>
+    <AuthenticatedLayout header="Dashboard">
 
         <div class="space-y-6">
             <!-- Welcome Banner -->

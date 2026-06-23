@@ -2,8 +2,14 @@
 import { ref } from 'vue';
 import Sidebar from '@/Components/Sidebar.vue';
 import Toast from '@/Components/Toast.vue';
-import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { Bars3Icon, XMarkIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { Link } from '@inertiajs/vue3';
+
+defineProps<{
+    header?: string;
+    backUrl?: string;
+}>();
 
 const showingSidebar = ref(false);
 </script>
@@ -42,15 +48,21 @@ const showingSidebar = ref(false);
             <!-- Page Heading (Desktop/Shared) -->
             <header
                 class="bg-white shadow dark:bg-light-bg"
-                v-if="$slots.header"
+                v-if="header || $slots.header"
             >
                 <div class="mx-auto px-4 py-6 sm:px-6 lg:px-8 flex items-center gap-4">
                     <button v-show="!showingSidebar" @click="showingSidebar = true" class="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none transition ease-in-out duration-150 z-50">
                         <Bars3Icon class="h-6 w-6" />
                     </button>
 
-                    <div>
-                        <slot name="header" />
+                    <div class="flex items-center gap-4">
+                        <Link v-if="backUrl" :href="backUrl" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition">
+                            <ArrowLeftIcon class="w-6 h-6" />
+                        </Link>
+                        <h2 v-if="header" class="font-semibold text-xl text-gray-800 dark:text-gray-200">
+                            {{ header }}
+                        </h2>
+                        <slot v-else name="header" />
                     </div>
                 </div>
             </header>

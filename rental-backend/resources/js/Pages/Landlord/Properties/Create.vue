@@ -76,15 +76,7 @@ const submit = () => {
 <template>
     <Head title="Add Property" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <div class="flex items-center gap-4">
-                <Link :href="route('landlord.properties.index')" class="text-gray-600 hover:text-gray-900">
-                    <ArrowLeftIcon class="w-6 h-6" />
-                </Link>
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">Add New Property</h2>
-            </div>
-        </template>
+    <AuthenticatedLayout header="Add New Property" :back-url="route('landlord.properties.index')">
 
         <div class="py-12">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
