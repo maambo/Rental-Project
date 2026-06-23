@@ -192,38 +192,7 @@ const getStatusBadge = (status: string) => {
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Link
-                        :href="route('landlord.properties.create')"
-                        class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-2 border-dashed border-gray-300 dark:border-gray-600"
-                    >
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-brand-red/10 rounded-lg">
-                                <PlusIcon class="w-8 h-8 text-brand-red" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">Add New Property</h3>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">List a new property for rent</p>
-                            </div>
-                        </div>
-                    </Link>
 
-                    <Link
-                        :href="route('landlord.properties.index')"
-                        class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                    >
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-blue-100 rounded-lg">
-                                <BuildingOfficeIcon class="w-8 h-8 text-blue-600" />
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">Manage Properties</h3>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">View and edit your listings</p>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
             </div>
         </div>
     </AuthenticatedLayout>
