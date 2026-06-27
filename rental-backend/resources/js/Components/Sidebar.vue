@@ -81,7 +81,7 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
                     Statistics
                 </Link>
                 <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Management</div>
-                <Link :href="route('users.index')" :class="[commonClasses, isActive('users.*') ? activeClasses : inactiveClasses]">
+                <Link :href="route('admin.users.index')" :class="[commonClasses, isActive('admin.users.*') ? activeClasses : inactiveClasses]">
                     <UsersIcon class="mr-3 h-5 w-5" />
                     Manage Users
                 </Link>
