@@ -26,7 +26,7 @@ const roles = props.roles; // Make roles available to template explicitly if nee
 
 watch([search, role], debounce(() => {
     router.get(
-        route('users.index'),
+        route('admin.users.index'),
         { search: search.value, role: role.value },
         { preserveState: true, replace: true }
     );
@@ -34,7 +34,7 @@ watch([search, role], debounce(() => {
 
 const deleteUser = (id: number) => {
     if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-        router.delete(route('users.destroy', id));
+        router.delete(route('admin.users.destroy', id));
     }
 };
 
@@ -82,7 +82,7 @@ const loginAs = (id: number) => {
                     </select>
                 </div>
 
-                <Link :href="route('users.create')">
+                <Link :href="route('admin.users.create')">
                     <PrimaryButton>
                         <UserPlusIcon class="mr-2 h-5 w-5" />
                         Add User
@@ -130,7 +130,7 @@ const loginAs = (id: number) => {
                                     <button @click="loginAs(user.id)" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" title="Login As User">
                                         <ArrowRightOnRectangleIcon class="h-5 w-5" />
                                     </button>
-                                    <Link :href="route('users.edit', user.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-blue-400 dark:hover:text-blue-300" title="Edit User">
+                                    <Link :href="route('admin.users.edit', user.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-blue-400 dark:hover:text-blue-300" title="Edit User">
                                         <PencilSquareIcon class="h-5 w-5" />
                                     </Link>
                                     <button @click="deleteUser(user.id)" class="text-brand-red hover:text-red-900 dark:hover:text-red-300" title="Delete User">

@@ -24,7 +24,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('users.store'), {
+    form.post(route('admin.users.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
@@ -36,7 +36,7 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center gap-4">
-                <Link :href="route('users.index')" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <Link :href="route('admin.users.index')" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                     <ArrowLeftIcon class="h-5 w-5" />
                 </Link>
                 <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
@@ -118,7 +118,7 @@ const submit = () => {
                         </div>
 
                         <div class="flex items-center justify-end gap-4">
-                            <Link :href="route('users.index')" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
+                            <Link :href="route('admin.users.index')" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
                                 Cancel
                             </Link>
                             <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
