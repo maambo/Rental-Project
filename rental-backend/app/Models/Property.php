@@ -16,19 +16,21 @@ class Property extends Model
         'title',
         'description',
         'price',
-        'location',
-        'province',
-        'town',
+        'street_address',
+        'province_id',
+        'district_id',
+        'town_id',
+        'latitude',
+        'longitude',
+        'property_type',
+        'property_subtype',
+        'listing_type',
         'bedrooms',
         'bathrooms',
-        'sqft',
         'square_feet',
         'amenities',
-        'is_approved',
-        'reviews_count',
         'approval_status',
         'is_visible_in_search',
-        'report_count',
         'is_auto_suspended',
         'requires_real_time_photo',
         'real_time_photo_url',
@@ -37,25 +39,24 @@ class Property extends Model
         'rejection_reason',
         'view_count',
         'like_count',
-        'latitude',
-        'longitude',
+        'report_count',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'is_approved' => 'boolean',
-        'amenities' => 'array',
-        'submitted_date' => 'datetime',
-        'approved_date' => 'datetime',
+        'price'                    => 'decimal:2',
+        'amenities'                => 'array',
+        'is_visible_in_search'     => 'boolean',
+        'is_auto_suspended'        => 'boolean',
+        'requires_real_time_photo' => 'boolean',
+        'latitude'                 => 'decimal:8',
+        'longitude'                => 'decimal:8',
+        'submitted_date'           => 'datetime',
+        'approved_date'            => 'datetime',
     ];
 
-    /**
-     * Boot method to generate property code
-     */
     protected static function boot()
     {
         parent::boot();
-
         static::creating(function ($property) {
             if (!$property->code) {
                 $property->code = self::generatePropertyCode();
@@ -63,25 +64,34 @@ class Property extends Model
         });
     }
 
-    /**
-     * Generate a unique property code in format PIV####
-     */
-    private static function generatePropertyCode()
+    private static function generatePropertyCode(): string
     {
         do {
-            $number = str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $code = 'PIV' . $number;
+            $code = 'PIV' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while (self::where('code', $code)->exists());
-
         return $code;
     }
 
-    /**
-     * Relationships
-     */
+    // Relationships
+
     public function landlord()
     {
         return $this->belongsTo(User::class, 'landlord_id');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function town()
+    {
+        return $this->belongsTo(Town::class);
     }
 
     public function images()
@@ -99,18 +109,6 @@ class Property extends Model
         return $this->hasMany(PropertyReport::class);
     }
 
-    public function viewingConfirmations()
-    {
-        return $this->hasMany(ViewingConfirmation::class);
-    }
-
-    public function scopeVisibleInSearch($query)
-    {
-        return $query->where('is_visible_in_search', true)
-                     ->where('is_auto_suspended', false)
-                     ->where('approval_status', 'approved');
-    }
-
     public function tourRequests()
     {
         return $this->hasMany(TourRequest::class);
@@ -126,57 +124,107 @@ class Property extends Model
         return $this->hasMany(RentalHistory::class);
     }
 
-    public function tenantRentals()
+    public function viewingConfirmations()
     {
-        return $this->hasMany(RentalHistory::class);
+        return $this->hasMany(ViewingConfirmation::class);
     }
 
-    /**
-     * Accessors
-     */
-    public function getPrimaryImageAttribute()
+    public function applications()
     {
-        $primaryImage = $this->images()->where('is_primary', true)->first();
-        return $primaryImage ? $primaryImage->image_url : ($this->images->first()->image_url ?? null);
+        return $this->hasMany(PropertyApplication::class);
     }
 
-    public function getAverageRatingAttribute()
+    public function utilities()
     {
-        return $this->reviews()->avg('rating') ?? 0;
+        return $this->belongsToMany(UtilityType::class, 'property_utilities')
+            ->withPivot('utility_option_id')
+            ->withTimestamps();
     }
 
-    public function getReviewCountAttribute()
+    // Scopes
+
+    public function scopeVisibleInSearch($query)
+    {
+        return $query->where('is_visible_in_search', true)
+                     ->where('is_auto_suspended', false)
+                     ->where('approval_status', 'approved');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    public function scopeForLandlord($query, int $landlordId)
+    {
+        return $query->where('landlord_id', $landlordId);
+    }
+
+    public function scopeSearch($query, array $filters)
+    {
+        return $query
+            ->when($filters['search'] ?? null, fn($q, $s) =>
+                $q->where(fn($q) => $q
+                    ->where('title', 'like', "%{$s}%")
+                    ->orWhere('description', 'like', "%{$s}%")
+                    ->orWhere('street_address', 'like', "%{$s}%")
+                )
+            )
+            ->when($filters['province_id'] ?? null,    fn($q, $v) => $q->where('province_id', $v))
+            ->when($filters['district_id'] ?? null,    fn($q, $v) => $q->where('district_id', $v))
+            ->when($filters['town_id'] ?? null,        fn($q, $v) => $q->where('town_id', $v))
+            ->when($filters['property_type'] ?? null,  fn($q, $v) => $q->where('property_type', $v))
+            ->when($filters['property_subtype'] ?? null, fn($q, $v) => $q->where('property_subtype', $v))
+            ->when($filters['listing_type'] ?? null,   fn($q, $v) => $q->where('listing_type', $v))
+            ->when($filters['min_price'] ?? null,      fn($q, $v) => $q->where('price', '>=', $v))
+            ->when($filters['max_price'] ?? null,      fn($q, $v) => $q->where('price', '<=', $v))
+            ->when($filters['bedrooms'] ?? null,       fn($q, $v) => $q->where('bedrooms', $v))
+            ->when($filters['bathrooms'] ?? null,      fn($q, $v) => $q->where('bathrooms', $v))
+            ->when($filters['amenities'] ?? null, function ($q, $amenities) {
+                foreach (explode(',', $amenities) as $amenity) {
+                    $q->whereJsonContains('amenities', trim($amenity));
+                }
+            });
+    }
+
+    // Helpers
+
+    public function isResidential(): bool { return $this->property_type === 'residential'; }
+    public function isCommercial(): bool  { return $this->property_type === 'commercial'; }
+    public function isForRent(): bool     { return $this->listing_type === 'rent'; }
+    public function isForSale(): bool     { return $this->listing_type === 'sale'; }
+    public function isResidentialRent(): bool { return $this->isResidential() && $this->isForRent(); }
+
+    // Accessors
+
+    public function getPrimaryImageAttribute(): ?string
+    {
+        $primary = $this->images->firstWhere('is_primary', true) ?? $this->images->first();
+        return $primary?->image_url;
+    }
+
+    public function getAverageRatingAttribute(): float
+    {
+        return round($this->reviews()->avg('rating') ?? 0, 1);
+    }
+
+    public function getReviewCountAttribute(): int
     {
         return $this->reviews()->count();
     }
 
-    /**
-     * Scope for advanced search
-     */
-    public function scopeSearch($query, array $filters)
+    public function getFullAddressAttribute(): string
     {
-        return $query->when($filters['search'] ?? null, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%')
-                    ->orWhere('location', 'like', '%' . $search . '%');
-            });
-        })->when($filters['province'] ?? null, function ($query, $province) {
-            $query->where('province', $province);
-        })->when($filters['town'] ?? null, function ($query, $town) {
-            $query->where('town', $town);
-        })->when($filters['min_price'] ?? null, function ($query, $minPrice) {
-            $query->where('price', '>=', $minPrice);
-        })->when($filters['max_price'] ?? null, function ($query, $maxPrice) {
-            $query->where('price', '<=', $maxPrice);
-        })->when($filters['bedrooms'] ?? null, function ($query, $bedrooms) {
-            $query->where('bedrooms', $bedrooms);
-        })->when($filters['bathrooms'] ?? null, function ($query, $bathrooms) {
-            $query->where('bathrooms', $bathrooms);
-        })->when($filters['amenities'] ?? null, function ($query, $amenities) {
-            foreach (explode(',', $amenities) as $amenity) {
-                $query->whereJsonContains('amenities', trim($amenity));
-            }
-        });
+        return implode(', ', array_filter([
+            $this->street_address,
+            $this->town?->name,
+            $this->district?->name,
+            $this->province?->name,
+        ]));
     }
 }

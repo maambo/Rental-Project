@@ -3,130 +3,90 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\LandlordApplication;
+use App\Services\LandlordApplicationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class LandlordApplicationAdminController extends Controller
 {
-    /**
-     * Display landlord applications.
-     */
+    public function __construct(private LandlordApplicationService $service) {}
+
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
-        
-        $query = DB::table('landlord_applications')
-            ->join('users', 'landlord_applications.user_id', '=', 'users.id')
-            ->select(
-                'landlord_applications.*',
-                'users.name as user_name',
-                'users.email as user_email'
-            );
+
+        $query = LandlordApplication::with('user')
+            ->orderByDesc('created_at');
 
         if ($status !== 'all') {
-            $query->where('landlord_applications.status', $status);
+            $query->where('status', $status);
         }
 
-        $applications = $query->orderBy('landlord_applications.created_at', 'desc')->get();
+        $applications = $query->get();
 
         $stats = [
-            'total' => DB::table('landlord_applications')->count(),
-            'pending' => DB::table('landlord_applications')->where('status', 'pending')->count(),
-            'under_review' => DB::table('landlord_applications')->where('status', 'under_review')->count(),
-            'approved' => DB::table('landlord_applications')->where('status', 'approved')->count(),
-            'rejected' => DB::table('landlord_applications')->where('status', 'rejected')->count(),
+            'total'        => LandlordApplication::count(),
+            'pending'      => LandlordApplication::where('status', 'pending')->count(),
+            'under_review' => LandlordApplication::where('status', 'under_review')->count(),
+            'approved'     => LandlordApplication::where('status', 'approved')->count(),
+            'rejected'     => LandlordApplication::where('status', 'rejected')->count(),
         ];
 
         return Inertia::render('Admin/Applications/Index', [
-            'applications' => $applications,
-            'stats' => $stats,
+            'applications'  => $applications,
+            'stats'         => $stats,
             'currentStatus' => $status,
         ]);
     }
 
-    /**
-     * Show application details.
-     */
     public function show($id)
     {
-        $application = DB::table('landlord_applications')
-            ->join('users', 'landlord_applications.user_id', '=', 'users.id')
-            ->select(
-                'landlord_applications.*',
-                'users.name as user_name',
-                'users.email as user_email'
-            )
-            ->where('landlord_applications.id', $id)
-            ->first();
-
-        if (!$application) {
-            return redirect()->route('admin.applications.index')->with('error', 'Application not found.');
-        }
+        $application = LandlordApplication::with('user')
+            ->findOrFail($id);
 
         return Inertia::render('Admin/Applications/Show', [
             'application' => $application,
         ]);
     }
 
-    /**
-     * Mark application as under review.
-     */
     public function markAsUnderReview($id)
     {
-        DB::table('landlord_applications')->where('id', $id)->update([
-            'status' => 'under_review',
-            'updated_at' => now(),
-        ]);
+        LandlordApplication::findOrFail($id)->update(['status' => 'under_review']);
 
-        return redirect()->back()->with('success', 'Application marked as under review.');
+        return back()->with('success', 'Application marked as under review.');
     }
 
-    /**
-     * Approve landlord application.
-     */
-    public function approve(Request $request, $id)
+    public function approve($id)
     {
-        $application = DB::table('landlord_applications')->where('id', $id)->first();
-        
-        if (!$application) {
-            return back()->with('error', 'Application not found.');
-        }
+        $application = LandlordApplication::with('user')->findOrFail($id);
 
-        // Update application status
-        DB::table('landlord_applications')->where('id', $id)->update([
-            'status' => 'approved',
+        $application->update([
+            'status'      => 'approved',
             'reviewed_at' => now(),
             'reviewed_by' => auth()->id(),
         ]);
 
-        // Assign landlord role to user
-        $landlordRole = DB::table('roles')->where('name', 'landlord')->first();
-        if ($landlordRole) {
-            DB::table('users')->where('id', $application->user_id)->update([
-                'role_id' => $landlordRole->id,
-            ]);
-        }
+        $this->service->promoteToLandlord($application->user);
 
-        return redirect()->route('admin.applications.index')->with('success', 'Application approved successfully. User is now a landlord.');
+        return redirect()->route('admin.applications.index')
+            ->with('success', 'Application approved. User is now a landlord.');
     }
 
-    /**
-     * Reject landlord application.
-     */
     public function reject(Request $request, $id)
     {
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:500',
         ]);
 
-        DB::table('landlord_applications')->where('id', $id)->update([
-            'status' => 'rejected',
+        LandlordApplication::findOrFail($id)->update([
+            'status'           => 'rejected',
             'rejection_reason' => $validated['rejection_reason'],
-            'reviewed_at' => now(),
-            'reviewed_by' => auth()->id(),
+            'reviewed_at'      => now(),
+            'reviewed_by'      => auth()->id(),
         ]);
 
-        return redirect()->route('admin.applications.index')->with('success', 'Application rejected.');
+        return redirect()->route('admin.applications.index')
+            ->with('success', 'Application rejected.');
     }
 }

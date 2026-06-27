@@ -10,23 +10,25 @@ class PropertyApplication extends Model
         'user_id',
         'property_id',
         'status',
-        'employer_name',
-        'job_title',
-        'monthly_income',
-        'employment_duration',
-        'reference_1_name',
-        'reference_1_phone',
-        'reference_1_relation',
-        'reference_2_name',
-        'reference_2_phone',
-        'reference_2_relation',
-        'preferred_move_in_date',
-        'lease_duration_months',
-        'occupants_count',
+        'message',
+        'preferred_move_in',
+        'additional_comments',
+        // Residential rent
+        'adults',
+        'children',
         'has_pets',
         'pet_details',
-        'additional_comments',
+        // Commercial
+        'intended_use',
+        'business_name',
     ];
+
+    protected $casts = [
+        'preferred_move_in' => 'date',
+        'has_pets'          => 'boolean',
+    ];
+
+    // Relationships
 
     public function user()
     {
@@ -36,5 +38,17 @@ class PropertyApplication extends Model
     public function property()
     {
         return $this->belongsTo(Property::class);
+    }
+
+    // Scopes
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
     }
 }

@@ -33,7 +33,9 @@
         "@nodelib/fs.scandir": "^4.0.1",
         "@nodelib/fs.stat": "^4.0.0",
         "@nodelib/fs.walk": "^3.0.1",
+        "@types/leaflet": "^1.9.21",
         "chart.js": "^4.5.1",
+        "leaflet": "^1.9.4",
         "vue-chartjs": "^5.3.3"
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\PropertyController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\TourRequestController;
@@ -16,6 +17,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/map', [PropertyController::class, 'map']);
 Route::get('/properties/{id}', [PropertyController::class, 'show']);
+
+// Location (public — used in forms and search filters)
+Route::prefix('locations')->name('api.locations.')->group(function () {
+    Route::get('/provinces', [LocationController::class, 'provinces'])->name('provinces');
+    Route::get('/districts/{province}', [LocationController::class, 'districts'])->name('districts');
+    Route::get('/towns/{district}', [LocationController::class, 'towns'])->name('towns');
+    Route::get('/search', [LocationController::class, 'search'])->name('search');
+});
 
 // Protected routes - Require authentication
 Route::middleware('auth:sanctum')->group(function () {

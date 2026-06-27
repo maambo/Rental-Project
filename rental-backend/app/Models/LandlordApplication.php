@@ -12,7 +12,6 @@ class LandlordApplication extends Model
         'address',
         'province',
         'town',
-        'verification_level',
         'landlord_type',
         'status',
         'id_document_url',
@@ -22,10 +21,6 @@ class LandlordApplication extends Model
         'video_walkthrough_url',
         'business_registration_url',
         'verification_submitted_at',
-        'verification_approved_at',
-        'payment_status',
-        'subscription_expires_at',
-        'listing_limit',
         'admin_notes',
         'rejection_reason',
         'reviewed_at',
@@ -34,34 +29,10 @@ class LandlordApplication extends Model
 
     protected $casts = [
         'verification_submitted_at' => 'datetime',
-        'verification_approved_at' => 'datetime',
-        'subscription_expires_at' => 'datetime',
-        'reviewed_at' => 'datetime',
+        'reviewed_at'               => 'datetime',
     ];
 
-    public function isBasicVerified(): bool
-    {
-        return $this->status === 'approved' && $this->verification_level === 'basic';
-    }
-
-    public function isTrustedLandlord(): bool
-    {
-        return $this->status === 'approved' && $this->verification_level === 'trusted';
-    }
-
-    public function isPremiumVerified(): bool
-    {
-        return $this->status === 'approved' && $this->verification_level === 'premium';
-    }
-
-    public function getRemainingListingsCount(): int
-    {
-        $propertiesCount = Property::where('landlord_id', $this->user_id)->count();
-        if ($this->listing_limit > 1000) {
-            return 999999;
-        }
-        return max(0, $this->listing_limit - $propertiesCount);
-    } // End of helper methods
+    // Relationships
 
     public function user()
     {
@@ -71,5 +42,34 @@ class LandlordApplication extends Model
     public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    // Scopes
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    // Helpers
+
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    public function isEditable(): bool
+    {
+        return in_array($this->status, ['pending', 'rejected']);
     }
 }

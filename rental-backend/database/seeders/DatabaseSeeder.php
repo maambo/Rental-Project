@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RolePermissionSeeder::class,
             AdminSeeder::class,
-            VerificationTierSeeder::class,
+            ZambiaLocationSeeder::class,
+            UtilitySeeder::class,
         ]);
 
         // User::factory(10)->create();

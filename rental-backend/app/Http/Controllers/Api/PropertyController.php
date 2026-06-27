@@ -14,8 +14,8 @@ class PropertyController extends Controller
     public function index(Request $request)
     {
         $properties = Property::search($request->all())
-            ->with(['images', 'landlord'])
-            ->where('is_approved', true)
+            ->with(['images', 'landlord', 'province', 'district', 'town'])
+            ->where('approval_status', 'approved')
             ->where('is_visible_in_search', true)
             ->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 20));
@@ -24,14 +24,16 @@ class PropertyController extends Controller
     }
 
     /**
-     * Get properties for map display.
+     * Get properties for map display, grouped by type.
      */
     public function map(Request $request)
     {
         $properties = Property::search($request->all())
-            ->where('is_approved', true)
+            ->where('approval_status', 'approved')
             ->where('is_visible_in_search', true)
-            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'location'])
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'property_type', 'listing_type', 'property_subtype'])
             ->get();
 
         return response()->json($properties);
@@ -42,15 +44,16 @@ class PropertyController extends Controller
      */
     public function show($id)
     {
-        $property = Property::with(['images', 'reviews.user', 'landlord'])
-            ->findOrFail($id);
+        $property = Property::with([
+            'images', 'reviews.user', 'landlord',
+            'province', 'district', 'town',
+            'utilities.options',
+        ])->findOrFail($id);
 
-        // Increment view count
         $property->increment('view_count');
 
-        // Add computed attributes
         $property->average_rating = $property->averageRating;
-        $property->review_count = $property->reviewCount;
+        $property->review_count   = $property->reviewCount;
 
         return response()->json($property);
     }
