@@ -18,6 +18,12 @@ class User extends Authenticatable
         'role_id',
         'google_id',
         'avatar',
+        'phone',
+        'id_type',
+        'nrc_passport',
+        'id_document_url',
+        'selfie_url',
+        'identity_verified_at',
     ];
 
     protected $hidden = [
@@ -120,5 +126,10 @@ class User extends Authenticatable
     public function hasUnlimitedProperties(): bool
     {
         return $this->propertyLimit() === -1;
+    }
+
+    public function isIdentityVerified(): bool
+    {
+        return $this->identity_verified_at !== null;
     }
 }

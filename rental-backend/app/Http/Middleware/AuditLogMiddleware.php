@@ -27,7 +27,9 @@ class AuditLogMiddleware
             }
 
             $excludeFields = ['password', 'password_confirmation', '_token'];
-            $newValues = $request->except($excludeFields);
+            $newValues = collect($request->except($excludeFields))
+                ->reject(fn ($value) => $value instanceof \Illuminate\Http\UploadedFile)
+                ->all();
 
             \App\Services\AuditService::log(
                 event: strtolower($request->method()) . '_request',

@@ -72,10 +72,15 @@ class LandlordApplicationService
         $role = Role::where('name', 'applicant_landlord')->first();
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role_id'  => $role?->id,
+            'name'            => $validated['name'],
+            'email'           => $validated['email'],
+            'password'        => Hash::make($validated['password']),
+            'role_id'         => $role?->id,
+            'phone'           => $validated['phone'],
+            'id_type'         => $validated['id_type'] ?? 'nrc',
+            'nrc_passport'    => $validated['nrc_passport'],
+            'id_document_url' => $documents['id_document_url'] ?? null,
+            'selfie_url'      => $documents['selfie_url'] ?? null,
         ]);
 
         return LandlordApplication::create(array_merge([

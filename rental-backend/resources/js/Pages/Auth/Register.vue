@@ -11,10 +11,21 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    phone: '',
+    id_type: 'nrc' as 'nrc' | 'passport',
+    nrc_passport: '',
+    id_document: null as File | null,
+    selfie: null as File | null,
 });
+
+const handleFile = (e: Event, field: 'id_document' | 'selfie') => {
+    const target = e.target as HTMLInputElement;
+    if (target.files?.[0]) form[field] = target.files[0] as any;
+};
 
 const submit = () => {
     form.post(route('register'), {
+        forceFormData: true,
         onFinish: () => {
             form.reset('password', 'password_confirmation');
         },
@@ -118,6 +129,79 @@ const submit = () => {
                     class="mt-2"
                     :message="form.errors.password_confirmation"
                 />
+            </div>
+
+            <!-- Identity Verification -->
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Identity Verification</p>
+
+                <div>
+                    <InputLabel for="phone" value="Phone Number" />
+                    <TextInput
+                        id="phone"
+                        type="tel"
+                        class="mt-1 block w-full focus:border-brand-orange focus:ring-brand-orange"
+                        v-model="form.phone"
+                        placeholder="+260 97 000 0000"
+                        required
+                    />
+                    <InputError class="mt-2" :message="form.errors.phone" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel value="ID Type" />
+                    <div class="mt-1 flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" v-model="form.id_type" value="nrc" class="text-brand-red focus:ring-brand-red" />
+                            <span class="text-sm text-gray-700 dark:text-gray-300">NRC (Zambian citizen)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" v-model="form.id_type" value="passport" class="text-brand-red focus:ring-brand-red" />
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Passport (non-citizen)</span>
+                        </label>
+                    </div>
+                    <InputError class="mt-2" :message="form.errors.id_type" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel for="nrc_passport" :value="form.id_type === 'nrc' ? 'NRC Number' : 'Passport Number'" />
+                    <TextInput
+                        id="nrc_passport"
+                        type="text"
+                        class="mt-1 block w-full focus:border-brand-orange focus:ring-brand-orange"
+                        v-model="form.nrc_passport"
+                        :placeholder="form.id_type === 'nrc' ? 'e.g. 123456/78/1' : 'e.g. A1234567'"
+                        required
+                    />
+                    <InputError class="mt-2" :message="form.errors.nrc_passport" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel for="id_document" :value="form.id_type === 'nrc' ? 'NRC Document (photo/scan)' : 'Passport (photo/scan)'" />
+                    <input
+                        id="id_document"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.pdf"
+                        required
+                        class="mt-1 block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-brand-red file:text-white hover:file:bg-red-700 cursor-pointer"
+                        @change="(e) => handleFile(e, 'id_document')"
+                    />
+                    <InputError class="mt-2" :message="form.errors.id_document" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel for="selfie" value="Selfie / Live Photo" />
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">A clear photo of your face — used to match your ID document.</p>
+                    <input
+                        id="selfie"
+                        type="file"
+                        accept=".jpg,.jpeg,.png"
+                        required
+                        class="mt-1 block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-brand-red file:text-white hover:file:bg-red-700 cursor-pointer"
+                        @change="(e) => handleFile(e, 'selfie')"
+                    />
+                    <InputError class="mt-2" :message="form.errors.selfie" />
+                </div>
             </div>
 
             <div class="mt-4 flex items-center justify-end">

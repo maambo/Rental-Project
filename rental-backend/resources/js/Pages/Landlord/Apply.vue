@@ -11,6 +11,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     phone: '',
+    id_type: 'nrc' as 'nrc' | 'passport',
     nrc_passport: '',
     address: '',
     province: '',
@@ -140,19 +141,33 @@ const submit = () => {
                                 </div>
                             </div>
 
-                            <!-- NRC/Passport Number -->
+                            <!-- ID Type + NRC/Passport Number -->
                             <div>
-                                <InputLabel for="nrc_passport" value="NRC / Passport Number *" />
-                                <input 
+                                <InputLabel value="ID Type *" />
+                                <div class="mt-1 flex gap-6">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" v-model="form.id_type" value="nrc" class="text-brand-red focus:ring-brand-red" />
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">NRC (Zambian citizen)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" v-model="form.id_type" value="passport" class="text-brand-red focus:ring-brand-red" />
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">Passport (non-citizen)</span>
+                                    </label>
+                                </div>
+                                <InputError :message="form.errors.id_type" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel for="nrc_passport" :value="form.id_type === 'nrc' ? 'NRC Number *' : 'Passport Number *'" />
+                                <input
                                     id="nrc_passport"
                                     v-model="form.nrc_passport"
                                     type="text"
                                     class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:border-brand-red focus:ring focus:ring-brand-red focus:ring-opacity-50"
-                                    placeholder="123456/78/1 or AB1234567"
+                                    :placeholder="form.id_type === 'nrc' ? 'e.g. 123456/78/1' : 'e.g. A1234567'"
                                     required
                                 />
                                 <InputError :message="form.errors.nrc_passport" class="mt-2" />
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">National Registration Card or Passport number</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -294,18 +309,17 @@ const submit = () => {
                                 <InputError :message="form.errors.proof_of_address" class="mt-2" />
                             </div>
 
-                            <!-- Trusted Tier Docs -->
-                            <div v-if="form.verification_level === 'trusted' || form.verification_level === 'premium'" class="border-t pt-4 mt-4">
-                                <h4 class="font-medium text-gray-900 dark:text-white mb-4">Required for Trusted Status</h4>
+                            <!-- Selfie — always required -->
+                            <div class="border-t pt-4 mt-4">
                                 <div>
-                                    <InputLabel value="Selfie with ID *" />
-                                    <p class="text-xs text-gray-500 mb-2">Please take a clear photo of yourself holding your ID card next to your face.</p>
-                                    <input type="file" @change="(e) => handleFileChange(e, 'selfie')" class="mt-1 block w-full text-sm text-gray-500
+                                    <InputLabel value="Selfie / Live Photo *" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">A clear photo of your face — used to match your ID document.</p>
+                                    <input type="file" required @change="(e) => handleFileChange(e, 'selfie')" class="mt-1 block w-full text-sm text-gray-500
                                     file:mr-4 file:py-2 file:px-4
                                     file:rounded-full file:border-0
                                     file:text-sm file:font-semibold
-                                    file:bg-brand-blue/10 file:text-brand-blue
-                                    hover:file:bg-brand-blue/20" accept=".jpg,.png" />
+                                    file:bg-brand-red/10 file:text-brand-red
+                                    hover:file:bg-brand-red/20" accept=".jpg,.jpeg,.png" />
                                     <InputError :message="form.errors.selfie" class="mt-2" />
                                 </div>
                             </div>

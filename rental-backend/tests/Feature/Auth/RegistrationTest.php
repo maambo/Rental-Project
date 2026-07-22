@@ -3,6 +3,8 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -18,11 +20,18 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        Storage::fake('public');
+
         $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
+            'name'                  => 'Test User',
+            'email'                 => 'test@example.com',
+            'password'              => 'password',
             'password_confirmation' => 'password',
+            'phone'                 => '+260971234567',
+            'id_type'               => 'nrc',
+            'nrc_passport'          => '123456/78/1',
+            'id_document'           => UploadedFile::fake()->image('id.jpg'),
+            'selfie'                => UploadedFile::fake()->image('selfie.jpg'),
         ]);
 
         $this->assertAuthenticated();
