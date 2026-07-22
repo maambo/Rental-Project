@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\LandlordApplication;
 use App\Models\Role;
+use App\Models\Subscription;
 use App\Models\User;
+use App\Models\VerificationTier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -89,11 +91,25 @@ class LandlordApplicationService
     }
 
     /**
-     * Promote a user to the landlord role after application approval.
+     * Promote a user to the landlord role and provision a Starter subscription.
      */
     public function promoteToLandlord(User $user): void
     {
         $landlordRole = Role::where('name', 'landlord')->firstOrFail();
         $user->update(['role_id' => $landlordRole->id]);
+
+        $starterTier = VerificationTier::where('name', 'starter')
+                                       ->where('tier_type', 'landlord')
+                                       ->first();
+
+        if ($starterTier && !$user->subscriptions()->active()->exists()) {
+            Subscription::create([
+                'user_id'              => $user->id,
+                'verification_tier_id' => $starterTier->id,
+                'status'               => 'active',
+                'billing_cycle'        => 'free',
+                'starts_at'            => now(),
+            ]);
+        }
     }
 }

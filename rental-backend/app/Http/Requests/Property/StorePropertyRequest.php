@@ -26,7 +26,8 @@ class StorePropertyRequest extends FormRequest
 
             // Core details
             'title'            => 'required|string|max:255',
-            'description'      => 'required|string',
+            'description'           => 'required|string',
+            'terms_and_conditions'  => 'nullable|string',
             'price'            => 'required|numeric|min:0',
             'bedrooms'         => 'nullable|integer|min:0',
             'bathrooms'        => 'nullable|integer|min:0',
@@ -41,6 +42,12 @@ class StorePropertyRequest extends FormRequest
             // Utilities (array of utility_option IDs)
             'utilities'        => 'nullable|array',
             'utilities.*'      => 'integer|exists:utility_options,id',
+
+            // Documents (optional)
+            'documents'        => 'nullable|array|max:10',
+            'documents.*'      => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png',
+            'document_names'   => 'nullable|array',
+            'document_names.*' => 'nullable|string|max:100',
         ];
     }
 

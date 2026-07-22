@@ -15,6 +15,7 @@ class Property extends Model
         'code',
         'title',
         'description',
+        'terms_and_conditions',
         'price',
         'street_address',
         'province_id',
@@ -33,6 +34,8 @@ class Property extends Model
         'is_visible_in_search',
         'is_auto_suspended',
         'requires_real_time_photo',
+        'availability_status',
+        'availability_changed_at',
         'real_time_photo_url',
         'submitted_date',
         'approved_date',
@@ -46,12 +49,13 @@ class Property extends Model
         'price'                    => 'decimal:2',
         'amenities'                => 'array',
         'is_visible_in_search'     => 'boolean',
-        'is_auto_suspended'        => 'boolean',
-        'requires_real_time_photo' => 'boolean',
-        'latitude'                 => 'decimal:8',
-        'longitude'                => 'decimal:8',
-        'submitted_date'           => 'datetime',
-        'approved_date'            => 'datetime',
+        'is_auto_suspended'          => 'boolean',
+        'requires_real_time_photo'  => 'boolean',
+        'latitude'                  => 'float',
+        'longitude'                 => 'float',
+        'submitted_date'            => 'datetime',
+        'approved_date'             => 'datetime',
+        'availability_changed_at'   => 'datetime',
     ];
 
     protected static function boot()
@@ -134,6 +138,11 @@ class Property extends Model
         return $this->hasMany(PropertyApplication::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(PropertyDocument::class)->orderByDesc('created_at');
+    }
+
     public function utilities()
     {
         return $this->belongsToMany(UtilityType::class, 'property_utilities')
@@ -147,7 +156,8 @@ class Property extends Model
     {
         return $query->where('is_visible_in_search', true)
                      ->where('is_auto_suspended', false)
-                     ->where('approval_status', 'approved');
+                     ->where('approval_status', 'approved')
+                     ->where('availability_status', 'available');
     }
 
     public function scopeApproved($query)

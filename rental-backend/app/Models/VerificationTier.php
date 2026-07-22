@@ -8,13 +8,14 @@ class VerificationTier extends Model
 {
     protected $fillable = [
         'name',
+        'tier_type',
         'display_name',
         'price_display',
         'price_amount',
         'property_limit',
         'features',
         'styling',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [

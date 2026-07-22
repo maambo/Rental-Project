@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
+use App\Models\TourRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TourRequestController extends Controller
 {
@@ -12,17 +12,20 @@ class TourRequestController extends Controller
     {
         $validated = $request->validate([
             'scheduled_at' => 'required|date|after:now',
-            'notes' => 'nullable|string',
+            'notes'        => 'nullable|string|max:500',
         ]);
 
-        DB::table('tour_requests')->insert([
-            'user_id' => auth()->id(),
-            'property_id' => $property->id,
-            'status' => 'pending',
-            'scheduled_at' => $validated['scheduled_at'],
-            'notes' => $validated['notes'] ?? null,
-            'created_at' => now(),
-            'updated_at' => now(),
+        $scheduledAt = \Carbon\Carbon::parse($validated['scheduled_at']);
+
+        TourRequest::create([
+            'property_id'    => $property->id,
+            'user_id'        => auth()->id(),
+            'name'           => auth()->user()->name,
+            'email'          => auth()->user()->email,
+            'preferred_date' => $scheduledAt->toDateString(),
+            'preferred_time' => $scheduledAt->format('H:i'),
+            'notes'          => $validated['notes'] ?? null,
+            'status'         => 'pending',
         ]);
 
         return back()->with('success', 'Tour request scheduled successfully!');

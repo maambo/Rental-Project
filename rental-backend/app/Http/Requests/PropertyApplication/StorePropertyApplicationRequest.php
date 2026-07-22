@@ -30,6 +30,7 @@ class StorePropertyApplicationRequest extends FormRequest
             'message'             => 'nullable|string|max:1000',
             'preferred_move_in'   => 'nullable|date|after:today',
             'additional_comments' => 'nullable|string|max:1000',
+            'applicant_terms'     => 'nullable|string|max:5000',
 
             // Residential rent fields
             'adults'     => $isResidentialRent ? 'required|integer|min:1|max:20' : 'nullable|integer',

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Property;
+use App\Models\PropertyDocument;
 use App\Models\PropertyImage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -64,6 +65,38 @@ class PropertyService
         }
 
         $property->utilities()->sync($sync);
+    }
+
+    /**
+     * Store uploaded document files for a property.
+     */
+    public function storeDocuments(Property $property, array $files, array $names, int $uploaderId): void
+    {
+        foreach ($files as $i => $file) {
+            /** @var UploadedFile $file */
+            $path = $file->store("properties/{$property->id}/documents", 'public');
+
+            PropertyDocument::create([
+                'property_id' => $property->id,
+                'uploaded_by' => $uploaderId,
+                'name'        => $names[$i] ?? $file->getClientOriginalName(),
+                'file_path'   => $path,
+                'mime_type'   => $file->getMimeType(),
+                'file_size'   => $file->getSize(),
+            ]);
+        }
+    }
+
+    /**
+     * Delete specific documents by ID (must belong to this property).
+     */
+    public function deleteDocuments(Property $property, array $documentIds): void
+    {
+        $docs = $property->documents()->whereIn('id', $documentIds)->get();
+        foreach ($docs as $doc) {
+            Storage::disk('public')->delete($doc->file_path);
+            $doc->delete();
+        }
     }
 
     /**

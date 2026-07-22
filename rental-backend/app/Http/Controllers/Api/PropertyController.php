@@ -58,89 +58,76 @@ class PropertyController extends Controller
         return response()->json($property);
     }
 
-    /**
-     * Store a newly created property (landlord only).
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'location' => 'required|string',
-            'bedrooms' => 'required|integer|min:0',
-            'bathrooms' => 'required|integer|min:0',
-            'sqft' => 'required|integer|min:0',
-            'images' => 'required|array|min:1',
-            'images.*' => 'required|url',
+            'province_id'      => 'required|exists:provinces,id',
+            'district_id'      => 'required|exists:districts,id',
+            'town_id'          => 'required|exists:towns,id',
+            'street_address'   => 'required|string|max:255',
+            'latitude'         => 'required|numeric|between:-18.1,-8.2',
+            'longitude'        => 'required|numeric|between:21.9,33.7',
+            'property_type'    => 'required|in:residential,commercial',
+            'property_subtype' => 'required|in:house,apartment,room,farm,plot,shop,office_space,warehouse',
+            'listing_type'     => 'required|in:rent,sale',
+            'title'            => 'required|string|max:255',
+            'description'      => 'required|string',
+            'terms_and_conditions' => 'nullable|string',
+            'price'            => 'required|numeric|min:0',
+            'bedrooms'         => 'nullable|integer|min:0',
+            'bathrooms'        => 'nullable|integer|min:0',
+            'square_feet'      => 'nullable|integer|min:0',
+            'amenities'        => 'nullable|array',
+            'amenities.*'      => 'string',
         ]);
 
-        // Generate property code
-        $lastProperty = Property::latest('id')->first();
-        $nextNumber = $lastProperty ? (int)substr($lastProperty->code, 3) + 1 : 1;
-        $code = 'PIV' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-        $property = Property::create([
-            'landlord_id' => $request->user()->id,
-            'code' => $code,
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
-            'location' => $validated['location'],
-            'bedrooms' => $validated['bedrooms'],
-            'bathrooms' => $validated['bathrooms'],
-            'sqft' => $validated['sqft'],
+        $property = Property::create(array_merge($validated, [
+            'landlord_id'     => $request->user()->id,
             'approval_status' => 'pending',
-            'submitted_date' => now(),
-        ]);
+            'submitted_date'  => now(),
+        ]));
 
-        // Create property images
-        foreach ($validated['images'] as $index => $imageUrl) {
-            $property->images()->create([
-                'image_url' => $imageUrl,
-                'order' => $index,
-                'is_primary' => $index === 0,
-            ]);
-        }
-
-        return response()->json($property->load('images'), 201);
+        return response()->json($property->load(['province', 'district', 'town']), 201);
     }
 
-    /**
-     * Update the specified property.
-     */
     public function update(Request $request, $id)
     {
         $property = Property::findOrFail($id);
 
-        // Ensure user owns the property
         if ($property->landlord_id !== $request->user()->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string',
-            'price' => 'sometimes|numeric|min:0',
-            'location' => 'sometimes|string',
-            'bedrooms' => 'sometimes|integer|min:0',
-            'bathrooms' => 'sometimes|integer|min:0',
-            'sqft' => 'sometimes|integer|min:0',
+            'province_id'      => 'sometimes|exists:provinces,id',
+            'district_id'      => 'sometimes|exists:districts,id',
+            'town_id'          => 'sometimes|exists:towns,id',
+            'street_address'   => 'sometimes|string|max:255',
+            'latitude'         => 'sometimes|numeric|between:-18.1,-8.2',
+            'longitude'        => 'sometimes|numeric|between:21.9,33.7',
+            'property_type'    => 'sometimes|in:residential,commercial',
+            'property_subtype' => 'sometimes|in:house,apartment,room,farm,plot,shop,office_space,warehouse',
+            'listing_type'     => 'sometimes|in:rent,sale',
+            'title'            => 'sometimes|string|max:255',
+            'description'      => 'sometimes|string',
+            'terms_and_conditions' => 'nullable|string',
+            'price'            => 'sometimes|numeric|min:0',
+            'bedrooms'         => 'nullable|integer|min:0',
+            'bathrooms'        => 'nullable|integer|min:0',
+            'square_feet'      => 'nullable|integer|min:0',
+            'amenities'        => 'nullable|array',
+            'amenities.*'      => 'string',
         ]);
 
         $property->update($validated);
 
-        return response()->json($property);
+        return response()->json($property->load(['province', 'district', 'town']));
     }
 
-    /**
-     * Remove the specified property.
-     */
     public function destroy(Request $request, $id)
     {
         $property = Property::findOrFail($id);
 
-        // Ensure user owns the property
         if ($property->landlord_id !== $request->user()->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }

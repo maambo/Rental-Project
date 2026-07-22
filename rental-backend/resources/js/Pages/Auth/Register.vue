@@ -137,5 +137,16 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+
+        <!-- Landlord CTA -->
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Want to list your property?</p>
+            <Link
+                :href="route('landlord.apply')"
+                class="inline-flex items-center justify-center w-full px-4 py-2.5 border-2 border-brand-red rounded-md text-sm font-semibold text-brand-red hover:bg-brand-red hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-brand-red focus:ring-offset-2"
+            >
+                Register as Landlord →
+            </Link>
+        </div>
     </GuestLayout>
 </template>

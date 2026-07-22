@@ -1,44 +1,49 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import {
-    HomeIcon,
-    UserIcon,
-    ClipboardDocumentListIcon,
-    ChartBarIcon,
-    Cog6ToothIcon,
-    ArrowLeftOnRectangleIcon,
-    BuildingOfficeIcon,
-    ChatBubbleLeftRightIcon,
-    WrenchScrewdriverIcon,
-    CurrencyDollarIcon,
-    CheckBadgeIcon,
-    UsersIcon,
-    FolderIcon,
-    ShieldCheckIcon,
-    DocumentTextIcon,
-    ClockIcon
+    HomeIcon, UserIcon, ClipboardDocumentListIcon, ChartBarIcon,
+    Cog6ToothIcon, ArrowLeftOnRectangleIcon, BuildingOfficeIcon,
+    ChatBubbleLeftRightIcon, WrenchScrewdriverIcon, CheckBadgeIcon,
+    UsersIcon, FolderIcon, ShieldCheckIcon, DocumentTextIcon,
+    ClockIcon, GlobeAltIcon, ChevronDownIcon, CreditCardIcon,
 } from '@heroicons/vue/24/outline';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const role = computed(() => user.value?.roleModel?.name || 'tenant');
 
-const isActive = (routePattern: string) => {
-    return route().current(routePattern);
+const isActive = (pattern: string) => route().current(pattern);
+
+const link = "flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-150 rounded-lg mx-2";
+const active = "bg-brand-red/10 text-brand-red";
+const inactive = "text-gray-400 hover:bg-gray-800 hover:text-white";
+
+// Accordion — only one group open at a time; null = all collapsed
+const defaultGroup: Record<string, string> = {
+    admin: 'quick',
+    applicant_landlord: 'applicant',
+    landlord: 'landlord',
 };
+const openGroups = ref<Set<string>>(new Set([defaultGroup[role.value] ?? 'tenant']));
 
-const commonClasses = "flex items-center px-4 py-3 text-sm font-medium transition-colors duration-200";
-const activeClasses = "border-r-4 border-brand-red bg-brand-red/10 text-brand-red";
-const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border-r-4 border-transparent";
-
+const toggle = (key: string) => {
+    if (openGroups.value.has(key)) {
+        openGroups.value.delete(key);
+    } else {
+        openGroups.value.add(key);
+    }
+    openGroups.value = new Set(openGroups.value); // trigger reactivity
+};
+const isOpen = (key: string) => openGroups.value.has(key);
 </script>
 
 <template>
-    <div class="flex h-screen w-64 flex-col bg-dark-bg text-white shadow-xl">
+    <div class="flex h-screen w-64 flex-col bg-dark-bg text-white shadow-xl overflow-hidden">
+
         <!-- Logo -->
-        <div class="flex h-16 items-center justify-center border-b border-gray-800">
+        <div class="flex h-16 items-center justify-center border-b border-gray-800 flex-shrink-0">
             <Link :href="route('dashboard')" class="flex items-center gap-2">
                 <ApplicationLogo class="h-8 w-8 fill-current text-brand-red" />
                 <span class="text-xl font-bold tracking-wider">RENTAL<span class="text-brand-red">APP</span></span>
@@ -46,143 +51,170 @@ const inactiveClasses = "text-gray-400 hover:bg-gray-800 hover:text-white border
         </div>
 
         <!-- User Info -->
-        <div class="border-b border-gray-800 p-4">
+        <div class="border-b border-gray-800 p-4 flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-light-bg text-brand-orange">
-                    <UserIcon class="h-6 w-6" />
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-light-bg text-brand-red flex-shrink-0">
+                    <UserIcon class="h-5 w-5" />
                 </div>
                 <div class="overflow-hidden">
                     <p class="truncate text-sm font-medium text-white">{{ user.name }}</p>
-                    <p class="truncate text-xs text-gray-500 capitalize">{{ role.replace('_', ' ') }}</p>
+                    <p class="truncate text-xs text-gray-500 capitalize">{{ role.replace(/_/g, ' ') }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto py-4 space-y-1">
-            
-            <!-- ADMIN MENU -->
+        <!-- Navigation — no scrollbar, fits within flex column -->
+        <nav class="flex-1 overflow-hidden py-3 flex flex-col gap-0.5">
+
+            <!-- ── ADMIN ─────────────────────────────────────────────── -->
             <template v-if="role === 'admin'">
-                <Link :href="route('dashboard')" :class="[commonClasses, isActive('dashboard') ? activeClasses : inactiveClasses]">
-                    <HomeIcon class="mr-3 h-5 w-5" />
-                    Dashboard
+                <Link :href="route('dashboard')" :class="[link, isActive('dashboard') ? active : inactive]">
+                    <HomeIcon class="mr-3 h-5 w-5 flex-shrink-0" />Dashboard
                 </Link>
-                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quick Actions</div>
-                <Link :href="route('admin.applications.index')" :class="[commonClasses, isActive('admin.applications.*') ? activeClasses : inactiveClasses]">
-                    <ClipboardDocumentListIcon class="mr-3 h-5 w-5" />
-                    Applications
-                </Link>
-                 <Link :href="route('admin.properties.index')" :class="[commonClasses, isActive('admin.properties.*') ? activeClasses : inactiveClasses]">
-                    <CheckBadgeIcon class="mr-3 h-5 w-5" />
-                    Approve Properties
-                </Link>
-                 <Link :href="route('admin.statistics.index')" :class="[commonClasses, isActive('admin.statistics.*') ? activeClasses : inactiveClasses]">
-                    <ChartBarIcon class="mr-3 h-5 w-5" />
-                    Statistics
-                </Link>
-                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Management</div>
-                <Link :href="route('admin.users.index')" :class="[commonClasses, isActive('admin.users.*') ? activeClasses : inactiveClasses]">
-                    <UsersIcon class="mr-3 h-5 w-5" />
-                    Manage Users
-                </Link>
-                <Link :href="route('admin.roles.index')" :class="[commonClasses, isActive('admin.roles.*') ? activeClasses : inactiveClasses]">
-                    <ShieldCheckIcon class="mr-3 h-5 w-5" />
-                    Roles & Permissions
-                </Link>
-                 <Link :href="route('admin.landlords.index')" :class="[commonClasses, isActive('admin.landlords.*') ? activeClasses : inactiveClasses]">
-                    <BuildingOfficeIcon class="mr-3 h-5 w-5" />
-                    Landlord Profiles
-                </Link>
+
+                <!-- Quick Actions group -->
+                <button @click="toggle('quick')"
+                        class="flex items-center justify-between px-4 py-1.5 mx-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors w-[calc(100%-1rem)]">
+                    <span>Quick Actions</span>
+                    <ChevronDownIcon class="h-3.5 w-3.5 transition-transform duration-200" :class="isOpen('quick') ? '' : '-rotate-90'" />
+                </button>
+                <template v-if="isOpen('quick')">
+                    <Link :href="route('admin.applications.index')" :class="[link, isActive('admin.applications.*') ? active : inactive]">
+                        <ClipboardDocumentListIcon class="mr-3 h-5 w-5 flex-shrink-0" />Applications
+                    </Link>
+                    <Link :href="route('admin.properties.index')" :class="[link, isActive('admin.properties.*') ? active : inactive]">
+                        <CheckBadgeIcon class="mr-3 h-5 w-5 flex-shrink-0" />Properties
+                    </Link>
+                    <Link :href="route('admin.statistics.index')" :class="[link, isActive('admin.statistics.*') ? active : inactive]">
+                        <ChartBarIcon class="mr-3 h-5 w-5 flex-shrink-0" />Statistics
+                    </Link>
+                </template>
+
+                <!-- Management group -->
+                <button @click="toggle('manage')"
+                        class="flex items-center justify-between px-4 py-1.5 mx-2 mt-1 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors w-[calc(100%-1rem)]">
+                    <span>Management</span>
+                    <ChevronDownIcon class="h-3.5 w-3.5 transition-transform duration-200" :class="isOpen('manage') ? '' : '-rotate-90'" />
+                </button>
+                <template v-if="isOpen('manage')">
+                    <Link :href="route('admin.users.index')" :class="[link, isActive('admin.users.*') ? active : inactive]">
+                        <UsersIcon class="mr-3 h-5 w-5 flex-shrink-0" />Manage Users
+                    </Link>
+                    <Link :href="route('admin.utilities.index')" :class="[link, isActive('admin.utilities.*') ? active : inactive]">
+                        <WrenchScrewdriverIcon class="mr-3 h-5 w-5 flex-shrink-0" />Utilities
+                    </Link>
+                    <Link :href="route('admin.roles.index')" :class="[link, isActive('admin.roles.*') ? active : inactive]">
+                        <ShieldCheckIcon class="mr-3 h-5 w-5 flex-shrink-0" />Roles &amp; Permissions
+                    </Link>
+                    <Link :href="route('admin.landlords.index')" :class="[link, isActive('admin.landlords.*') ? active : inactive]">
+                        <BuildingOfficeIcon class="mr-3 h-5 w-5 flex-shrink-0" />Landlord Profiles
+                    </Link>
+                    <Link :href="route('admin.subscriptions.index')" :class="[link, isActive('admin.subscriptions.*') ? active : inactive]">
+                        <CreditCardIcon class="mr-3 h-5 w-5 flex-shrink-0" />Subscriptions
+                    </Link>
+                </template>
             </template>
 
-            <!-- APPLICANT LANDLORD MENU -->
+            <!-- ── APPLICANT LANDLORD ─────────────────────────────────── -->
             <template v-else-if="role === 'applicant_landlord'">
-                <Link :href="route('dashboard')" :class="[commonClasses, isActive('dashboard') ? activeClasses : inactiveClasses]">
-                    <HomeIcon class="mr-3 h-5 w-5" />
-                    Dashboard
+                <Link :href="route('dashboard')" :class="[link, isActive('dashboard') ? active : inactive]">
+                    <HomeIcon class="mr-3 h-5 w-5 flex-shrink-0" />Dashboard
                 </Link>
-                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Application</div>
-                <Link :href="route('landlord.status')" :class="[commonClasses, isActive('landlord.status') ? activeClasses : inactiveClasses]">
-                    <ClockIcon class="mr-3 h-5 w-5" />
-                    Application Status
-                </Link>
-                <Link :href="route('landlord.application.edit')" :class="[commonClasses, isActive('landlord.application.edit') ? activeClasses : inactiveClasses]">
-                    <DocumentTextIcon class="mr-3 h-5 w-5" />
-                    Update Application
-                </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5" />
-                    Help & Support
-                </Link>
+
+                <button @click="toggle('applicant')"
+                        class="flex items-center justify-between px-4 py-1.5 mx-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors w-[calc(100%-1rem)]">
+                    <span>Application</span>
+                    <ChevronDownIcon class="h-3.5 w-3.5 transition-transform duration-200" :class="isOpen('applicant') ? '' : '-rotate-90'" />
+                </button>
+                <template v-if="isOpen('applicant')">
+                    <Link :href="route('landlord.status')" :class="[link, isActive('landlord.status') ? active : inactive]">
+                        <ClockIcon class="mr-3 h-5 w-5 flex-shrink-0" />Application Status
+                    </Link>
+                    <Link :href="route('landlord.application.edit')" :class="[link, isActive('landlord.application.edit') ? active : inactive]">
+                        <DocumentTextIcon class="mr-3 h-5 w-5 flex-shrink-0" />Update Application
+                    </Link>
+                    <Link :href="route('help-support')" :class="[link, isActive('help-support') ? active : inactive]">
+                        <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5 flex-shrink-0" />Help &amp; Support
+                    </Link>
+                </template>
             </template>
 
-            <!-- LANDLORD MENU -->
+            <!-- ── LANDLORD ───────────────────────────────────────────── -->
             <template v-else-if="role === 'landlord'">
-                 <Link :href="route('landlord.dashboard')" :class="[commonClasses, isActive('landlord.dashboard') ? activeClasses : inactiveClasses]">
-                    <HomeIcon class="mr-3 h-5 w-5" />
-                    Dashboard
+                <Link :href="route('landlord.dashboard')" :class="[link, isActive('landlord.dashboard') ? active : inactive]">
+                    <HomeIcon class="mr-3 h-5 w-5 flex-shrink-0" />Dashboard
                 </Link>
-                <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Property Management</div>
-                <Link :href="route('landlord.properties.index')" :class="[commonClasses, isActive('landlord.properties.*') ? activeClasses : inactiveClasses]">
-                    <BuildingOfficeIcon class="mr-3 h-5 w-5" />
-                    My Properties
-                </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <UsersIcon class="mr-3 h-5 w-5" />
-                    Tour Requests
-                </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <WrenchScrewdriverIcon class="mr-3 h-5 w-5" />
-                    Maintenance
-                </Link>
-                 <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5" />
-                    Messages
-                </Link>
+
+                <button @click="toggle('landlord')"
+                        class="flex items-center justify-between px-4 py-1.5 mx-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors w-[calc(100%-1rem)]">
+                    <span>Property Management</span>
+                    <ChevronDownIcon class="h-3.5 w-3.5 transition-transform duration-200" :class="isOpen('landlord') ? '' : '-rotate-90'" />
+                </button>
+                <template v-if="isOpen('landlord')">
+                    <Link :href="route('landlord.properties.index')" :class="[link, isActive('landlord.properties.*') ? active : inactive]">
+                        <BuildingOfficeIcon class="mr-3 h-5 w-5 flex-shrink-0" />My Properties
+                    </Link>
+                    <Link :href="route('landlord.property-applications.index')" :class="[link, isActive('landlord.property-applications.*') ? active : inactive]">
+                        <ClipboardDocumentListIcon class="mr-3 h-5 w-5 flex-shrink-0" />Applications
+                    </Link>
+                    <Link :href="route('landlord.tour-requests.index')" :class="[link, isActive('landlord.tour-requests.*') ? active : inactive]">
+                        <UsersIcon class="mr-3 h-5 w-5 flex-shrink-0" />Tour Requests
+                    </Link>
+                    <Link :href="route('landlord.maintenance.index')" :class="[link, isActive('landlord.maintenance.*') ? active : inactive]">
+                        <WrenchScrewdriverIcon class="mr-3 h-5 w-5 flex-shrink-0" />Maintenance
+                    </Link>
+                    <Link :href="route('chat.index')" :class="[link, isActive('chat.*') ? active : inactive]">
+                        <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5 flex-shrink-0" />Messages
+                    </Link>
+                </template>
             </template>
 
-            <!-- TENANT MENU -->
+            <!-- ── TENANT ─────────────────────────────────────────────── -->
             <template v-else>
-                 <Link :href="route('dashboard')" :class="[commonClasses, isActive('dashboard') ? activeClasses : inactiveClasses]">
-                    <HomeIcon class="mr-3 h-5 w-5" />
-                    Dashboard
+                <Link :href="route('dashboard')" :class="[link, isActive('dashboard') ? active : inactive]">
+                    <HomeIcon class="mr-3 h-5 w-5 flex-shrink-0" />Dashboard
                 </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <BuildingOfficeIcon class="mr-3 h-5 w-5" />
-                    My Rentals
-                </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5" />
-                    Messages
-                </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <WrenchScrewdriverIcon class="mr-3 h-5 w-5" />
-                    Maintenance
-                </Link>
-                <Link href="#" :class="[commonClasses, inactiveClasses]">
-                    <FolderIcon class="mr-3 h-5 w-5" />
-                    History
-                </Link>
+
+                <button @click="toggle('tenant')"
+                        class="flex items-center justify-between px-4 py-1.5 mx-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors w-[calc(100%-1rem)]">
+                    <span>My Space</span>
+                    <ChevronDownIcon class="h-3.5 w-3.5 transition-transform duration-200" :class="isOpen('tenant') ? '' : '-rotate-90'" />
+                </button>
+                <template v-if="isOpen('tenant')">
+                    <Link :href="route('tenant.applications.index')" :class="[link, isActive('tenant.applications.*') ? active : inactive]">
+                        <ClipboardDocumentListIcon class="mr-3 h-5 w-5 flex-shrink-0" />My Applications
+                    </Link>
+                    <Link :href="route('tenant.my-rentals.index')" :class="[link, isActive('tenant.my-rentals.*') ? active : inactive]">
+                        <BuildingOfficeIcon class="mr-3 h-5 w-5 flex-shrink-0" />My Rentals
+                    </Link>
+                    <Link :href="route('chat.index')" :class="[link, isActive('chat.*') ? active : inactive]">
+                        <ChatBubbleLeftRightIcon class="mr-3 h-5 w-5 flex-shrink-0" />Messages
+                    </Link>
+                    <Link :href="route('tenant.maintenance.index')" :class="[link, isActive('tenant.maintenance.*') ? active : inactive]">
+                        <WrenchScrewdriverIcon class="mr-3 h-5 w-5 flex-shrink-0" />Maintenance
+                    </Link>
+                    <Link :href="route('rental-history.index')" :class="[link, isActive('rental-history.*') ? active : inactive]">
+                        <FolderIcon class="mr-3 h-5 w-5 flex-shrink-0" />History
+                    </Link>
+                </template>
             </template>
 
-            <div class="my-4 border-t border-gray-800"></div>
-            
-             <Link :href="route('profile.edit')" :class="[commonClasses, isActive('profile.edit') ? activeClasses : inactiveClasses]">
-                <UserIcon class="mr-3 h-5 w-5" />
-                Profile
-            </Link>
-             <Link v-if="role === 'admin'" :href="route('admin.settings.index')" :class="[commonClasses, isActive('admin.settings.*') ? activeClasses : inactiveClasses]">
-                <Cog6ToothIcon class="mr-3 h-5 w-5" />
-                Settings
-            </Link>
+            <!-- ── Bottom links (always visible) ─────────────────────── -->
+            <div class="mt-auto pt-3 border-t border-gray-800 flex flex-col gap-0.5">
+                <Link :href="route('landing')" :class="[link, isActive('landing') ? active : inactive]">
+                    <GlobeAltIcon class="mr-3 h-5 w-5 flex-shrink-0" />Home
+                </Link>
+                <Link :href="route('profile.edit')" :class="[link, isActive('profile.edit') ? active : inactive]">
+                    <UserIcon class="mr-3 h-5 w-5 flex-shrink-0" />Profile
+                </Link>
+                <Link v-if="role === 'admin'" :href="route('admin.settings.index')" :class="[link, isActive('admin.settings.*') ? active : inactive]">
+                    <Cog6ToothIcon class="mr-3 h-5 w-5 flex-shrink-0" />Settings
+                </Link>
+                <Link :href="route('logout')" method="post" as="button"
+                      class="flex items-center rounded-lg mx-2 px-4 py-2.5 text-sm font-medium text-gray-400 hover:bg-red-900/20 hover:text-red-400 transition-colors">
+                    <ArrowLeftOnRectangleIcon class="mr-3 h-5 w-5 flex-shrink-0" />Logout
+                </Link>
+            </div>
         </nav>
-
-        <!-- Logout -->
-        <div class="border-t border-gray-800 p-4">
-            <Link :href="route('logout')" method="post" as="button" class="flex w-full items-center rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-red-900/20 hover:text-red-500 transition-colors">
-                <ArrowLeftOnRectangleIcon class="mr-3 h-5 w-5" />
-                Logout
-            </Link>
-        </div>
     </div>
 </template>

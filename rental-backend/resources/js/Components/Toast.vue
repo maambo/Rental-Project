@@ -26,23 +26,23 @@ watch(() => page.props.flash, (flash: any) => {
     }
 }, { deep: true });
 
-const bgClass = computed(() => type.value === 'success' ? 'bg-green-50 dark:bg-green-900/50 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/50 border-red-200 dark:border-red-800');
-const textClass = computed(() => type.value === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200');
+const bgClass = computed(() => type.value === 'success' ? 'bg-green-900/60 border border-green-700/60' : 'bg-red-900/60 border border-red-700/60');
+const textClass = computed(() => type.value === 'success' ? 'text-green-200' : 'text-red-200');
 const iconComponent = computed(() => type.value === 'success' ? CheckCircleIcon : XCircleIcon);
-const iconClass = computed(() => type.value === 'success' ? 'text-green-400 dark:text-green-300' : 'text-red-400 dark:text-red-300');
+const iconClass = computed(() => type.value === 'success' ? 'text-green-400' : 'text-red-400');
 
 </script>
 
 <template>
     <transition
         enter-active-class="transform ease-out duration-300 transition"
-        enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+        enter-from-class="-translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
         enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
         leave-active-class="transition ease-in duration-100"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
     >
-        <div v-if="show" class="fixed bottom-4 right-4 z-50 pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5" :class="bgClass">
+        <div v-if="show" class="fixed top-4 right-4 z-50 pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5" :class="bgClass">
             <div class="p-4">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
@@ -54,7 +54,7 @@ const iconClass = computed(() => type.value === 'success' ? 'text-green-400 dark
                         </p>
                     </div>
                     <div class="ml-4 flex flex-shrink-0">
-                        <button type="button" @click="show = false" class="inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2" :class="[type === 'success' ? 'text-green-500 hover:bg-green-100 focus:ring-green-600 dark:hover:bg-green-800' : 'text-red-500 hover:bg-red-100 focus:ring-red-600 dark:hover:bg-red-800']">
+                        <button type="button" @click="show = false" class="inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2" :class="type === 'success' ? 'text-green-400 hover:bg-green-800/50 focus:ring-green-600' : 'text-red-400 hover:bg-red-800/50 focus:ring-red-600'">
                             <span class="sr-only">Close</span>
                             <XMarkIcon class="h-5 w-5" aria-hidden="true" />
                         </button>

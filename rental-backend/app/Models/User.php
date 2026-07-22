@@ -85,6 +85,16 @@ class User extends Authenticatable
         return $this->hasMany(SavedProperty::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)->active()->with('tier')->latestOfMany();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     public function hasRole(string $roleName): bool
@@ -95,4 +105,20 @@ class User extends Authenticatable
     public function isAdmin(): bool    { return $this->hasRole('admin'); }
     public function isLandlord(): bool { return $this->hasRole('landlord'); }
     public function isTenant(): bool   { return $this->hasRole('tenant'); }
+
+    public function currentTier(): ?VerificationTier
+    {
+        return $this->activeSubscription?->tier
+            ?? VerificationTier::where('name', 'starter')->where('tier_type', 'landlord')->first();
+    }
+
+    public function propertyLimit(): int
+    {
+        return $this->currentTier()?->property_limit ?? 1;
+    }
+
+    public function hasUnlimitedProperties(): bool
+    {
+        return $this->propertyLimit() === -1;
+    }
 }

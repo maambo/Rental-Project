@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { 
-    BuildingOfficeIcon, 
-    CheckCircleIcon, 
+import PropertiesMap from '@/Components/PropertiesMap.vue';
+import {
+    BuildingOfficeIcon,
+    CheckCircleIcon,
     ClockIcon,
     UserGroupIcon,
     CalendarIcon,
-    PlusIcon
+    PlusIcon,
+    MapPinIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps<{
@@ -19,176 +22,138 @@ const props = defineProps<{
         pending_applications: number;
         tour_requests: number;
     };
-    recentProperties: any[];
-    tier: string;
-    propertyLimit: number | null;
+    mapProperties: any[];
 }>();
 
-const getStatusBadge = (status: string) => {
-    const badges = {
-        approved: 'bg-green-100 text-green-800',
-        pending: 'bg-yellow-100 text-yellow-800',
-        rejected: 'bg-red-100 text-red-800',
-    };
-    return badges[status as keyof typeof badges] || 'bg-gray-100 text-gray-800';
-};
+const mapReadyProperties = computed(() =>
+    props.mapProperties.map(p => ({
+        ...p,
+        detailUrl: route('properties.show', p.id),
+    }))
+);
 </script>
 
 <template>
     <Head title="Landlord Dashboard" />
 
     <AuthenticatedLayout header="Landlord Dashboard">
-
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                <!-- Tier Info Banner -->
-                <div class="bg-gradient-to-r from-brand-red to-red-700 text-white rounded-lg p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-2xl font-bold capitalize">{{ tier }} Tier</h3>
-                            <p class="text-red-100 mt-1">
-                                {{ propertyLimit ? `${stats.total_properties} / ${propertyLimit}` : stats.total_properties }} 
-                                {{ propertyLimit ? 'Properties' : 'Unlimited Properties' }}
-                            </p>
-                        </div>
-                        <BuildingOfficeIcon class="w-16 h-16 opacity-50" />
-                    </div>
-                </div>
+        <div class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Total Properties -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <div class="p-3 bg-blue-100 rounded-lg">
-                                    <BuildingOfficeIcon class="w-8 h-8 text-blue-600" />
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Properties</p>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.total_properties }}</p>
-                                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <div class="bg-light-bg rounded-xl p-4">
+                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5 flex items-center gap-3">
+                            <BuildingOfficeIcon class="w-7 h-7 text-brand-red shrink-0" />
+                            <div>
+                                <p class="text-xs text-gray-500">Properties</p>
+                                <p class="text-2xl font-bold text-white">{{ stats.total_properties }}</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Approved Properties -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <div class="p-3 bg-green-100 rounded-lg">
-                                    <CheckCircleIcon class="w-8 h-8 text-green-600" />
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Approved</p>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.approved_properties }}</p>
-                                </div>
+                    <div class="bg-light-bg rounded-xl p-4">
+                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5 flex items-center gap-3">
+                            <CheckCircleIcon class="w-7 h-7 text-green-400 shrink-0" />
+                            <div>
+                                <p class="text-xs text-gray-500">Approved</p>
+                                <p class="text-2xl font-bold text-white">{{ stats.approved_properties }}</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Pending Properties -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <div class="p-3 bg-yellow-100 rounded-lg">
-                                    <ClockIcon class="w-8 h-8 text-yellow-600" />
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Pending Approval</p>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.pending_properties }}</p>
-                                </div>
+                    <div class="bg-light-bg rounded-xl p-4">
+                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5 flex items-center gap-3">
+                            <ClockIcon class="w-7 h-7 text-yellow-400 shrink-0" />
+                            <div>
+                                <p class="text-xs text-gray-500">Pending</p>
+                                <p class="text-2xl font-bold text-white">{{ stats.pending_properties }}</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Applications -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <div class="p-3 bg-purple-100 rounded-lg">
-                                    <UserGroupIcon class="w-8 h-8 text-purple-600" />
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Applications</p>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.total_applications }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">{{ stats.pending_applications }} pending</p>
-                                </div>
+                    <div class="bg-light-bg rounded-xl p-4">
+                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5 flex items-center gap-3">
+                            <UserGroupIcon class="w-7 h-7 text-purple-400 shrink-0" />
+                            <div>
+                                <p class="text-xs text-gray-500">Applications</p>
+                                <p class="text-2xl font-bold text-white">{{ stats.total_applications }}</p>
+                                <p class="text-[10px] text-gray-500">{{ stats.pending_applications }} pending</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Tour Requests -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <div class="p-3 bg-orange-100 rounded-lg">
-                                    <CalendarIcon class="w-8 h-8 text-orange-600" />
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Tour Requests</p>
-                                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.tour_requests }}</p>
-                                </div>
+                    <div class="bg-light-bg rounded-xl p-4">
+                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5 flex items-center gap-3">
+                            <CalendarIcon class="w-7 h-7 text-orange-400 shrink-0" />
+                            <div>
+                                <p class="text-xs text-gray-500">Tour Requests</p>
+                                <p class="text-2xl font-bold text-white">{{ stats.tour_requests }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Properties -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Properties</h3>
-                        <Link
-                            :href="route('landlord.properties.index')"
-                            class="text-sm text-brand-red hover:text-red-700 font-medium"
-                        >
-                            View All
-                        </Link>
-                    </div>
-                    <div class="p-6">
-                        <div v-if="recentProperties.length === 0" class="text-center py-8">
-                            <BuildingOfficeIcon class="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                            <p class="text-gray-600 dark:text-gray-400 mb-4">No properties yet</p>
-                            <Link
-                                :href="route('landlord.properties.create')"
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-red text-white rounded-lg hover:bg-red-700"
-                            >
-                                <PlusIcon class="w-5 h-5" />
-                                Add Your First Property
+                <!-- Properties Map -->
+                <div class="bg-light-bg rounded-xl overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-700/60 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <MapPinIcon class="w-4 h-4 text-brand-red" />
+                            <h3 class="text-sm font-semibold text-white">My Properties</h3>
+                            <span class="ml-1 text-xs px-2 py-0.5 rounded-full bg-dark-bg/60 text-gray-400">
+                                {{ mapProperties.length }} total · {{ mapProperties.filter(p => p.latitude && p.longitude).length }} on map
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <Link :href="route('landlord.properties.create')"
+                                class="inline-flex items-center gap-1.5 text-xs bg-brand-red text-white px-3 py-1.5 rounded-md font-medium hover:bg-red-700 transition">
+                                <PlusIcon class="w-3.5 h-3.5" /> Add Property
+                            </Link>
+                            <Link :href="route('landlord.properties.index')"
+                                class="text-xs text-brand-red hover:text-red-400 font-medium">
+                                View All →
                             </Link>
                         </div>
-                        <div v-else class="space-y-4">
-                            <div
-                                v-for="property in recentProperties"
-                                :key="property.id"
-                                class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-                            >
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 dark:text-white">{{ property.title }}</h4>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ property.location }}</p>
-                                    <p class="text-sm font-medium text-brand-red mt-1">K{{ property.price }}/month</p>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        :class="[
-                                            'px-3 py-1 rounded-full text-xs font-medium capitalize',
-                                            getStatusBadge(property.approval_status)
-                                        ]"
-                                    >
-                                        {{ property.approval_status }}
-                                    </span>
-                                    <Link
-                                        :href="route('landlord.properties.edit', property.id)"
-                                        class="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                                    >
-                                        View
-                                    </Link>
-                                </div>
+                    </div>
+
+                    <div class="p-4">
+                        <!-- Map -->
+                        <PropertiesMap
+                            v-if="mapProperties.length"
+                            :properties="mapReadyProperties"
+                            height="h-[480px]"
+                            :zoom="11"
+                        />
+
+                        <!-- Empty state -->
+                        <div v-else class="py-16 text-center">
+                            <BuildingOfficeIcon class="w-14 h-14 mx-auto text-gray-600 mb-3" />
+                            <h3 class="text-base font-semibold text-white mb-1">No Properties Yet</h3>
+                            <p class="text-sm text-gray-400 mb-6">Add your first property listing to see it on the map.</p>
+                            <Link :href="route('landlord.properties.create')"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-red text-white rounded-lg hover:bg-red-700 text-sm font-medium transition">
+                                <PlusIcon class="w-4 h-4" /> Add Property
+                            </Link>
+                        </div>
+
+                        <!-- Legend -->
+                        <div v-if="mapProperties.length" class="mt-3 flex flex-wrap items-center gap-4 px-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-green-500 ring-2 ring-green-500/30 inline-block"></span>
+                                <span class="text-xs text-gray-400">Approved</span>
                             </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-yellow-500 ring-2 ring-yellow-500/30 inline-block"></span>
+                                <span class="text-xs text-gray-400">Pending</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-red-500 ring-2 ring-red-500/30 inline-block"></span>
+                                <span class="text-xs text-gray-400">Rented / Sold</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-blue-500 ring-2 ring-blue-500/30 inline-block"></span>
+                                <span class="text-xs text-gray-400">Under Review</span>
+                            </div>
+                            <span class="text-xs text-gray-600 ml-auto">Click a pin to see property details</span>
                         </div>
                     </div>
                 </div>
-
 
             </div>
         </div>

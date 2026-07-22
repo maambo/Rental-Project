@@ -43,9 +43,23 @@ class PropertyController extends Controller
 
     public function store(StorePropertyRequest $request)
     {
+        $user = auth()->user();
+
+        if (!$user->hasUnlimitedProperties()) {
+            $limit = $user->propertyLimit();
+            $count = Property::forLandlord($user->id)->count();
+
+            if ($count >= $limit) {
+                $plural = $limit === 1 ? 'property' : 'properties';
+                return back()->with('error',
+                    "Your current plan allows up to {$limit} {$plural}. Upgrade your subscription to add more."
+                );
+            }
+        }
+
         $property = Property::create(array_merge(
             $request->only([
-                'title', 'description', 'price',
+                'title', 'description', 'terms_and_conditions', 'price',
                 'province_id', 'district_id', 'town_id',
                 'street_address', 'latitude', 'longitude',
                 'property_type', 'property_subtype', 'listing_type',
@@ -59,8 +73,12 @@ class PropertyController extends Controller
             ]
         ));
 
-        $this->propertyService->storeImages($property, $request->file('images'));
+        $this->propertyService->storeImages($property, $request->file('images') ?? []);
         $this->propertyService->syncUtilities($property, $request->utilities ?? []);
+
+        if ($request->hasFile('documents')) {
+            $this->propertyService->storeDocuments($property, $request->file('documents'), $request->document_names ?? [], auth()->id());
+        }
 
         return redirect()->route('landlord.properties.index')
             ->with('success', 'Property submitted for review.');
@@ -68,14 +86,9 @@ class PropertyController extends Controller
 
     public function edit($id)
     {
-        $property = Property::with(['images', 'province', 'district', 'town', 'utilities.options'])
+        $property = Property::with(['images', 'province', 'district', 'town', 'utilities.options', 'documents'])
             ->forLandlord(auth()->id())
             ->findOrFail($id);
-
-        if (!in_array($property->approval_status, ['pending', 'rejected'])) {
-            return redirect()->route('landlord.properties.index')
-                ->with('error', 'You can only edit properties that are pending or rejected.');
-        }
 
         return Inertia::render('Landlord/Properties/Edit', [
             'property'     => $property,
@@ -87,21 +100,18 @@ class PropertyController extends Controller
     {
         $property = Property::forLandlord(auth()->id())->findOrFail($id);
 
-        if (!in_array($property->approval_status, ['pending', 'rejected'])) {
-            return back()->with('error', 'You can only edit properties that are pending or rejected.');
-        }
-
         $property->update(array_merge(
             $request->only([
-                'title', 'description', 'price',
+                'title', 'description', 'terms_and_conditions', 'price',
                 'province_id', 'district_id', 'town_id',
                 'street_address', 'latitude', 'longitude',
                 'property_type', 'property_subtype', 'listing_type',
                 'bedrooms', 'bathrooms', 'square_feet',
             ]),
             [
-                'amenities'       => $request->amenities ?? [],
-                'approval_status' => 'pending',
+                'amenities'            => $request->amenities ?? [],
+                'approval_status'      => 'pending',
+                'is_visible_in_search' => false,
             ]
         ));
 
@@ -114,6 +124,14 @@ class PropertyController extends Controller
         }
 
         $this->propertyService->syncUtilities($property, $request->utilities ?? []);
+
+        if ($request->filled('remove_documents')) {
+            $this->propertyService->deleteDocuments($property, $request->remove_documents);
+        }
+
+        if ($request->hasFile('new_documents')) {
+            $this->propertyService->storeDocuments($property, $request->file('new_documents'), $request->document_names ?? [], auth()->id());
+        }
 
         return redirect()->route('landlord.properties.index')
             ->with('success', 'Property updated and resubmitted for review.');

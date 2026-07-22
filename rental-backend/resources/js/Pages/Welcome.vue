@@ -1,16 +1,45 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import DashboardCard from '@/Components/DashboardCard.vue';
-import { MapPinIcon, HomeIcon, ArrowRightIcon, EyeIcon, UsersIcon, ChartBarIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
+import { MapPinIcon, HomeIcon, ArrowRightIcon, EyeIcon, UsersIcon, ChartBarIcon, BuildingOfficeIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import { StarIcon } from '@heroicons/vue/24/solid';
+import { ref } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     canLogin?: boolean;
     canRegister?: boolean;
-    laravelVersion: string;
-    phpVersion: string;
+    laravelVersion?: string;
+    phpVersion?: string;
     properties: Array<any>;
+    totalVisible: number;
+    provinces: Array<{ id: number; name: string }>;
 }>();
+
+const FEATURED_LIMIT = 6;
+
+const search       = ref('');
+const provinceId   = ref('');
+const propertyType = ref('');
+const listingType  = ref('');
+
+function browseProperties() {
+    router.get(route('properties.index'), {
+        search:        search.value || undefined,
+        province_id:   provinceId.value || undefined,
+        property_type: propertyType.value || undefined,
+        listing_type:  listingType.value || undefined,
+    });
+}
+
+function viewAllUrl() {
+    const params = new URLSearchParams();
+    if (search.value)       params.set('search', search.value);
+    if (provinceId.value)   params.set('province_id', provinceId.value);
+    if (propertyType.value) params.set('property_type', propertyType.value);
+    if (listingType.value)  params.set('listing_type', listingType.value);
+    const qs = params.toString();
+    return route('properties.index') + (qs ? '?' + qs : '');
+}
 </script>
 
 <template>
@@ -61,15 +90,37 @@ defineProps<{
                         Discover amazing properties in Lusaka. From cozy apartments to spacious family homes, we have it all.
                     </p>
                     
-                    <!-- Search Bar Placeholder or CTA -->
-                    <div class="flex flex-col sm:flex-row gap-4">
-                         <a href="#properties" class="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-brand-red bg-white hover:bg-gray-50 md:text-lg">
-                            Browse Properties
-                        </a>
-                        <Link :href="route('landlord.apply')" class="inline-flex justify-center items-center px-6 py-3 border border-white text-base font-medium rounded-full text-white hover:bg-white/10 md:text-lg">
-                            Become a Landlord
-                        </Link>
-                    </div>
+                    <!-- Quick Filter Form -->
+                    <form @submit.prevent="browseProperties"
+                        class="bg-white/15 backdrop-blur-sm rounded-2xl p-4 flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-1">
+                            <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
+                            <input v-model="search" type="text" placeholder="Search properties…"
+                                class="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white/20 text-white placeholder-white/60 text-sm border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50" />
+                        </div>
+                        <select v-model="provinceId"
+                            class="rounded-lg bg-white/20 text-white text-sm border border-white/30 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-white/50 min-w-[130px]">
+                            <option value="" class="text-gray-900">All Provinces</option>
+                            <option v-for="p in provinces" :key="p.id" :value="String(p.id)" class="text-gray-900">{{ p.name }}</option>
+                        </select>
+                        <select v-model="propertyType"
+                            class="rounded-lg bg-white/20 text-white text-sm border border-white/30 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-white/50 min-w-[110px]">
+                            <option value="" class="text-gray-900">All Types</option>
+                            <option value="residential" class="text-gray-900">Residential</option>
+                            <option value="commercial" class="text-gray-900">Commercial</option>
+                        </select>
+                        <select v-model="listingType"
+                            class="rounded-lg bg-white/20 text-white text-sm border border-white/30 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-white/50 min-w-[90px]">
+                            <option value="" class="text-gray-900">For</option>
+                            <option value="rent" class="text-gray-900">Rent</option>
+                            <option value="sale" class="text-gray-900">Sale</option>
+                        </select>
+                        <button type="submit"
+                            class="px-5 py-2.5 bg-white text-brand-red rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors whitespace-nowrap">
+                            Search
+                        </button>
+                    </form>
+
                 </div>
             </div>
              <!-- Decorative Curve -->
@@ -87,9 +138,10 @@ defineProps<{
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Featured Properties</h2>
                     <p class="text-gray-500 dark:text-gray-400 mt-1">Handpicked properties just for you</p>
                 </div>
-                 <Link href="#" class="text-brand-red font-semibold hover:text-brand-orange flex items-center gap-1">
-                    View All <ArrowRightIcon class="h-4 w-4" />
-                </Link>
+                <a v-if="totalVisible > FEATURED_LIMIT" :href="viewAllUrl()"
+                    class="text-brand-red font-semibold hover:text-brand-orange flex items-center gap-1">
+                    View All ({{ totalVisible }}) <ArrowRightIcon class="h-4 w-4" />
+                </a>
             </div>
 
             <div v-if="properties.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

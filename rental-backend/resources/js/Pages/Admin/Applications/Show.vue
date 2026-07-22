@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { ArrowLeftIcon, CheckIcon, XMarkIcon, ClockIcon } from '@heroicons/vue/24/outline';
-
 import VerificationBadge from '@/Components/VerificationBadge.vue';
+import {
+    UserIcon, MapPinIcon, DocumentTextIcon,
+    ClipboardDocumentCheckIcon, BoltIcon,
+    CheckIcon, XMarkIcon, ClockIcon,
+} from '@heroicons/vue/24/outline';
 
 type ApplicationStatus = 'pending' | 'under_review' | 'approved' | 'rejected';
 
@@ -33,11 +36,11 @@ const props = defineProps<{
     application: LandlordApplication;
 }>();
 
-const statusColors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    under_review: 'bg-blue-100 text-blue-800',
-   approved: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
+const statusColors: Record<ApplicationStatus, string> = {
+    pending:      'bg-yellow-500/20 text-yellow-400 ring-1 ring-yellow-500/30',
+    under_review: 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/30',
+    approved:     'bg-green-500/20 text-green-400 ring-1 ring-green-500/30',
+    rejected:     'bg-red-500/20 text-red-400 ring-1 ring-red-500/30',
 };
 
 const approve = () => {
@@ -57,80 +60,71 @@ const reject = () => {
 <template>
     <Head title="Application Details" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <Link :href="route('admin.applications.index')" class="text-gray-600 hover:text-gray-900">
-                        <ArrowLeftIcon class="w-6 h-6" />
-                    </Link>
-                    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">Application Details</h2>
-                </div>
-                <span :class="['px-3 py-1 text-sm rounded-full', statusColors[application.status]]">
-                    {{ application.status.replace('_', ' ').toUpperCase() }}
-                </span>
-            </div>
-        </template>
-
+    <AuthenticatedLayout header="Application Details" :back-url="route('admin.applications.index')">
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
                     <!-- Main Content -->
                     <div class="lg:col-span-2 space-y-6">
+
                         <!-- Applicant Information -->
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Applicant Information</h3>
+                        <div class="bg-light-bg rounded-xl overflow-hidden">
+                            <div class="px-4 py-3 border-b border-gray-700/60 flex items-center gap-2">
+                                <UserIcon class="w-4 h-4 text-brand-red" />
+                                <h3 class="text-sm font-semibold text-white">Applicant Information</h3>
+                                <span :class="['ml-auto px-2.5 py-0.5 rounded-full text-xs font-semibold', statusColors[application.status]]">
+                                    {{ application.status.replace('_', ' ') }}
+                                </span>
                             </div>
-                            <div class="p-6">
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-500">Full Name</label>
-                                        <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.user_name }}</p>
+                            <div class="p-5">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                        <p class="text-xs text-gray-500 mb-0.5">Full Name</p>
+                                        <p class="text-sm font-semibold text-white">{{ application.user_name }}</p>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-500">Email Address</label>
-                                        <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.user_email }}</p>
+                                    <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                        <p class="text-xs text-gray-500 mb-0.5">Email Address</p>
+                                        <p class="text-sm font-semibold text-white break-all">{{ application.user_email }}</p>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-500">NRC/Passport Number</label>
-                                        <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.nrc_passport }}</p>
+                                    <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                        <p class="text-xs text-gray-500 mb-0.5">NRC / Passport</p>
+                                        <p class="text-sm font-semibold text-white font-mono">{{ application.nrc_passport }}</p>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-500">Landlord Type</label>
-                                        <p class="mt-1 text-lg text-gray-900 dark:text-white capitalize">
+                                    <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                        <p class="text-xs text-gray-500 mb-0.5">Landlord Type</p>
+                                        <p class="text-sm font-semibold text-white capitalize">
                                             {{ application.landlord_type ? application.landlord_type.replace('_', ' ') : '—' }}
                                         </p>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-500">Verification Level</label>
-                                        <div class="mt-1">
-                                            <VerificationBadge :level="application.verification_level" />
-                                        </div>
+                                    <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5 col-span-2">
+                                        <p class="text-xs text-gray-500 mb-1">Verification Level</p>
+                                        <VerificationBadge :level="application.verification_level" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Address Information -->
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Address Information</h3>
+                        <div class="bg-light-bg rounded-xl overflow-hidden">
+                            <div class="px-4 py-3 border-b border-gray-700/60 flex items-center gap-2">
+                                <MapPinIcon class="w-4 h-4 text-brand-red" />
+                                <h3 class="text-sm font-semibold text-white">Address Information</h3>
                             </div>
-                            <div class="p-6">
-                                <div class="grid grid-cols-1 gap-6">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-500">Street Address</label>
-                                        <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.address }}</p>
+                            <div class="p-5">
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                        <p class="text-xs text-gray-500 mb-0.5">Street Address</p>
+                                        <p class="text-sm font-semibold text-white">{{ application.address }}</p>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-6">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-500">Town/City</label>
-                                            <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.town }}</p>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                            <p class="text-xs text-gray-500 mb-0.5">Town / City</p>
+                                            <p class="text-sm font-semibold text-white">{{ application.town }}</p>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-500">Province</label>
-                                            <p class="mt-1 text-lg text-gray-900 dark:text-white">{{ application.province }}</p>
+                                        <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                            <p class="text-xs text-gray-500 mb-0.5">Province</p>
+                                            <p class="text-sm font-semibold text-white">{{ application.province }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -138,101 +132,129 @@ const reject = () => {
                         </div>
 
                         <!-- Documents -->
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Uploaded Documents</h3>
+                        <div class="bg-light-bg rounded-xl overflow-hidden">
+                            <div class="px-4 py-3 border-b border-gray-700/60 flex items-center gap-2">
+                                <DocumentTextIcon class="w-4 h-4 text-brand-red" />
+                                <h3 class="text-sm font-semibold text-white">Uploaded Documents</h3>
                             </div>
-                            <div class="p-6">
-                                <div class="space-y-3">
-                                    <a :href="`/storage/${application.id_document_url}`" target="_blank" 
-                                       class="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <span class="text-3xl">📄</span>
-                                        <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">ID Document</p>
-                                            <p class="text-sm text-gray-500">Click to view</p>
-                                        </div>
-                                    </a>
-                                    <a :href="`/storage/${application.proof_of_address_url}`" target="_blank" 
-                                       class="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <span class="text-3xl">📄</span>
-                                        <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">Proof of Address</p>
-                                            <p class="text-sm text-gray-500">Click to view</p>
-                                        </div>
-                                    </a>
-                                    <a v-if="application.tax_certificate_url" :href="`/storage/${application.tax_certificate_url}`" target="_blank" 
-                                       class="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <span class="text-3xl">📄</span>
-                                        <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">Tax Certificate</p>
-                                            <p class="text-sm text-gray-500">Click to view</p>
-                                        </div>
-                                    </a>
-                                </div>
+                            <div class="p-5 space-y-2">
+                                <a :href="`/storage/${application.id_document_url}`" target="_blank"
+                                   class="flex items-center gap-3 p-3 bg-dark-bg/60 rounded-lg hover:bg-dark-bg transition-colors">
+                                    <span class="text-2xl">📄</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">ID Document</p>
+                                        <p class="text-xs text-gray-500">Click to view</p>
+                                    </div>
+                                    <span class="ml-auto text-xs text-brand-red">Open →</span>
+                                </a>
+                                <a :href="`/storage/${application.proof_of_address_url}`" target="_blank"
+                                   class="flex items-center gap-3 p-3 bg-dark-bg/60 rounded-lg hover:bg-dark-bg transition-colors">
+                                    <span class="text-2xl">📄</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Proof of Address</p>
+                                        <p class="text-xs text-gray-500">Click to view</p>
+                                    </div>
+                                    <span class="ml-auto text-xs text-brand-red">Open →</span>
+                                </a>
+                                <a v-if="application.selfie_url" :href="`/storage/${application.selfie_url}`" target="_blank"
+                                   class="flex items-center gap-3 p-3 bg-dark-bg/60 rounded-lg hover:bg-dark-bg transition-colors">
+                                    <span class="text-2xl">🤳</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Selfie / Photo ID</p>
+                                        <p class="text-xs text-gray-500">Click to view</p>
+                                    </div>
+                                    <span class="ml-auto text-xs text-brand-red">Open →</span>
+                                </a>
+                                <a v-if="application.tax_certificate_url" :href="`/storage/${application.tax_certificate_url}`" target="_blank"
+                                   class="flex items-center gap-3 p-3 bg-dark-bg/60 rounded-lg hover:bg-dark-bg transition-colors">
+                                    <span class="text-2xl">📄</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Tax Certificate</p>
+                                        <p class="text-xs text-gray-500">Click to view</p>
+                                    </div>
+                                    <span class="ml-auto text-xs text-brand-red">Open →</span>
+                                </a>
+                                <a v-if="application.business_registration_url" :href="`/storage/${application.business_registration_url}`" target="_blank"
+                                   class="flex items-center gap-3 p-3 bg-dark-bg/60 rounded-lg hover:bg-dark-bg transition-colors">
+                                    <span class="text-2xl">🏢</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Business Registration</p>
+                                        <p class="text-xs text-gray-500">Click to view</p>
+                                    </div>
+                                    <span class="ml-auto text-xs text-brand-red">Open →</span>
+                                </a>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Sidebar -->
                     <div class="space-y-6">
-                        <!-- Application Status -->
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Status</h3>
+
+                        <!-- Status Card -->
+                        <div class="bg-light-bg rounded-xl overflow-hidden">
+                            <div class="px-4 py-3 border-b border-gray-700/60 flex items-center gap-2">
+                                <ClipboardDocumentCheckIcon class="w-4 h-4 text-brand-red" />
+                                <h3 class="text-sm font-semibold text-white">Application Status</h3>
                             </div>
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-500">Current Status</label>
-                                    <p class="mt-1">
-                                        <span :class="['px-3 py-1 text-sm rounded-full', statusColors[application.status]]">
-                                            {{ application.status.replace('_', ' ') }}
-                                        </span>
+                            <div class="p-4 space-y-3">
+                                <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                    <p class="text-xs text-gray-500 mb-1">Current Status</p>
+                                    <span :class="['px-2.5 py-0.5 rounded-full text-xs font-semibold', statusColors[application.status]]">
+                                        {{ application.status.replace('_', ' ') }}
+                                    </span>
+                                </div>
+                                <div class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                    <p class="text-xs text-gray-500 mb-0.5">Applied On</p>
+                                    <p class="text-xs font-semibold text-white">
+                                        {{ new Date(application.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
                                     </p>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-500">Applied On</label>
-                                    <p class="mt-1 text-gray-900 dark:text-white">{{ new Date(application.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
+                                <div v-if="application.reviewed_at" class="bg-dark-bg/60 rounded-lg px-3 py-2.5">
+                                    <p class="text-xs text-gray-500 mb-0.5">Reviewed On</p>
+                                    <p class="text-xs font-semibold text-white">
+                                        {{ new Date(application.reviewed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+                                    </p>
                                 </div>
-                                <div v-if="application.reviewed_at">
-                                    <label class="block text-sm font-medium text-gray-500">Reviewed On</label>
-                                    <p class="mt-1 text-gray-900 dark:text-white">{{ new Date(application.reviewed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
-                                </div>
-                                <div v-if="application.rejection_reason">
-                                    <label class="block text-sm font-medium text-gray-500">Rejection Reason</label>
-                                    <p class="mt-1 text-red-600">{{ application.rejection_reason }}</p>
+                                <div v-if="application.rejection_reason" class="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5">
+                                    <p class="text-xs text-gray-500 mb-0.5">Rejection Reason</p>
+                                    <p class="text-xs text-red-400">{{ application.rejection_reason }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Actions -->
-                        <div v-if="application.status === 'pending' || application.status === 'under_review'" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Actions</h3>
+                        <div v-if="application.status === 'pending' || application.status === 'under_review'"
+                             class="bg-light-bg rounded-xl overflow-hidden">
+                            <div class="px-4 py-3 border-b border-gray-700/60 flex items-center gap-2">
+                                <BoltIcon class="w-4 h-4 text-brand-red" />
+                                <h3 class="text-sm font-semibold text-white">Actions</h3>
                             </div>
-                            <div class="p-6 space-y-3">
+                            <div class="p-4 space-y-2">
                                 <button
                                     @click="() => router.post(route('admin.applications.under-review', application.id))"
-                                    class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-medium"
+                                    class="w-full flex items-center justify-center gap-2 bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/30 px-4 py-2.5 rounded-lg hover:bg-blue-500/30 font-medium text-sm transition-colors"
                                 >
-                                    <ClockIcon class="w-5 h-5" />
+                                    <ClockIcon class="w-4 h-4" />
                                     Mark as Under Review
                                 </button>
                                 <button
                                     @click="approve"
-                                    class="w-full flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-medium"
+                                    class="w-full flex items-center justify-center gap-2 bg-green-500/20 text-green-400 ring-1 ring-green-500/30 px-4 py-2.5 rounded-lg hover:bg-green-500/30 font-medium text-sm transition-colors"
                                 >
-                                    <CheckIcon class="w-5 h-5" />
+                                    <CheckIcon class="w-4 h-4" />
                                     Approve Application
                                 </button>
                                 <button
                                     @click="reject"
-                                    class="w-full flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 font-medium"
+                                    class="w-full flex items-center justify-center gap-2 bg-red-500/20 text-red-400 ring-1 ring-red-500/30 px-4 py-2.5 rounded-lg hover:bg-red-500/30 font-medium text-sm transition-colors"
                                 >
-                                    <XMarkIcon class="w-5 h-5" />
+                                    <XMarkIcon class="w-4 h-4" />
                                     Reject Application
                                 </button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

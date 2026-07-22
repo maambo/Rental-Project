@@ -24,6 +24,7 @@ Route::prefix('locations')->name('api.locations.')->group(function () {
     Route::get('/districts/{province}', [LocationController::class, 'districts'])->name('districts');
     Route::get('/towns/{district}', [LocationController::class, 'towns'])->name('towns');
     Route::get('/search', [LocationController::class, 'search'])->name('search');
+    Route::get('/reverse', [LocationController::class, 'reverse'])->name('reverse');
 });
 
 // Protected routes - Require authentication

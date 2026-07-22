@@ -40,26 +40,25 @@ class LandlordApplicationAdminController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show(LandlordApplication $application)
     {
-        $application = LandlordApplication::with('user')
-            ->findOrFail($id);
+        $application->load('user');
 
         return Inertia::render('Admin/Applications/Show', [
             'application' => $application,
         ]);
     }
 
-    public function markAsUnderReview($id)
+    public function markAsUnderReview(LandlordApplication $application)
     {
-        LandlordApplication::findOrFail($id)->update(['status' => 'under_review']);
+        $application->update(['status' => 'under_review']);
 
         return back()->with('success', 'Application marked as under review.');
     }
 
-    public function approve($id)
+    public function approve(LandlordApplication $application)
     {
-        $application = LandlordApplication::with('user')->findOrFail($id);
+        $application->load('user');
 
         $application->update([
             'status'      => 'approved',
@@ -73,13 +72,13 @@ class LandlordApplicationAdminController extends Controller
             ->with('success', 'Application approved. User is now a landlord.');
     }
 
-    public function reject(Request $request, $id)
+    public function reject(Request $request, LandlordApplication $application)
     {
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:500',
         ]);
 
-        LandlordApplication::findOrFail($id)->update([
+        $application->update([
             'status'           => 'rejected',
             'rejection_reason' => $validated['rejection_reason'],
             'reviewed_at'      => now(),

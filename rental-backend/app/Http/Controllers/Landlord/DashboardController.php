@@ -24,15 +24,14 @@ class DashboardController extends Controller
             'tour_requests'        => TourRequest::whereIn('property_id', $propertyIds)->where('status', 'pending')->count(),
         ];
 
-        $recentProperties = Property::forLandlord($landlordId)
-            ->with('images')
+        $mapProperties = Property::forLandlord($landlordId)
             ->orderByDesc('created_at')
-            ->limit(5)
-            ->get();
+            ->get(['id', 'title', 'price', 'listing_type', 'property_type',
+                   'availability_status', 'approval_status', 'latitude', 'longitude', 'street_address']);
 
         return Inertia::render('Landlord/Dashboard', [
-            'stats'            => $stats,
-            'recentProperties' => $recentProperties,
+            'stats'         => $stats,
+            'mapProperties' => $mapProperties,
         ]);
     }
 }

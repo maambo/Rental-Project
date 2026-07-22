@@ -26,7 +26,8 @@ class UpdatePropertyRequest extends FormRequest
 
             // Core details
             'title'            => 'required|string|max:255',
-            'description'      => 'required|string',
+            'description'           => 'required|string',
+            'terms_and_conditions'  => 'nullable|string',
             'price'            => 'required|numeric|min:0',
             'bedrooms'         => 'nullable|integer|min:0',
             'bathrooms'        => 'nullable|integer|min:0',
@@ -43,6 +44,14 @@ class UpdatePropertyRequest extends FormRequest
             // Utilities
             'utilities'        => 'nullable|array',
             'utilities.*'      => 'integer|exists:utility_options,id',
+
+            // Document management
+            'new_documents'      => 'nullable|array|max:10',
+            'new_documents.*'    => 'file|mimes:pdf,doc,docx,jpeg,png,jpg|max:10240',
+            'document_names'     => 'nullable|array',
+            'document_names.*'   => 'nullable|string|max:255',
+            'remove_documents'   => 'nullable|array',
+            'remove_documents.*' => 'integer|exists:property_documents,id',
         ];
     }
 

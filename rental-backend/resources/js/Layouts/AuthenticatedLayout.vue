@@ -15,11 +15,11 @@ const showingSidebar = ref(false);
 </script>
 
 <template>
-    <div class="flex min-h-screen bg-gray-100 dark:bg-dark-bg">
+    <div class="flex h-screen overflow-hidden bg-gray-100 dark:bg-dark-bg">
         <Toast />
         
         <!-- Desktop Sidebar -->
-        <Sidebar class="hidden lg:flex" />
+        <Sidebar class="hidden lg:flex flex-shrink-0 overflow-y-auto" />
 
         <!-- Mobile Sidebar Overlay -->
         <div v-show="showingSidebar" class="fixed inset-0 z-50 flex lg:hidden" role="dialog" aria-modal="true">
@@ -44,7 +44,7 @@ const showingSidebar = ref(false);
         </div>
 
         <!-- Main Content Column -->
-        <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Page Heading (Desktop/Shared) -->
             <header
                 class="bg-white shadow dark:bg-light-bg"

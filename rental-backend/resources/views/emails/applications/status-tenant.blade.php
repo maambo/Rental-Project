@@ -1,18 +1,28 @@
 <x-mail::message>
-# Application Status Updated
+# Application Update
 
 Hello {{ $user->name }},
 
-The status of your application for **{{ $propertyName }}** has been updated to: **{{ ucfirst($status) }}**.
+Your application for **{{ $propertyName }}** has been updated.
 
-@if($status === 'approved')
-Please log in to your dashboard to review the lease agreement and make your initial payment.
+@if($status === 'under_review')
+**Status: Under Review**
+
+The landlord has started reviewing your application. You'll hear back soon.
 @elseif($status === 'rejected')
-Reason: {{ $reason }}
+**Status: Not Successful**
+
+Unfortunately your application was not approved.
+
+@if($reason)
+**Reason:** {{ $reason }}
+@endif
+@else
+**Status:** {{ ucfirst(str_replace('_', ' ', $status)) }}
 @endif
 
-<x-mail::button :url="route('dashboard')">
-Go to Dashboard
+<x-mail::button :url="route('tenant.applications.index')">
+View My Applications
 </x-mail::button>
 
 Thanks,<br>
