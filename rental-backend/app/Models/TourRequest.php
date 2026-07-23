@@ -12,6 +12,7 @@ class TourRequest extends Model
         'name',
         'email',
         'phone',
+        'scheduled_at',
         'preferred_date',
         'preferred_time',
         'notes',

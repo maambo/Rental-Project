@@ -40,6 +40,11 @@ class PropertyApplicationController extends Controller
 
     public function store(StorePropertyApplicationRequest $request, Property $property)
     {
+        // Block if property is not visible/approved
+        if (! Property::visibleInSearch()->where('id', $property->id)->exists()) {
+            return back()->with('error', 'This property is not currently accepting applications.');
+        }
+
         // Block blacklisted users
         $user = auth()->user();
         $isBlacklisted = Blacklist::where('email', $user->email)->exists();
@@ -123,7 +128,7 @@ class PropertyApplicationController extends Controller
     }
 
     /** Tenant makes payment — finalises the deal. */
-    public function pay(PropertyApplication $application)
+    public function pay(Property $property, PropertyApplication $application)
     {
         if ($application->user_id !== auth()->id()) {
             abort(403);

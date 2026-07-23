@@ -51,6 +51,11 @@ class LandlordApplicationController extends Controller
                 ->with('info', 'You have not submitted a landlord application yet.');
         }
 
+        if (!$application->isEditable()) {
+            return redirect()->route('landlord.status')
+                ->with('info', 'Your application cannot be edited at this stage.');
+        }
+
         return Inertia::render('Landlord/EditApplication', [
             'application' => $application,
             'user'        => auth()->user(),

@@ -28,7 +28,10 @@ class AuditLogMiddleware
 
             $excludeFields = ['password', 'password_confirmation', '_token'];
             $newValues = collect($request->except($excludeFields))
-                ->reject(fn ($value) => $value instanceof \Illuminate\Http\UploadedFile)
+                ->reject(fn ($value) =>
+                    $value instanceof \Illuminate\Http\UploadedFile
+                    || (is_array($value) && collect($value)->contains(fn ($v) => $v instanceof \Illuminate\Http\UploadedFile))
+                )
                 ->all();
 
             \App\Services\AuditService::log(

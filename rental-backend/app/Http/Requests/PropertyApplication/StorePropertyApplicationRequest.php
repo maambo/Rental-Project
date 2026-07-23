@@ -14,7 +14,7 @@ class StorePropertyApplicationRequest extends FormRequest
     protected function resolveProperty(): Property
     {
         if (!$this->property) {
-            $this->property = Property::findOrFail($this->property_id);
+            $this->property = $this->route('property');
         }
         return $this->property;
     }
@@ -26,7 +26,6 @@ class StorePropertyApplicationRequest extends FormRequest
         $isCommercial      = $property->isCommercial();
 
         return [
-            'property_id'         => 'required|exists:properties,id',
             'message'             => 'nullable|string|max:1000',
             'preferred_move_in'   => 'nullable|date|after:today',
             'additional_comments' => 'nullable|string|max:1000',

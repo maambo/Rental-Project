@@ -22,6 +22,7 @@ class TourRequestController extends Controller
             'user_id'        => auth()->id(),
             'name'           => auth()->user()->name,
             'email'          => auth()->user()->email,
+            'scheduled_at'   => $scheduledAt,
             'preferred_date' => $scheduledAt->toDateString(),
             'preferred_time' => $scheduledAt->format('H:i'),
             'notes'          => $validated['notes'] ?? null,
