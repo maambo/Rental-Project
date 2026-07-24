@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ZambiaLocationSeeder::class,
             UtilitySeeder::class,
             VerificationTierSeeder::class,
+            TradeCategorySeeder::class,
         ]);
     }
 }

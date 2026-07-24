@@ -8,11 +8,13 @@ import {
     ChatBubbleLeftRightIcon, WrenchScrewdriverIcon, CheckBadgeIcon,
     UsersIcon, FolderIcon, ShieldCheckIcon, DocumentTextIcon,
     ClockIcon, GlobeAltIcon, ChevronDownIcon, CreditCardIcon,
+    BriefcaseIcon, CalendarDaysIcon,
 } from '@heroicons/vue/24/outline';
 
 const page = usePage();
-const user = computed(() => page.props.auth.user);
+const user = computed(() => (page.props.auth as any).user);
 const role = computed(() => user.value?.roleModel?.name || 'tenant');
+const hasWorkerProfile = computed(() => user.value?.hasWorkerProfile ?? false);
 
 const isActive = (pattern: string) => route().current(pattern);
 
@@ -197,6 +199,30 @@ const isOpen = (key: string) => openGroups.value.has(key);
                         <FolderIcon class="mr-3 h-5 w-5 flex-shrink-0" />History
                     </Link>
                 </template>
+            </template>
+
+            <!-- ── MARKETPLACE (all roles) ───────────────────────────── -->
+            <button @click="toggle('marketplace')"
+                    class="flex items-center justify-between px-4 py-1.5 mx-2 mt-1 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors w-[calc(100%-1rem)]">
+                <span>Marketplace</span>
+                <ChevronDownIcon class="h-3.5 w-3.5 transition-transform duration-200" :class="isOpen('marketplace') ? '' : '-rotate-90'" />
+            </button>
+            <template v-if="isOpen('marketplace')">
+                <Link :href="route('marketplace.workers.index')" :class="[link, isActive('marketplace.workers.*') ? active : inactive]">
+                    <BriefcaseIcon class="mr-3 h-5 w-5 flex-shrink-0" />Find Workers
+                </Link>
+                <Link :href="route('marketplace.bookings.index')" :class="[link, isActive('marketplace.bookings.*') ? active : inactive]">
+                    <CalendarDaysIcon class="mr-3 h-5 w-5 flex-shrink-0" />My Bookings
+                </Link>
+                <Link v-if="hasWorkerProfile" :href="route('worker.dashboard')" :class="[link, isActive('worker.*') ? active : inactive]">
+                    <UserIcon class="mr-3 h-5 w-5 flex-shrink-0" />Worker Dashboard
+                </Link>
+                <Link v-else :href="route('worker.profile.create')" :class="[link, inactive]">
+                    <UserIcon class="mr-3 h-5 w-5 flex-shrink-0" />Become a Worker
+                </Link>
+                <Link v-if="role === 'admin'" :href="route('admin.workers.index')" :class="[link, isActive('admin.workers.*') ? active : inactive]">
+                    <ShieldCheckIcon class="mr-3 h-5 w-5 flex-shrink-0" />Manage Workers
+                </Link>
             </template>
 
             <!-- ── Bottom links (always visible) ─────────────────────── -->

@@ -1,5 +1,6 @@
 ﻿<?php
 
+use App\Http\Controllers\Admin\WorkerController as AdminWorkerController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BlacklistController;
 use App\Http\Controllers\Admin\LandlordApplicationAdminController;
@@ -12,6 +13,13 @@ use App\Http\Controllers\Admin\StatisticsController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\UtilityController;
 use App\Http\Controllers\Api\PropertyReportController;
+use App\Http\Controllers\Marketplace\BookingController as MarketplaceBookingController;
+use App\Http\Controllers\Marketplace\WorkerController as MarketplaceWorkerController;
+use App\Http\Controllers\Worker\BookingController as WorkerBookingController;
+use App\Http\Controllers\Worker\DashboardController as WorkerDashboardController;
+use App\Http\Controllers\Worker\PortfolioController as WorkerPortfolioController;
+use App\Http\Controllers\Worker\ProfileController as WorkerProfileController;
+use App\Http\Controllers\Worker\ServiceController as WorkerServiceController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -32,6 +40,10 @@ use App\Http\Controllers\Tenant\LedgerController;
 use App\Http\Controllers\TourRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
+// Public Marketplace
+Route::get('/workers', [MarketplaceWorkerController::class, 'index'])->name('marketplace.workers.index');
+Route::get('/workers/{workerProfile}', [MarketplaceWorkerController::class, 'show'])->name('marketplace.workers.show');
 
 // Public
 Route::get('/', [HomeController::class, 'index'])->name('landing');
@@ -71,6 +83,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
 
     Route::get('/help-support', fn () => inertia('ComingSoon', ['feature' => 'Help & Support']))->name('help-support');
+
+    // Marketplace — authenticated actions (booking, reviews)
+    Route::get('/workers/{workerProfile}/book', [MarketplaceWorkerController::class, 'book'])->name('marketplace.workers.book');
+    Route::post('/workers/{workerProfile}/book', [MarketplaceWorkerController::class, 'storeBooking'])->name('marketplace.workers.storeBooking');
+
+    Route::prefix('marketplace/bookings')->name('marketplace.bookings.')->group(function () {
+        Route::get('/', [MarketplaceBookingController::class, 'index'])->name('index');
+        Route::get('/{booking}', [MarketplaceBookingController::class, 'show'])->name('show');
+        Route::post('/{booking}/cancel', [MarketplaceBookingController::class, 'cancel'])->name('cancel');
+        Route::post('/{booking}/review', [MarketplaceBookingController::class, 'review'])->name('review');
+    });
+});
+
+// Worker profile management
+Route::middleware(['auth'])->prefix('worker')->name('worker.')->group(function () {
+    Route::get('/dashboard', [WorkerDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/profile/create', [WorkerProfileController::class, 'create'])->name('profile.create');
+    Route::post('/profile', [WorkerProfileController::class, 'store'])->name('profile.store');
+    Route::get('/profile/edit', [WorkerProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [WorkerProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/services', [WorkerServiceController::class, 'index'])->name('services.index');
+    Route::post('/services', [WorkerServiceController::class, 'store'])->name('services.store');
+    Route::put('/services/{service}', [WorkerServiceController::class, 'update'])->name('services.update');
+    Route::delete('/services/{service}', [WorkerServiceController::class, 'destroy'])->name('services.destroy');
+
+    Route::get('/portfolio', [WorkerPortfolioController::class, 'index'])->name('portfolio.index');
+    Route::post('/portfolio', [WorkerPortfolioController::class, 'store'])->name('portfolio.store');
+    Route::delete('/portfolio/{photo}', [WorkerPortfolioController::class, 'destroy'])->name('portfolio.destroy');
+
+    Route::get('/bookings', [WorkerBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [WorkerBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}/accept', [WorkerBookingController::class, 'accept'])->name('bookings.accept');
+    Route::post('/bookings/{booking}/reject', [WorkerBookingController::class, 'reject'])->name('bookings.reject');
+    Route::post('/bookings/{booking}/in-progress', [WorkerBookingController::class, 'markInProgress'])->name('bookings.in-progress');
+    Route::post('/bookings/{booking}/complete', [WorkerBookingController::class, 'complete'])->name('bookings.complete');
 });
 
 // Landlord
@@ -141,6 +190,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 
     Route::resource('subscriptions', SubscriptionController::class)->only(['index', 'store', 'update', 'destroy']);
+
+    // Worker marketplace admin
+    Route::prefix('workers')->name('workers.')->group(function () {
+        Route::get('/', [AdminWorkerController::class, 'index'])->name('index');
+        Route::post('/{workerProfile}/verify', [AdminWorkerController::class, 'verify'])->name('verify');
+        Route::post('/{workerProfile}/revoke', [AdminWorkerController::class, 'revoke'])->name('revoke');
+        Route::post('/{workerProfile}/toggle-featured', [AdminWorkerController::class, 'toggleFeatured'])->name('toggle-featured');
+        Route::get('/categories', [AdminWorkerController::class, 'categories'])->name('categories.index');
+        Route::post('/categories', [AdminWorkerController::class, 'storeCategory'])->name('categories.store');
+        Route::post('/categories/{tradeCategory}/toggle', [AdminWorkerController::class, 'toggleCategory'])->name('categories.toggle');
+    });
 });
 
 require __DIR__ . '/auth.php';

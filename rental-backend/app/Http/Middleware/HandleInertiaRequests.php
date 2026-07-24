@@ -35,21 +35,23 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $user ? [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role_id' => $user->role_id,
-                    'google_id' => $user->google_id,
-                    'roleModel' => $user->roleModel ? [
-                        'id' => $user->roleModel->id,
-                        'name' => $user->roleModel->name,
+                    'id'              => $user->id,
+                    'name'            => $user->name,
+                    'email'           => $user->email,
+                    'role_id'         => $user->role_id,
+                    'google_id'       => $user->google_id,
+                    'hasWorkerProfile'=> fn () => $user->workerProfile()->exists(),
+                    'roleModel'       => $user->roleModel ? [
+                        'id'           => $user->roleModel->id,
+                        'name'         => $user->roleModel->name,
                         'display_name' => $user->roleModel->display_name,
                     ] : null,
                 ] : null,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
+                'error'   => fn () => $request->session()->get('error'),
+                'info'    => fn () => $request->session()->get('info'),
             ],
         ];
     }

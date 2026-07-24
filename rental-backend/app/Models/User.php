@@ -101,6 +101,16 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class)->active()->with('tier')->latestOfMany();
     }
 
+    public function workerProfile()
+    {
+        return $this->hasOne(WorkerProfile::class);
+    }
+
+    public function jobBookingsAsClient()
+    {
+        return $this->hasMany(JobBooking::class, 'client_id');
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     public function hasRole(string $roleName): bool
