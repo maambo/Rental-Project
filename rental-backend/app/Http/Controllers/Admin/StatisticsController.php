@@ -7,10 +7,13 @@ use App\Models\Property;
 use App\Models\PropertyApplication;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\ReportingService;
 use Inertia\Inertia;
 
 class StatisticsController extends Controller
 {
+    public function __construct(private readonly ReportingService $reporting) {}
+
     public function index()
     {
         $stats = [
@@ -35,8 +38,8 @@ class StatisticsController extends Controller
                 'rejected' => PropertyApplication::where('status', 'rejected')->count(),
             ],
             'financials' => [
-                'total_transactions' => Transaction::where('Status', 'COMPLETED')->sum('Amount'),
-                'avg_transaction'    => Transaction::where('Status', 'COMPLETED')->avg('Amount') ?? 0,
+                'total_transactions' => $this->reporting->totalRevenue(),
+                'avg_transaction'    => $this->reporting->averageTransaction(),
             ],
         ];
 

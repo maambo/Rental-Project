@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Tenant;
+namespace App\Http\Controllers\Payments\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Billing;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
 
 class LedgerController extends Controller
 {
@@ -16,7 +14,7 @@ class LedgerController extends Controller
     public function index()
     {
         $tenantId = auth()->id();
-        
+
         // Get all billing records for the tenant
         $entries = Billing::where('UserID', $tenantId)
             ->with(['leaseAgreement.property'])
@@ -33,7 +31,7 @@ class LedgerController extends Controller
                 'id' => $entry->id,
                 'date' => $entry->Date->toDateString(),
                 'description' => $entry->Description,
-                'reference' => $entry->PackageName ?? 'Invoice',
+                'reference' => $entry->Description ?: 'Invoice',
                 'debit' => $debit,
                 'credit' => $credit,
                 'balance' => $balance,

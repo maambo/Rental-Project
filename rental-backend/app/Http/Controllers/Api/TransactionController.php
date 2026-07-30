@@ -23,11 +23,14 @@ class TransactionController extends Controller
             'data'   => 'nullable|array',
         ]);
 
+        $transactionId = 'TXN-' . strtoupper(bin2hex(random_bytes(6)));
+
         $transaction = Transaction::create([
             'UID'             => (string) Str::uuid(),
             'RequestID'       => (string) Str::uuid(),
-            'TransactionID'   => 'TXN-' . strtoupper(bin2hex(random_bytes(6))),
+            'TransactionID'   => $transactionId,
             'UserID'          => auth()->id(),
+            'user_id'         => auth()->id(),
             'NRC'             => $validated['nrc'] ?? null,
             'TransactionDate' => now()->toDateString(),
             'Amount'          => $validated['amount'],
@@ -36,7 +39,6 @@ class TransactionController extends Controller
             'Phone'           => $validated['phone'] ?? null,
             'Status'          => 'COMPLETED',
             'Data'            => json_encode($validated['data'] ?? []),
-            'Timestamp'       => now(),
         ]);
 
         if (isset($validated['data']['application_id'])) {
@@ -46,9 +48,11 @@ class TransactionController extends Controller
             if ($application) {
                 Mail::to($application->property->landlord->email)->send(
                     new PaymentReceivedLandlord(
-                        $application->property->title,
-                        $validated['amount'],
-                        auth()->user()->name
+                        amount: $validated['amount'],
+                        propertyName: $application->property->title,
+                        transactionId: $transactionId,
+                        date: now()->format('d M Y, H:i'),
+                        tenantName: auth()->user()->name,
                     )
                 );
             }

@@ -11,8 +11,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\StatisticsController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\PropertyReportController as AdminPropertyReportController;
 use App\Http\Controllers\Admin\UtilityController;
-use App\Http\Controllers\Api\PropertyReportController;
 use App\Http\Controllers\Marketplace\BookingController as MarketplaceBookingController;
 use App\Http\Controllers\Marketplace\WorkerController as MarketplaceWorkerController;
 use App\Http\Controllers\Worker\BookingController as WorkerBookingController;
@@ -24,19 +24,24 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Landlord\BillingController as LandlordBillingController;
 use App\Http\Controllers\Landlord\DashboardController as LandlordDashboardController;
 use App\Http\Controllers\Landlord\LeaseController;
 use App\Http\Controllers\Landlord\PropertyApplicationController as LandlordPropertyApplicationController;
 use App\Http\Controllers\Landlord\PropertyController as LandlordPropertyController;
 use App\Http\Controllers\LandlordApplicationController;
+use App\Http\Controllers\Payments\Landlord\BillingController as LandlordBillingController;
+use App\Http\Controllers\Payments\Tenant\BillingController as TenantBillingController;
+use App\Http\Controllers\Payments\Tenant\LedgerController;
+use App\Http\Controllers\Payments\SubscriptionPaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyApplicationController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyReviewController;
 use App\Http\Controllers\RentalHistoryController;
-use App\Http\Controllers\Tenant\BillingController as TenantBillingController;
-use App\Http\Controllers\Tenant\LedgerController;
+use App\Http\Controllers\Reports\AdminFinancialReportController;
+use App\Http\Controllers\Reports\LandlordReportController;
+use App\Http\Controllers\Reports\TenantReportController;
+use App\Http\Controllers\Reports\WorkerReportController;
 use App\Http\Controllers\TourRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -96,6 +101,13 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// Payments — subscription checkout (self-service, simulated payment methods)
+Route::middleware(['auth'])->prefix('payments')->name('payments.')->group(function () {
+    Route::get('/subscribe', [SubscriptionPaymentController::class, 'index'])->name('subscribe.index');
+    Route::get('/subscribe/{tier}', [SubscriptionPaymentController::class, 'create'])->name('subscribe.create');
+    Route::post('/subscribe/{tier}', [SubscriptionPaymentController::class, 'store'])->name('subscribe.store');
+});
+
 // Worker profile management
 Route::middleware(['auth'])->prefix('worker')->name('worker.')->group(function () {
     Route::get('/dashboard', [WorkerDashboardController::class, 'index'])->name('dashboard');
@@ -120,6 +132,8 @@ Route::middleware(['auth'])->prefix('worker')->name('worker.')->group(function (
     Route::post('/bookings/{booking}/reject', [WorkerBookingController::class, 'reject'])->name('bookings.reject');
     Route::post('/bookings/{booking}/in-progress', [WorkerBookingController::class, 'markInProgress'])->name('bookings.in-progress');
     Route::post('/bookings/{booking}/complete', [WorkerBookingController::class, 'complete'])->name('bookings.complete');
+
+    Route::get('/reports', [WorkerReportController::class, 'index'])->name('reports.index');
 });
 
 // Landlord
@@ -138,6 +152,10 @@ Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord
     Route::resource('billing', LandlordBillingController::class)->only(['index', 'show']);
     Route::post('/billing/{billing}/verify', [LandlordBillingController::class, 'verifyPayment'])->name('billing.verify');
 
+    Route::get('/reports', [LandlordReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export/csv', [LandlordReportController::class, 'exportCsv'])->name('reports.export.csv');
+    Route::get('/reports/export/pdf', [LandlordReportController::class, 'exportPdf'])->name('reports.export.pdf');
+
     Route::get('/tour-requests', fn () => inertia('ComingSoon', ['feature' => 'Tour Requests']))->name('tour-requests.index');
     Route::get('/maintenance', fn () => inertia('ComingSoon', ['feature' => 'Maintenance']))->name('maintenance.index');
 });
@@ -146,7 +164,9 @@ Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord
 Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->group(function () {
     Route::resource('billing', TenantBillingController::class)->only(['index', 'show']);
     Route::post('/billing/{billing}/confirm', [TenantBillingController::class, 'confirmPayment'])->name('billing.confirm');
+    Route::post('/billing/{billing}/pay', [TenantBillingController::class, 'payViaSimulatedMethod'])->name('billing.pay');
     Route::get('/ledger', [LedgerController::class, 'index'])->name('ledger.index');
+    Route::get('/reports', [TenantReportController::class, 'index'])->name('reports.index');
     Route::get('/my-rentals', fn () => inertia('ComingSoon', ['feature' => 'My Rentals']))->name('my-rentals.index');
     Route::get('/maintenance', fn () => inertia('ComingSoon', ['feature' => 'Maintenance']))->name('maintenance.index');
 });
@@ -170,11 +190,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/properties/{property}/reject', [PropertyApprovalController::class, 'reject'])->name('properties.reject');
 
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+
+    // Financial reports — distinct from the content-moderation "/admin/reports" route below
+    Route::get('/financial-reports', [AdminFinancialReportController::class, 'index'])->name('financial-reports.index');
+    Route::get('/financial-reports/export/csv', [AdminFinancialReportController::class, 'exportCsv'])->name('financial-reports.export.csv');
+    Route::get('/financial-reports/export/pdf', [AdminFinancialReportController::class, 'exportPdf'])->name('financial-reports.export.pdf');
     Route::get('/landlords', [LandlordProfileController::class, 'index'])->name('landlords.index');
     Route::get('/landlords/{id}', [LandlordProfileController::class, 'show'])->name('landlords.show');
 
     Route::resource('blacklist', BlacklistController::class)->only(['index', 'store', 'destroy']);
-    Route::get('/reports', [PropertyReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports', [AdminPropertyReportController::class, 'index'])->name('reports.index');
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');

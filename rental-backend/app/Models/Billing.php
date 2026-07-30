@@ -13,9 +13,8 @@ class Billing extends Model
         'Amount',
         'Date',
         'Description',
-        'PackageName',
-        'Approval',
         'Year',
+        'billing_period',
         'lease_agreement_id',
         'status',
         'proof_of_payment',
@@ -25,6 +24,7 @@ class Billing extends Model
     protected $casts = [
         'Date' => 'datetime',
         'paid_at' => 'datetime',
+        'billing_period' => 'date',
         'Amount' => 'float',
     ];
 

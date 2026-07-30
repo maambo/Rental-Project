@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Landlord;
+namespace App\Http\Controllers\Payments\Landlord;
 
 use App\Http\Controllers\Controller;
 use App\Models\Billing;
@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class BillingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     /**
      * Display a listing of bills for the landlord's tenants.
      */

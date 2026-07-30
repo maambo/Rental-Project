@@ -42,11 +42,4 @@ class PropertyReportController extends Controller
 
         return response()->json(['message' => 'Report submitted successfully'], 201);
     }
-
-    public function index()
-    {
-        return PropertyReport::with(['property', 'reporter'])
-            ->orderByDesc('created_at')
-            ->paginate(20);
-    }
 }
