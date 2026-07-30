@@ -60,6 +60,15 @@ class PropertyController extends Controller
 
     public function store(Request $request)
     {
+        $user = $request->user();
+        if (!$user->hasUnlimitedProperties()) {
+            $limit = $user->propertyLimit();
+            $count = Property::forLandlord($user->id)->count();
+            if ($count >= $limit) {
+                return response()->json(['error' => 'Property limit reached for your current plan.'], 403);
+            }
+        }
+
         $validated = $request->validate([
             'province_id'      => 'required|exists:provinces,id',
             'district_id'      => 'required|exists:districts,id',

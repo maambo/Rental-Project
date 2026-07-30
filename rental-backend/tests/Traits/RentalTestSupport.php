@@ -2,14 +2,20 @@
 
 namespace Tests\Traits;
 
+use App\Models\Billing;
 use App\Models\District;
+use App\Models\JobBooking;
 use App\Models\LandlordApplication;
+use App\Models\LeaseAgreement;
 use App\Models\Property;
 use App\Models\Province;
 use App\Models\Role;
 use App\Models\Town;
+use App\Models\TradeCategory;
 use App\Models\User;
 use App\Models\VerificationTier;
+use App\Models\WorkerProfile;
+use App\Models\WorkerService;
 
 trait RentalTestSupport
 {
@@ -17,6 +23,8 @@ trait RentalTestSupport
     protected Role $landlordRole;
     protected Role $tenantRole;
     protected Role $applicantRole;
+
+    private static int $locationSeq = 0;
 
     protected function createRoles(): void
     {
@@ -58,12 +66,19 @@ trait RentalTestSupport
         return User::factory()->create(['role_id' => $this->applicantRole->id]);
     }
 
-    /** Returns [Province, District, Town]. */
+    /**
+     * Returns [Province, District, Town]. Each call creates a unique Province code
+     * to avoid UniqueConstraintViolationException when called multiple times per test.
+     */
     protected function makeLocation(): array
     {
-        $province = Province::create(['name' => 'Lusaka', 'code' => 'LS']);
-        $district = District::create(['name' => 'Lusaka', 'province_id' => $province->id]);
-        $town     = Town::create(['name' => 'Lusaka', 'district_id' => $district->id]);
+        $seq = ++self::$locationSeq;
+        $province = Province::firstOrCreate(
+            ['code' => 'LS' . $seq],
+            ['name' => 'Lusaka ' . $seq]
+        );
+        $district = District::create(['name' => 'Lusaka ' . $seq, 'province_id' => $province->id]);
+        $town     = Town::create(['name' => 'Lusaka ' . $seq, 'district_id' => $district->id]);
         return [$province, $district, $town];
     }
 
@@ -111,5 +126,109 @@ trait RentalTestSupport
             'proof_of_address_url' => 'docs/proof.jpg',
             'selfie_url'           => 'docs/selfie.jpg',
         ], $overrides));
+    }
+
+    /** Create a LeaseAgreement record directly. */
+    protected function makeLeaseAgreement(User $tenant, Property $property, array $overrides = []): LeaseAgreement
+    {
+        return LeaseAgreement::create(array_merge([
+            'property_id'  => $property->id,
+            'user_id'      => $tenant->id,
+            'landlord_id'  => $property->landlord_id,
+            'status'       => 'active',
+            'content'      => 'Test lease agreement.',
+            'monthly_rent' => 2500,
+            'start_date'   => now()->startOfMonth(),
+            'end_date'     => now()->addYear()->endOfMonth(),
+        ], $overrides));
+    }
+
+    /** Create a Billing record directly for a given lease. */
+    protected function makeBilling(LeaseAgreement $lease, array $overrides = []): Billing
+    {
+        $period = now()->startOfMonth();
+        return Billing::create(array_merge([
+            'lease_agreement_id' => $lease->id,
+            'UserID'             => (string) $lease->user_id,
+            'Amount'             => $lease->monthly_rent,
+            'Date'               => $period,
+            'Description'        => 'Rent for ' . $period->format('F Y'),
+            'Year'               => $period->year,
+            'billing_period'     => $period->toDateTimeString(),
+            'status'             => 'pending',
+        ], $overrides));
+    }
+
+    /** Create a WorkerProfile record directly (active + verified). */
+    protected function makeWorkerProfile(User $user, array $overrides = []): WorkerProfile
+    {
+        $category = TradeCategory::firstOrCreate(
+            ['slug' => 'plumbing'],
+            ['name' => 'Plumbing', 'icon' => '🔧', 'is_active' => true, 'sort_order' => 1]
+        );
+        [, , $town] = $this->makeLocation();
+
+        return WorkerProfile::create(array_merge([
+            'user_id'           => $user->id,
+            'trade_category_id' => $category->id,
+            'town_id'           => $town->id,
+            'tagline'           => 'Test worker',
+            'bio'               => 'Experienced worker.',
+            'experience_years'  => 3,
+            'phone'             => '0971234567',
+            'is_verified'       => true,
+            'is_active'         => true,
+            'is_featured'       => false,
+            'rating_average'    => 0,
+            'rating_count'      => 0,
+        ], $overrides));
+    }
+
+    /** Create a WorkerService record directly. */
+    protected function makeWorkerService(WorkerProfile $profile, array $overrides = []): WorkerService
+    {
+        return WorkerService::create(array_merge([
+            'worker_profile_id' => $profile->id,
+            'service_name'      => 'Pipe Repair',
+            'description'       => 'Fix leaking pipes.',
+            'rate_type'         => 'hourly',
+            'base_rate'         => 150,
+            'minimum_charge'    => 200,
+            'is_active'         => true,
+        ], $overrides));
+    }
+
+    /** Create a JobBooking record directly. */
+    protected function makeJobBooking(User $client, WorkerProfile $worker, WorkerService $service, array $overrides = []): JobBooking
+    {
+        return JobBooking::create(array_merge([
+            'client_id'         => $client->id,
+            'worker_profile_id' => $worker->id,
+            'worker_service_id' => $service->id,
+            'job_description'   => 'Need pipe fixed urgently.',
+            'location'          => '123 Test Street',
+            'agreed_price'      => 500,
+            'platform_fee'      => 40,
+            'worker_net'        => 460,
+            'status'            => 'pending',
+        ], $overrides));
+    }
+
+    /** Standard mobile money payload for payment tests. */
+    protected function mobileMoneyPayload(string $provider = 'mtn', string $phone = '0971234567'): array
+    {
+        return ['method' => 'mobile_money', 'provider' => $provider, 'phone' => $phone];
+    }
+
+    /** Standard card payload for payment tests. */
+    protected function cardPayload(string $number = '4111111111111111'): array
+    {
+        return [
+            'method'          => 'card',
+            'card_number'     => $number,
+            'card_expiry'     => '12/28',
+            'card_cvv'        => '123',
+            'cardholder_name' => 'Test User',
+        ];
     }
 }

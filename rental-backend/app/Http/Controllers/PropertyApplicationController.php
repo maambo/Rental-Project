@@ -9,6 +9,7 @@ use App\Mail\PaymentReceivedLandlord;
 use App\Models\Blacklist;
 use App\Models\Property;
 use App\Models\PropertyApplication;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -16,6 +17,8 @@ use Inertia\Inertia;
 
 class PropertyApplicationController extends Controller
 {
+    public function __construct(private readonly PaymentService $paymentService) {}
+
     public function create(Property $property)
     {
         if (! Property::visibleInSearch()->where('id', $property->id)->exists()) {
@@ -127,8 +130,8 @@ class PropertyApplicationController extends Controller
             ->with('success', 'Application cancelled.');
     }
 
-    /** Tenant makes payment — finalises the deal. */
-    public function pay(Property $property, PropertyApplication $application)
+    /** Tenant makes payment — charges via the simulated payment method, then finalises the deal. */
+    public function pay(Request $request, Property $property, PropertyApplication $application)
     {
         if ($application->user_id !== auth()->id()) {
             abort(403);
@@ -145,6 +148,10 @@ class PropertyApplicationController extends Controller
         // Load before transaction so relationships are available for emails
         $application->load(['property.landlord', 'user']);
         $property = $application->property;
+
+        $this->paymentService->initiateRentPayment($application, $request->only([
+            'method', 'provider', 'phone', 'card_number', 'card_expiry', 'card_cvv', 'cardholder_name',
+        ]));
 
         DB::transaction(function () use ($application, $property) {
             $application->update([

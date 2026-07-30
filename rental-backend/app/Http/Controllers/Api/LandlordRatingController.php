@@ -20,7 +20,7 @@ class LandlordRatingController extends Controller
 
         // Check verification (did they confirm viewing?)
         $isVerified = false;
-        if ($validated['property_id']) {
+        if ($validated['property_id'] ?? null) {
             $isVerified = ViewingConfirmation::where('property_id', $validated['property_id'])
                 ->where('tenant_id', auth()->id())
                 ->exists();
@@ -30,7 +30,7 @@ class LandlordRatingController extends Controller
             [
                 'landlord_id' => $validated['landlord_id'],
                 'tenant_id' => auth()->id(),
-                'property_id' => $validated['property_id'],
+                'property_id' => $validated['property_id'] ?? null,
             ],
             [
                 'rating' => $validated['rating'],

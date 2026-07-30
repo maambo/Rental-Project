@@ -31,6 +31,15 @@ class TenantApplicationWorkflowTest extends TestCase
         ], $overrides);
     }
 
+    private function mobileMoneyPayload(): array
+    {
+        return [
+            'method'   => 'mobile_money',
+            'provider' => 'mtn',
+            'phone'    => '0966123456',
+        ];
+    }
+
     // ── Submit application ────────────────────────────────────────────────────
 
     public function test_tenant_can_apply_for_an_available_property(): void
@@ -246,12 +255,18 @@ class TenantApplicationWorkflowTest extends TestCase
         ]);
 
         $this->actingAs($tenant)
-            ->post(route('properties.pay', [$property, $application]))
+            ->post(route('properties.pay', [$property, $application]), $this->mobileMoneyPayload())
             ->assertRedirect(route('tenant.applications.index'));
 
         $this->assertDatabaseHas('property_applications', [
             'id'     => $application->id,
             'status' => 'completed',
+        ]);
+
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $tenant->id,
+            'Type'    => 'MOBILE_MONEY',
+            'Status'  => 'COMPLETED',
         ]);
 
         $this->assertDatabaseHas('properties', [
@@ -282,7 +297,7 @@ class TenantApplicationWorkflowTest extends TestCase
         ]);
 
         $this->actingAs($tenant1)
-            ->post(route('properties.pay', [$property, $winningApp]));
+            ->post(route('properties.pay', [$property, $winningApp]), $this->mobileMoneyPayload());
 
         $this->assertDatabaseHas('property_applications', ['id' => $losingApp->id, 'status' => 'rejected']);
     }
