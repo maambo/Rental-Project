@@ -3,6 +3,8 @@
 .env
 .env.backup
 .env.production
+.env.testing
+database/testing.sqlite
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -23,9 +25,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
-# Cypress and PHPUnit Tests
-/cypress
-/cypress.config.ts
-**/*.cy.ts
-**/*.cy.js
-/tests
+# Cypress test artifacts (specs themselves are tracked)
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
