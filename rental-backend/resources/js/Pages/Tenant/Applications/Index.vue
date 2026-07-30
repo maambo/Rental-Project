@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PaymentMethodPicker from '@/Components/PaymentMethodPicker.vue';
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 
 interface PropertyImage { image_url: string; is_primary: boolean }
@@ -54,10 +55,11 @@ const getPayForm = (id: number) => {
     return payForms[id];
 };
 
-const submitPayment = () => {
+const submitPayment = (paymentPayload: Record<string, string>) => {
     if (!confirmingApp.value || !allChecked()) return;
     const app = confirmingApp.value;
-    getPayForm(app.id).post(
+    const form = getPayForm(app.id);
+    form.transform(() => paymentPayload).post(
         route('properties.pay', { property: app.property.id, application: app.id }),
         { onSuccess: () => { confirmingApp.value = null; } }
     );
@@ -232,7 +234,7 @@ const steps = (app: Application) => [
         <!-- Payment confirmation modal -->
         <Teleport to="body">
             <div v-if="confirmingApp" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-                <div class="bg-light-bg rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+                <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
 
                     <!-- Header -->
                     <div class="bg-dark-bg/80 px-6 py-5 border-b border-gray-700">
@@ -298,16 +300,28 @@ const steps = (app: Application) => [
                         </label>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="px-6 py-5 flex gap-3">
+                    <!-- Payment method — only unlocked once the checklist is complete -->
+                    <div v-if="allChecked() && confirmingApp" class="px-6 pb-6 pt-2">
+                        <PaymentMethodPicker
+                            :processing="getPayForm(confirmingApp.id).processing"
+                            submit-label="Confirm & Pay"
+                            @submit="submitPayment"
+                        />
+                        <button @click="confirmingApp = null"
+                                class="w-full mt-3 px-4 py-2 text-gray-500 hover:text-gray-300 text-sm transition-colors">
+                            Go Back
+                        </button>
+                    </div>
+
+                    <!-- Actions (checklist not complete yet) -->
+                    <div v-else class="px-6 py-5 flex gap-3">
                         <button @click="confirmingApp = null"
                                 class="flex-1 px-4 py-2.5 border border-gray-700 rounded-lg text-gray-300 text-sm hover:bg-gray-700/50 transition-colors">
                             Go Back
                         </button>
-                        <button @click="submitPayment"
-                                :disabled="!allChecked() || (confirmingApp ? getPayForm(confirmingApp.id).processing : false)"
-                                class="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg transition-colors">
-                            {{ confirmingApp && getPayForm(confirmingApp.id).processing ? 'Processing…' : 'Confirm & Pay' }}
+                        <button disabled
+                                class="flex-1 px-4 py-2.5 bg-green-600 opacity-40 cursor-not-allowed text-white text-sm font-bold rounded-lg">
+                            Complete checklist above
                         </button>
                     </div>
                 </div>

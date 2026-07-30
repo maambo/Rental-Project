@@ -145,7 +145,7 @@ function viewAllUrl() {
             </div>
 
             <div v-if="properties.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div v-for="property in properties" :key="property.id" class="bg-white dark:bg-light-bg rounded-2xl shadow-lg overflow-hidden transition hover:shadow-xl group">
+                <div v-for="property in properties" :key="property.id" class="bg-white dark:bg-light-bg rounded-xl shadow-lg overflow-hidden transition hover:shadow-xl group">
                     <!-- Image -->
                     <div class="relative h-48 bg-gray-200">
                         <img 

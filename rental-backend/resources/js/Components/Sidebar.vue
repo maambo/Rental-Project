@@ -8,7 +8,7 @@ import {
     ChatBubbleLeftRightIcon, WrenchScrewdriverIcon, CheckBadgeIcon,
     UsersIcon, FolderIcon, ShieldCheckIcon, DocumentTextIcon,
     ClockIcon, GlobeAltIcon, ChevronDownIcon, CreditCardIcon,
-    BriefcaseIcon, CalendarDaysIcon,
+    BriefcaseIcon, CalendarDaysIcon, ChartPieIcon,
 } from '@heroicons/vue/24/outline';
 
 const page = usePage();
@@ -90,6 +90,9 @@ const isOpen = (key: string) => openGroups.value.has(key);
                     <Link :href="route('admin.statistics.index')" :class="[link, isActive('admin.statistics.*') ? active : inactive]">
                         <ChartBarIcon class="mr-3 h-5 w-5 flex-shrink-0" />Statistics
                     </Link>
+                    <Link :href="route('admin.financial-reports.index')" :class="[link, isActive('admin.financial-reports.*') ? active : inactive]">
+                        <ChartPieIcon class="mr-3 h-5 w-5 flex-shrink-0" />Financial Reports
+                    </Link>
                 </template>
 
                 <!-- Management group -->
@@ -159,6 +162,9 @@ const isOpen = (key: string) => openGroups.value.has(key);
                     <Link :href="route('landlord.property-applications.index')" :class="[link, isActive('landlord.property-applications.*') ? active : inactive]">
                         <ClipboardDocumentListIcon class="mr-3 h-5 w-5 flex-shrink-0" />Applications
                     </Link>
+                    <Link :href="route('landlord.reports.index')" :class="[link, isActive('landlord.reports.*') ? active : inactive]">
+                        <ChartPieIcon class="mr-3 h-5 w-5 flex-shrink-0" />Reports
+                    </Link>
                     <Link :href="route('landlord.tour-requests.index')" :class="[link, isActive('landlord.tour-requests.*') ? active : inactive]">
                         <UsersIcon class="mr-3 h-5 w-5 flex-shrink-0" />Tour Requests
                     </Link>
@@ -198,6 +204,9 @@ const isOpen = (key: string) => openGroups.value.has(key);
                     <Link :href="route('rental-history.index')" :class="[link, isActive('rental-history.*') ? active : inactive]">
                         <FolderIcon class="mr-3 h-5 w-5 flex-shrink-0" />History
                     </Link>
+                    <Link :href="route('tenant.reports.index')" :class="[link, isActive('tenant.reports.*') ? active : inactive]">
+                        <ChartPieIcon class="mr-3 h-5 w-5 flex-shrink-0" />Payment Reports
+                    </Link>
                 </template>
             </template>
 
@@ -214,8 +223,11 @@ const isOpen = (key: string) => openGroups.value.has(key);
                 <Link :href="route('marketplace.bookings.index')" :class="[link, isActive('marketplace.bookings.*') ? active : inactive]">
                     <CalendarDaysIcon class="mr-3 h-5 w-5 flex-shrink-0" />My Bookings
                 </Link>
-                <Link v-if="hasWorkerProfile" :href="route('worker.dashboard')" :class="[link, isActive('worker.*') ? active : inactive]">
+                <Link v-if="hasWorkerProfile" :href="route('worker.dashboard')" :class="[link, isActive('worker.dashboard') ? active : inactive]">
                     <UserIcon class="mr-3 h-5 w-5 flex-shrink-0" />Worker Dashboard
+                </Link>
+                <Link v-if="hasWorkerProfile" :href="route('worker.reports.index')" :class="[link, isActive('worker.reports.*') ? active : inactive]">
+                    <ChartPieIcon class="mr-3 h-5 w-5 flex-shrink-0" />Earnings Report
                 </Link>
                 <Link v-else :href="route('worker.profile.create')" :class="[link, inactive]">
                     <UserIcon class="mr-3 h-5 w-5 flex-shrink-0" />Become a Worker

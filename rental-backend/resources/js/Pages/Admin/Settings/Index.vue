@@ -7,13 +7,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     <Head title="Settings" />
 
     <AuthenticatedLayout header="System Settings">
-        <div class="py-12">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">
-                        System settings management is coming soon.
-                    </p>
-                </div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                <p class="text-gray-400 text-sm">
+                    System settings management is coming soon.
+                </p>
             </div>
         </div>
     </AuthenticatedLayout>

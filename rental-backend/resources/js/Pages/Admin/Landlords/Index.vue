@@ -14,52 +14,48 @@ const props = defineProps<{
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">Landlord Profiles</h2>
+            <h2 class="text-xl font-semibold text-white">Landlord Profiles</h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verification</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Properties</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr v-for="landlord in landlords" :key="landlord.id">
-                                    <td class="px-6 py-4 text-sm font-medium">
-                                        <Link :href="route('admin.landlords.show', landlord.id)" class="text-brand-blue hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-                                            {{ landlord.name }}
-                                        </Link>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ landlord.email }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ landlord.phone || '-' }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 capitalize">
-                                        <VerificationBadge :level="landlord.verification_level" />
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ landlord.property_count }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">
-                                        {{ new Date(landlord.created_at).toLocaleDateString() }}
-                                    </td>
-                                    <td class="px-6 py-4 text-right text-sm font-medium">
-                                        <Link :href="route('chat.show', landlord.id)" class="text-brand-blue hover:text-blue-900 dark:hover:text-blue-300 inline-flex items-center gap-1">
-                                            <ChatBubbleLeftRightIcon class="w-5 h-5" />
-                                            Chat
-                                        </Link>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700 text-gray-400 text-left">
+                            <th class="px-4 py-3 font-medium">Name</th>
+                            <th class="px-4 py-3 font-medium">Email</th>
+                            <th class="px-4 py-3 font-medium">Phone</th>
+                            <th class="px-4 py-3 font-medium">Verification</th>
+                            <th class="px-4 py-3 font-medium">Properties</th>
+                            <th class="px-4 py-3 font-medium">Joined</th>
+                            <th class="px-4 py-3 font-medium text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700">
+                        <tr v-for="landlord in landlords" :key="landlord.id" class="hover:bg-gray-700/40">
+                            <td class="px-4 py-3 font-medium">
+                                <Link :href="route('admin.landlords.show', landlord.id)" class="text-brand-red hover:text-brand-orange hover:underline">
+                                    {{ landlord.name }}
+                                </Link>
+                            </td>
+                            <td class="px-4 py-3 text-gray-400">{{ landlord.email }}</td>
+                            <td class="px-4 py-3 text-gray-400">{{ landlord.phone || '-' }}</td>
+                            <td class="px-4 py-3 text-gray-400 capitalize">
+                                <VerificationBadge :level="landlord.verification_level" />
+                            </td>
+                            <td class="px-4 py-3 text-gray-400">{{ landlord.property_count }}</td>
+                            <td class="px-4 py-3 text-gray-400">
+                                {{ new Date(landlord.created_at).toLocaleDateString() }}
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <Link :href="route('chat.show', landlord.id)" class="text-brand-red hover:text-brand-orange inline-flex items-center gap-1">
+                                    <ChatBubbleLeftRightIcon class="w-5 h-5" />
+                                    Chat
+                                </Link>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </AuthenticatedLayout>

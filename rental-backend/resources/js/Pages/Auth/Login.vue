@@ -31,18 +31,18 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <div v-if="status" class="mb-4 text-sm font-medium text-green-400">
             {{ status }}
         </div>
 
         <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome Back</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Sign in to manage your account</p>
+            <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
+            <p class="text-sm text-gray-400">Sign in to manage your account</p>
         </div>
 
         <!-- Google Sign In -->
         <div class="mb-6">
-            <a :href="route('auth.google')" class="flex items-center justify-center w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition">
+            <a :href="route('auth.google')" class="flex items-center justify-center w-full px-4 py-2 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-gray-200 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition">
                 <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                         <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
@@ -56,9 +56,9 @@ const submit = () => {
         </div>
 
         <div class="relative flex py-2 items-center mb-6">
-            <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+            <div class="flex-grow border-t border-gray-600"></div>
             <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">Or sign in with email</span>
-            <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+            <div class="flex-grow border-t border-gray-600"></div>
         </div>
 
         <form @submit.prevent="submit">
@@ -96,7 +96,7 @@ const submit = () => {
             <div class="mt-4 block">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" class="text-brand-red focus:ring-brand-red" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400"
+                    <span class="ms-2 text-sm text-gray-400"
                         >Remember me</span
                     >
                 </label>
@@ -106,7 +106,7 @@ const submit = () => {
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
+                    class="rounded-md text-sm text-gray-400 underline hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 focus:ring-offset-gray-800"
                 >
                     Forgot your password?
                 </Link>
@@ -120,8 +120,8 @@ const submit = () => {
                 </PrimaryButton>
             </div>
             
-            <div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-                Don't have an account? 
+            <div class="mt-6 text-center text-sm text-gray-400">
+                Don't have an account?
                 <Link :href="route('register')" class="text-brand-red hover:text-brand-orange font-semibold">
                     Register
                 </Link>

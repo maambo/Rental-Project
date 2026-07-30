@@ -50,7 +50,7 @@ const loginAs = (id: number) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            <h2 class="text-xl font-semibold text-white">
                 Manage Users
             </h2>
         </template>
@@ -71,11 +71,11 @@ const loginAs = (id: number) => {
                             class="pl-10 block w-full"
                         />
                     </div>
-                    
+
                     <!-- Role Filter -->
-                     <select
+                    <select
                         v-model="role"
-                        class="block w-full max-w-[150px] rounded-md border-gray-300 shadow-sm focus:border-brand-orange focus:ring-brand-orange dark:border-gray-700 dark:bg-dark-bg dark:text-gray-300 dark:focus:border-brand-orange dark:focus:ring-brand-orange"
+                        class="block w-full max-w-[150px] rounded-lg border-gray-600 bg-gray-700 text-gray-200 shadow-sm focus:border-brand-orange focus:ring-brand-orange"
                     >
                         <option value="all">All Roles</option>
                         <option v-for="r in props.roles" :key="r.id" :value="r.name">{{ r.name.charAt(0).toUpperCase() + r.name.slice(1) }}</option>
@@ -91,56 +91,56 @@ const loginAs = (id: number) => {
             </div>
 
             <!-- Table -->
-            <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-light-bg">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Email</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Role</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Created At</th>
-                            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700 text-gray-400 text-left">
+                            <th class="px-4 py-3 font-medium">Name</th>
+                            <th class="px-4 py-3 font-medium">Email</th>
+                            <th class="px-4 py-3 font-medium">Role</th>
+                            <th class="px-4 py-3 font-medium">Created At</th>
+                            <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-light-bg">
-                        <tr v-for="user in users.data" :key="user.id" class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ user.name }}</div>
+                    <tbody class="divide-y divide-gray-700">
+                        <tr v-for="user in users.data" :key="user.id" class="hover:bg-gray-700/40">
+                            <td class="px-4 py-3">
+                                <div class="font-medium text-white">{{ user.name }}</div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
+                            <td class="px-4 py-3">
+                                <div class="text-gray-400">{{ user.email }}</div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 capitalize"
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-0.5 rounded-full text-xs capitalize"
                                     :class="{
-                                        'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300': user.role_model?.name === 'admin',
-                                        'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300': user.role_model?.name === 'landlord',
-                                        'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300': user.role_model?.name === 'tenant',
-                                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': !['admin', 'landlord', 'tenant'].includes(user.role_model?.name)
+                                        'bg-purple-500/20 text-purple-400': user.role_model?.name === 'admin',
+                                        'bg-blue-500/20 text-blue-400': user.role_model?.name === 'landlord',
+                                        'bg-green-500/20 text-green-400': user.role_model?.name === 'tenant',
+                                        'bg-gray-500/20 text-gray-400': !['admin', 'landlord', 'tenant'].includes(user.role_model?.name)
                                     }"
                                 >
                                     {{ user.role_model?.name || 'No Role' }}
                                 </span>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="px-4 py-3 text-gray-400">
                                 {{ new Date(user.created_at).toLocaleDateString() }}
                             </td>
-                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                            <td class="px-4 py-3 text-right">
                                 <div class="flex justify-end gap-3">
-                                    <button @click="loginAs(user.id)" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" title="Login As User">
+                                    <button @click="loginAs(user.id)" class="text-green-400 hover:text-green-300" title="Login As User">
                                         <ArrowRightOnRectangleIcon class="h-5 w-5" />
                                     </button>
-                                    <Link :href="route('admin.users.edit', user.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-blue-400 dark:hover:text-blue-300" title="Edit User">
+                                    <Link :href="route('admin.users.edit', user.id)" class="text-brand-red hover:text-brand-orange" title="Edit User">
                                         <PencilSquareIcon class="h-5 w-5" />
                                     </Link>
-                                    <button @click="deleteUser(user.id)" class="text-brand-red hover:text-red-900 dark:hover:text-red-300" title="Delete User">
+                                    <button @click="deleteUser(user.id)" class="text-red-400 hover:text-red-300" title="Delete User">
                                         <TrashIcon class="h-5 w-5" />
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                         <tr v-if="users.data.length === 0">
-                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <tr v-if="users.data.length === 0">
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
                                 No users found.
                             </td>
                         </tr>

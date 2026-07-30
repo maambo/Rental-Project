@@ -67,106 +67,104 @@ const toggleGroup = (groupPermissions: Array<any>) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            <h2 class="text-xl font-semibold text-white">
                 {{ role ? 'Edit Role' : 'Create New Role' }}
             </h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <form @submit.prevent="submit" class="p-6 space-y-6">
-                        <!-- Basic Info -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <InputLabel for="name" value="Role Name (slug)" />
-                                <input
-                                    id="name"
-                                    v-model="form.name"
-                                    type="text"
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
-                                    placeholder="e.g., admin, landlord"
-                                    required
-                                />
-                                <InputError :message="form.errors.name" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel for="display_name" value="Display Name" />
-                                <input
-                                    id="display_name"
-                                    v-model="form.display_name"
-                                    type="text"
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
-                                    placeholder="e.g., Administrator"
-                                    required
-                                />
-                                <InputError :message="form.errors.display_name" class="mt-2" />
-                            </div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-gray-800 rounded-xl border border-gray-700">
+                <form @submit.prevent="submit" class="p-6 space-y-6">
+                    <!-- Basic Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <InputLabel for="name" value="Role Name (slug)" />
+                            <input
+                                id="name"
+                                v-model="form.name"
+                                type="text"
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-700 text-gray-200 shadow-sm focus:border-brand-orange focus:ring-brand-orange"
+                                placeholder="e.g., admin, landlord"
+                                required
+                            />
+                            <InputError :message="form.errors.name" class="mt-2" />
                         </div>
 
                         <div>
-                            <InputLabel for="description" value="Description" />
-                            <textarea
-                                id="description"
-                                v-model="form.description"
-                                rows="3"
-                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
-                            ></textarea>
-                            <InputError :message="form.errors.description" class="mt-2" />
+                            <InputLabel for="display_name" value="Display Name" />
+                            <input
+                                id="display_name"
+                                v-model="form.display_name"
+                                type="text"
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-700 text-gray-200 shadow-sm focus:border-brand-orange focus:ring-brand-orange"
+                                placeholder="e.g., Administrator"
+                                required
+                            />
+                            <InputError :message="form.errors.display_name" class="mt-2" />
                         </div>
+                    </div>
 
-                        <!-- Permissions -->
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Assign Permissions</h3>
-                            
-                            <div v-for="(groupPerms, group) in permissions" :key="group" class="mb-6">
-                                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
-                                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 capitalize">{{ group || 'Other' }}</h4>
-                                    <button
-                                        type="button"
-                                        @click="toggleGroup(groupPerms)"
-                                        class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                                    >
-                                        {{ groupPerms.every(p => form.permissions.includes(p.id)) ? 'Deselect All' : 'Select All' }}
-                                    </button>
-                                </div>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    <label
-                                        v-for="permission in groupPerms"
-                                        :key="permission.id"
-                                        class="flex items-start space-x-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            :checked="form.permissions.includes(permission.id)"
-                                            @change="togglePermission(permission.id)"
-                                            class="mt-1 rounded border-gray-300 text-brand-red focus:ring-brand-red"
-                                        />
-                                        <div class="flex-1">
-                                            <div class="font-medium text-sm text-gray-900 dark:text-gray-100">
-                                                {{ permission.display_name }}
-                                            </div>
-                                            <div v-if="permission.description" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                {{ permission.description }}
-                                            </div>
+                    <div>
+                        <InputLabel for="description" value="Description" />
+                        <textarea
+                            id="description"
+                            v-model="form.description"
+                            rows="3"
+                            class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-700 text-gray-200 shadow-sm focus:border-brand-orange focus:ring-brand-orange"
+                        ></textarea>
+                        <InputError :message="form.errors.description" class="mt-2" />
+                    </div>
+
+                    <!-- Permissions -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4">Assign Permissions</h3>
+
+                        <div v-for="(groupPerms, group) in permissions" :key="group" class="mb-6">
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-700">
+                                <h4 class="font-semibold text-gray-300 capitalize">{{ group || 'Other' }}</h4>
+                                <button
+                                    type="button"
+                                    @click="toggleGroup(groupPerms)"
+                                    class="text-sm text-brand-red hover:text-brand-orange"
+                                >
+                                    {{ groupPerms.every(p => form.permissions.includes(p.id)) ? 'Deselect All' : 'Select All' }}
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                <label
+                                    v-for="permission in groupPerms"
+                                    :key="permission.id"
+                                    class="flex items-start space-x-3 p-3 border border-gray-700 rounded-lg hover:bg-gray-700/40 cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        :checked="form.permissions.includes(permission.id)"
+                                        @change="togglePermission(permission.id)"
+                                        class="mt-1 rounded border-gray-600 bg-gray-900 text-brand-red focus:ring-brand-red"
+                                    />
+                                    <div class="flex-1">
+                                        <div class="font-medium text-sm text-white">
+                                            {{ permission.display_name }}
                                         </div>
-                                    </label>
-                                </div>
+                                        <div v-if="permission.description" class="text-xs text-gray-500 mt-1">
+                                            {{ permission.description }}
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="flex justify-end space-x-4">
-                            <a :href="route('admin.roles.index')" class="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                Cancel
-                            </a>
-                            <PrimaryButton :disabled="form.processing">
-                                {{ role ? 'Update Role' : 'Create Role' }}
-                            </PrimaryButton>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex justify-end space-x-4">
+                        <a :href="route('admin.roles.index')" class="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+                            Cancel
+                        </a>
+                        <PrimaryButton :disabled="form.processing">
+                            {{ role ? 'Update Role' : 'Create Role' }}
+                        </PrimaryButton>
+                    </div>
+                </form>
             </div>
         </div>
     </AuthenticatedLayout>

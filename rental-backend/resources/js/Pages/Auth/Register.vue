@@ -38,13 +38,13 @@ const submit = () => {
         <Head title="Register" />
 
         <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Create Account</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Join our community today</p>
+            <h2 class="text-2xl font-bold text-white">Create Account</h2>
+            <p class="text-sm text-gray-400">Join our community today</p>
         </div>
 
         <!-- Google Sign Up -->
         <div class="mb-6">
-            <a :href="route('auth.google')" class="flex items-center justify-center w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition">
+            <a :href="route('auth.google')" class="flex items-center justify-center w-full px-4 py-2 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-gray-200 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition">
                  <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                         <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
@@ -58,9 +58,9 @@ const submit = () => {
         </div>
 
         <div class="relative flex py-2 items-center mb-6">
-            <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+            <div class="flex-grow border-t border-gray-600"></div>
             <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">Or sign up with email</span>
-            <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+            <div class="flex-grow border-t border-gray-600"></div>
         </div>
 
         <form @submit.prevent="submit">
@@ -132,8 +132,8 @@ const submit = () => {
             </div>
 
             <!-- Identity Verification -->
-            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Identity Verification</p>
+            <div class="mt-6 pt-4 border-t border-gray-700">
+                <p class="text-sm font-semibold text-gray-300 mb-4">Identity Verification</p>
 
                 <div>
                     <InputLabel for="phone" value="Phone Number" />
@@ -153,11 +153,11 @@ const submit = () => {
                     <div class="mt-1 flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" v-model="form.id_type" value="nrc" class="text-brand-red focus:ring-brand-red" />
-                            <span class="text-sm text-gray-700 dark:text-gray-300">NRC (Zambian citizen)</span>
+                            <span class="text-sm text-gray-300">NRC (Zambian citizen)</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" v-model="form.id_type" value="passport" class="text-brand-red focus:ring-brand-red" />
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Passport (non-citizen)</span>
+                            <span class="text-sm text-gray-300">Passport (non-citizen)</span>
                         </label>
                     </div>
                     <InputError class="mt-2" :message="form.errors.id_type" />
@@ -183,7 +183,7 @@ const submit = () => {
                         type="file"
                         accept=".jpg,.jpeg,.png,.pdf"
                         required
-                        class="mt-1 block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-brand-red file:text-white hover:file:bg-red-700 cursor-pointer"
+                        class="mt-1 block w-full text-sm text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-brand-red file:text-white hover:file:bg-red-700 cursor-pointer"
                         @change="(e) => handleFile(e, 'id_document')"
                     />
                     <InputError class="mt-2" :message="form.errors.id_document" />
@@ -191,13 +191,13 @@ const submit = () => {
 
                 <div class="mt-4">
                     <InputLabel for="selfie" value="Selfie / Live Photo" />
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">A clear photo of your face — used to match your ID document.</p>
+                    <p class="text-xs text-gray-400 mb-1">A clear photo of your face — used to match your ID document.</p>
                     <input
                         id="selfie"
                         type="file"
                         accept=".jpg,.jpeg,.png"
                         required
-                        class="mt-1 block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-brand-red file:text-white hover:file:bg-red-700 cursor-pointer"
+                        class="mt-1 block w-full text-sm text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-brand-red file:text-white hover:file:bg-red-700 cursor-pointer"
                         @change="(e) => handleFile(e, 'selfie')"
                     />
                     <InputError class="mt-2" :message="form.errors.selfie" />
@@ -207,7 +207,7 @@ const submit = () => {
             <div class="mt-4 flex items-center justify-end">
                 <Link
                     :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
+                    class="rounded-md text-sm text-gray-400 underline hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 focus:ring-offset-gray-800"
                 >
                     Already registered?
                 </Link>
@@ -223,11 +223,11 @@ const submit = () => {
         </form>
 
         <!-- Landlord CTA -->
-        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Want to list your property?</p>
+        <div class="mt-6 pt-6 border-t border-gray-700 text-center">
+            <p class="text-sm text-gray-400 mb-3">Want to list your property?</p>
             <Link
                 :href="route('landlord.apply')"
-                class="inline-flex items-center justify-center w-full px-4 py-2.5 border-2 border-brand-red rounded-md text-sm font-semibold text-brand-red hover:bg-brand-red hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-brand-red focus:ring-offset-2"
+                class="inline-flex items-center justify-center w-full px-4 py-2.5 border-2 border-brand-red rounded-lg text-sm font-semibold text-brand-red hover:bg-brand-red hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-brand-red focus:ring-offset-2"
             >
                 Register as Landlord →
             </Link>

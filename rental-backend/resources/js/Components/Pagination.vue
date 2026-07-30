@@ -16,13 +16,13 @@ defineProps<{
             <template v-for="(link, key) in links" :key="key">
                 <div
                     v-if="link.url === null"
-                    class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded dark:border-gray-700"
+                    class="mr-1 mb-1 px-4 py-2 text-sm leading-4 text-gray-500 border border-gray-700 rounded-lg"
                     v-html="link.label"
                 />
                 <Link
                     v-else
-                    class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-brand-red focus:text-brand-red dark:border-gray-700 dark:hover:bg-gray-800"
-                    :class="{ 'bg-brand-red text-white hover:bg-brand-red dark:bg-brand-red': link.active, 'bg-white dark:bg-dark-bg text-gray-700 dark:text-gray-300': !link.active }"
+                    class="mr-1 mb-1 px-4 py-2 text-sm leading-4 border rounded-lg transition-colors"
+                    :class="link.active ? 'bg-brand-red text-white border-brand-red' : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'"
                     :href="link.url"
                     v-html="link.label"
                 />

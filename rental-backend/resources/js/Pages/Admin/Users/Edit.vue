@@ -42,18 +42,18 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center gap-4">
-                <Link :href="route('admin.users.index')" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <Link :href="route('admin.users.index')" class="text-gray-400 hover:text-white">
                     <ArrowLeftIcon class="h-5 w-5" />
                 </Link>
-                <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                <h2 class="text-xl font-semibold text-white">
                     Edit User
                 </h2>
             </div>
         </template>
 
         <div class="mx-auto max-w-2xl">
-            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-light-bg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="bg-gray-800 rounded-xl border border-gray-700">
+                <div class="p-6">
                     <form @submit.prevent="submit" class="space-y-6">
                         <div>
                             <InputLabel for="name" value="Name" />
@@ -87,7 +87,7 @@ const submit = () => {
                             <select
                                 id="role_id"
                                 v-model="form.role_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-orange focus:ring-brand-orange dark:border-gray-700 dark:bg-dark-bg dark:text-gray-300 dark:focus:border-brand-orange dark:focus:ring-brand-orange"
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-700 text-gray-200 shadow-sm focus:border-brand-orange focus:ring-brand-orange"
                             >
                                 <option v-for="role in roles" :key="role.id" :value="role.id">
                                     {{ role.display_name || role.name }}
@@ -96,8 +96,8 @@ const submit = () => {
                             <InputError class="mt-2" :message="form.errors.role_id" />
                         </div>
 
-                        <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
-                             <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">Leave password blank to keep current password.</p>
+                        <div class="border-t border-gray-700 pt-4">
+                            <p class="mb-4 text-sm text-gray-400">Leave password blank to keep current password.</p>
                             <div>
                                 <InputLabel for="password" value="New Password" />
                                 <TextInput
@@ -124,7 +124,7 @@ const submit = () => {
                         </div>
 
                         <div class="flex items-center justify-end gap-4">
-                            <Link :href="route('admin.users.index')" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
+                            <Link :href="route('admin.users.index')" class="text-sm text-gray-400 hover:text-white">
                                 Cancel
                             </Link>
                             <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">

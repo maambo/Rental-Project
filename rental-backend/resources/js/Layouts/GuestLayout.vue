@@ -5,7 +5,7 @@ import { HomeIcon } from '@heroicons/vue/24/solid';
 
 <template>
     <div
-        class="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0 dark:bg-dark-bg"
+        class="flex min-h-screen flex-col items-center bg-dark-bg pt-6 sm:justify-center sm:pt-0"
     >
         <div>
             <Link href="/">
@@ -14,7 +14,7 @@ import { HomeIcon } from '@heroicons/vue/24/solid';
         </div>
 
         <div
-            class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg dark:bg-light-bg"
+            class="mt-6 w-full overflow-hidden bg-gray-800 border border-gray-700 px-6 py-4 sm:max-w-md sm:rounded-xl"
         >
             <slot />
         </div>

@@ -9,9 +9,9 @@ defineProps<{
 <template>
     <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
         :class="{
-            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': level === 'basic',
-            'bg-brand-blue/10 text-brand-blue dark:bg-blue-900/30 dark:text-blue-300': level === 'trusted',
-            'bg-brand-gold/10 text-brand-gold dark:bg-yellow-900/30 dark:text-yellow-300': level === 'premium'
+            'bg-gray-700 text-gray-300': level === 'basic',
+            'bg-brand-info/10 text-brand-info': level === 'trusted',
+            'bg-brand-warning/10 text-brand-warning': level === 'premium'
         }"
     >
         <ShieldCheckIcon v-if="level === 'basic'" class="w-3.5 h-3.5" />
