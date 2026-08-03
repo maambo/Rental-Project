@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Property;
 use App\Models\TourRequest;
+use App\Notifications\TourRequestStatusUpdated;
 use Illuminate\Http\Request;
 
 class TourRequestController extends Controller
@@ -75,6 +76,32 @@ class TourRequestController extends Controller
             'status' => 'approved',
             'landlord_response' => $validated['landlord_response'] ?? null,
         ]);
+
+        $tourRequest->load('property');
+        $tourRequest->user?->notify(new TourRequestStatusUpdated($tourRequest));
+
+        return response()->json($tourRequest);
+    }
+
+    public function reject(Request $request, $id)
+    {
+        $tourRequest = TourRequest::findOrFail($id);
+
+        if ($tourRequest->property->landlord_id !== $request->user()->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'landlord_response' => 'nullable|string|max:500',
+        ]);
+
+        $tourRequest->update([
+            'status' => 'rejected',
+            'landlord_response' => $validated['landlord_response'] ?? null,
+        ]);
+
+        $tourRequest->load('property');
+        $tourRequest->user?->notify(new TourRequestStatusUpdated($tourRequest));
 
         return response()->json($tourRequest);
     }

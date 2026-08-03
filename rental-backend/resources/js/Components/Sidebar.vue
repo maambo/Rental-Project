@@ -8,7 +8,7 @@ import {
     ChatBubbleLeftRightIcon, WrenchScrewdriverIcon, CheckBadgeIcon,
     UsersIcon, FolderIcon, ShieldCheckIcon, DocumentTextIcon,
     ClockIcon, GlobeAltIcon, ChevronDownIcon, CreditCardIcon,
-    BriefcaseIcon, CalendarDaysIcon, ChartPieIcon,
+    BriefcaseIcon, CalendarDaysIcon, ChartPieIcon, MapIcon,
 } from '@heroicons/vue/24/outline';
 
 const page = usePage();
@@ -89,6 +89,9 @@ const isOpen = (key: string) => openGroups.value.has(key);
                     </Link>
                     <Link :href="route('admin.statistics.index')" :class="[link, isActive('admin.statistics.*') ? active : inactive]">
                         <ChartBarIcon class="mr-3 h-5 w-5 flex-shrink-0" />Statistics
+                    </Link>
+                    <Link :href="route('admin.analytics.properties.index')" :class="[link, isActive('admin.analytics.properties.*') ? active : inactive]">
+                        <MapIcon class="mr-3 h-5 w-5 flex-shrink-0" />Property Analytics
                     </Link>
                     <Link :href="route('admin.financial-reports.index')" :class="[link, isActive('admin.financial-reports.*') ? active : inactive]">
                         <ChartPieIcon class="mr-3 h-5 w-5 flex-shrink-0" />Financial Reports
@@ -200,6 +203,9 @@ const isOpen = (key: string) => openGroups.value.has(key);
                     </Link>
                     <Link :href="route('tenant.maintenance.index')" :class="[link, isActive('tenant.maintenance.*') ? active : inactive]">
                         <WrenchScrewdriverIcon class="mr-3 h-5 w-5 flex-shrink-0" />Maintenance
+                    </Link>
+                    <Link :href="route('tenant.tour-requests.index')" :class="[link, isActive('tenant.tour-requests.*') ? active : inactive]">
+                        <CalendarDaysIcon class="mr-3 h-5 w-5 flex-shrink-0" />Tour Requests
                     </Link>
                     <Link :href="route('rental-history.index')" :class="[link, isActive('rental-history.*') ? active : inactive]">
                         <FolderIcon class="mr-3 h-5 w-5 flex-shrink-0" />History

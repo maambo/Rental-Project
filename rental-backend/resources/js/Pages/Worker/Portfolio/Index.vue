@@ -54,7 +54,7 @@ const remove = (id: number) => {
             </nav>
         </template>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold text-white">Portfolio Photos</h1>
@@ -93,7 +93,7 @@ const remove = (id: number) => {
                 <p>No portfolio photos yet. Showcase your work by adding photos.</p>
             </div>
 
-            <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                 <div v-for="p in photos" :key="p.id" class="relative group rounded-xl overflow-hidden aspect-square bg-gray-700">
                     <img :src="`/storage/${p.image_url}`" :alt="p.caption ?? ''" class="w-full h-full object-cover" />
                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex flex-col justify-between p-2">

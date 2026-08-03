@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BlacklistController;
 use App\Http\Controllers\Admin\LandlordApplicationAdminController;
 use App\Http\Controllers\Admin\LandlordProfileController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\PropertyAnalyticsController;
 use App\Http\Controllers\Admin\PropertyApprovalController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\StatisticsController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\PropertyReportController as AdminPropertyReportController;
 use App\Http\Controllers\Admin\UtilityController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Marketplace\BookingController as MarketplaceBookingController;
 use App\Http\Controllers\Marketplace\WorkerController as MarketplaceWorkerController;
 use App\Http\Controllers\Worker\BookingController as WorkerBookingController;
@@ -43,6 +45,7 @@ use App\Http\Controllers\Reports\LandlordReportController;
 use App\Http\Controllers\Reports\TenantReportController;
 use App\Http\Controllers\Reports\WorkerReportController;
 use App\Http\Controllers\TourRequestController;
+use App\Http\Controllers\Landlord\TourRequestController as LandlordTourRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -86,8 +89,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
 
     Route::get('/help-support', fn () => inertia('ComingSoon', ['feature' => 'Help & Support']))->name('help-support');
+
+    // Notifications
+    Route::get('/notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
     // Marketplace — authenticated actions (booking, reviews)
     Route::get('/workers/{workerProfile}/book', [MarketplaceWorkerController::class, 'book'])->name('marketplace.workers.book');
@@ -156,7 +166,10 @@ Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord
     Route::get('/reports/export/csv', [LandlordReportController::class, 'exportCsv'])->name('reports.export.csv');
     Route::get('/reports/export/pdf', [LandlordReportController::class, 'exportPdf'])->name('reports.export.pdf');
 
-    Route::get('/tour-requests', fn () => inertia('ComingSoon', ['feature' => 'Tour Requests']))->name('tour-requests.index');
+    Route::get('/tour-requests', [LandlordTourRequestController::class, 'index'])->name('tour-requests.index');
+    Route::post('/tour-requests/{tourRequest}/approve', [LandlordTourRequestController::class, 'approve'])->name('tour-requests.approve');
+    Route::post('/tour-requests/{tourRequest}/reject', [LandlordTourRequestController::class, 'reject'])->name('tour-requests.reject');
+    Route::patch('/tour-requests/{tourRequest}', [LandlordTourRequestController::class, 'update'])->name('tour-requests.update');
     Route::get('/maintenance', fn () => inertia('ComingSoon', ['feature' => 'Maintenance']))->name('maintenance.index');
 });
 
@@ -169,6 +182,9 @@ Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->g
     Route::get('/reports', [TenantReportController::class, 'index'])->name('reports.index');
     Route::get('/my-rentals', fn () => inertia('ComingSoon', ['feature' => 'My Rentals']))->name('my-rentals.index');
     Route::get('/maintenance', fn () => inertia('ComingSoon', ['feature' => 'Maintenance']))->name('maintenance.index');
+    Route::get('/tour-requests', [TourRequestController::class, 'index'])->name('tour-requests.index');
+    Route::post('/tour-requests/{tourRequest}/accept', [TourRequestController::class, 'accept'])->name('tour-requests.accept');
+    Route::post('/tour-requests/{tourRequest}/decline', [TourRequestController::class, 'decline'])->name('tour-requests.decline');
 });
 
 // Admin
@@ -190,6 +206,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/properties/{property}/reject', [PropertyApprovalController::class, 'reject'])->name('properties.reject');
 
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+
+    // Property analytics — filterable by location, type, and utilities, with export
+    Route::get('/analytics/properties', [PropertyAnalyticsController::class, 'index'])->name('analytics.properties.index');
+    Route::get('/analytics/properties/export/csv', [PropertyAnalyticsController::class, 'exportCsv'])->name('analytics.properties.export.csv');
+    Route::get('/analytics/properties/export/pdf', [PropertyAnalyticsController::class, 'exportPdf'])->name('analytics.properties.export.pdf');
 
     // Financial reports — distinct from the content-moderation "/admin/reports" route below
     Route::get('/financial-reports', [AdminFinancialReportController::class, 'index'])->name('financial-reports.index');

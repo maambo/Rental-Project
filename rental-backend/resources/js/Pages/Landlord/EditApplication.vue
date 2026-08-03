@@ -79,7 +79,7 @@ const handleFile = (field: string, event: Event) => {
 
     <AuthenticatedLayout header="Edit Application" :back-url="route('landlord.status')">
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-gray-800 rounded-xl border border-gray-700">
                 <div class="p-6">
                     <!-- Warning Message -->

@@ -134,6 +134,128 @@ describe('Tenant — Applying for a Property', () => {
     });
 });
 
+describe('Tenant — Schedule a Tour', () => {
+    it('"Schedule a Tour" button is visible on a public property show page', () => {
+        cy.request({ url: '/api/properties', failOnStatusCode: false }).then(resp => {
+            const data = resp.body?.data ?? resp.body ?? [];
+            const properties = Array.isArray(data) ? data : [];
+            if (properties.length === 0) {
+                cy.log('No approved properties in DB — skipping');
+                return;
+            }
+            cy.visit(`/properties/${properties[0].id}`);
+            cy.contains('button', /schedule a tour/i).should('be.visible');
+        });
+    });
+
+    it('clicking the button opens the tour modal with datetime and notes fields', () => {
+        cy.loginAsTenant();
+        cy.request({ url: '/api/properties', failOnStatusCode: false }).then(resp => {
+            const data = resp.body?.data ?? resp.body ?? [];
+            const properties = Array.isArray(data) ? data : [];
+            if (properties.length === 0) {
+                cy.log('No approved properties in DB — skipping');
+                return;
+            }
+            cy.visit(`/properties/${properties[0].id}`);
+            cy.contains('button', /schedule a tour/i).click();
+            cy.get('input[type=datetime-local]').should('be.visible');
+            cy.get('textarea').filter(':visible').should('exist');
+            cy.contains('button', /schedule request/i).should('be.visible');
+        });
+    });
+
+    it('tenant can submit a tour request and the modal closes on success', () => {
+        cy.loginAsTenant();
+        cy.request({ url: '/api/properties', failOnStatusCode: false }).then(resp => {
+            const data = resp.body?.data ?? resp.body ?? [];
+            const properties = Array.isArray(data) ? data : [];
+            if (properties.length === 0) {
+                cy.log('No approved properties in DB — skipping');
+                return;
+            }
+            cy.visit(`/properties/${properties[0].id}`);
+            cy.contains('button', /schedule a tour/i).click();
+
+            const future = new Date();
+            future.setDate(future.getDate() + 30);
+            const pad = (n: number) => String(n).padStart(2, '0');
+            const datetimeLocal =
+                `${future.getFullYear()}-${pad(future.getMonth() + 1)}-${pad(future.getDate())}T10:00`;
+
+            cy.get('input[type=datetime-local]').type(datetimeLocal);
+            cy.get('textarea').filter(':visible').first().type('Interested in a morning visit.');
+            cy.contains('button', /schedule request/i).click();
+            // On success the modal unmounts — the datetime input disappears
+            cy.get('input[type=datetime-local]', { timeout: 10000 }).should('not.exist');
+        });
+    });
+
+    it('property owner gets an alert and the tour modal does not open', () => {
+        cy.loginAsLandlord();
+        cy.visit('/landlord/properties');
+        cy.get('body').then(($body) => {
+            const link = $body.find('a[href*="/landlord/properties/"]')[0];
+            if (!link) {
+                cy.log('No properties found for landlord — skipping owner tour test');
+                return;
+            }
+            const match = (link.getAttribute('href') ?? '').match(/\/landlord\/properties\/(\d+)/);
+            if (!match) {
+                cy.log('Could not parse property ID from landlord href — skipping');
+                return;
+            }
+            const id = match[1];
+            cy.on('window:alert', (msg) => {
+                expect(msg).to.match(/cannot schedule a tour for your own property/i);
+            });
+            cy.visit(`/properties/${id}`);
+            cy.contains('button', /schedule a tour/i).click();
+            cy.get('input[type=datetime-local]').should('not.exist');
+        });
+    });
+});
+
+describe('Tenant — Applying for a Property (full flow)', () => {
+    beforeEach(() => cy.loginAsTenant());
+
+    it('apply form shows all required fields', () => {
+        cy.request({ url: '/api/properties', failOnStatusCode: false }).then(resp => {
+            const data = resp.body?.data ?? resp.body ?? [];
+            const properties = Array.isArray(data) ? data : [];
+            if (properties.length === 0) {
+                cy.log('No approved properties in DB — skipping');
+                return;
+            }
+            cy.visit(`/properties/${properties[0].id}/apply`);
+            cy.get('body').should('not.contain', 'Server Error');
+            cy.get('textarea').first().should('be.visible'); // message to landlord
+            cy.get('#adults').should('be.visible');
+            cy.get('#children').should('be.visible');
+            cy.contains('button', /submit application/i).should('be.visible');
+        });
+    });
+
+    it('submitting with valid data redirects away from /apply', () => {
+        cy.request({ url: '/api/properties', failOnStatusCode: false }).then(resp => {
+            const data = resp.body?.data ?? resp.body ?? [];
+            const properties = Array.isArray(data) ? data : [];
+            if (properties.length === 0) {
+                cy.log('No approved properties in DB — skipping');
+                return;
+            }
+            const id = properties[0].id;
+            cy.visit(`/properties/${id}/apply`);
+            cy.get('textarea').first().type('I am a reliable tenant and would love to rent this property.');
+            cy.get('#adults').clear().type('2');
+            cy.get('#children').clear().type('0');
+            cy.contains('button', /submit application/i).click();
+            cy.url({ timeout: 15000 }).should('not.include', '/apply');
+            cy.get('body').should('not.contain', 'Server Error');
+        });
+    });
+});
+
 describe('Tenant — Register', () => {
     it('shows the registration page', () => {
         cy.visit('/register');

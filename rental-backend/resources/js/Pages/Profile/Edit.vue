@@ -21,21 +21,22 @@ defineProps<{
             </h2>
         </template>
 
-        <div class="mx-auto max-w-3xl space-y-5 px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8">
-                <UpdateProfileInformationForm
-                    :must-verify-email="mustVerifyEmail"
-                    :status="status"
-                    class="max-w-xl"
-                />
-            </div>
+        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8">
+                    <UpdateProfileInformationForm
+                        :must-verify-email="mustVerifyEmail"
+                        :status="status"
+                    />
+                </div>
 
-            <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8">
-                <UpdatePasswordForm class="max-w-xl" />
-            </div>
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8">
+                    <UpdatePasswordForm />
+                </div>
 
-            <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8">
-                <DeleteUserForm class="max-w-xl" />
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8 lg:col-span-2">
+                    <DeleteUserForm />
+                </div>
             </div>
         </div>
     </AuthenticatedLayout>

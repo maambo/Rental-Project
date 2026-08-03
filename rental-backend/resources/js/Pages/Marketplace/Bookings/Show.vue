@@ -55,7 +55,7 @@ const statusClass = (s: string) => ({
             </nav>
         </template>
 
-        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
             <!-- Status card -->
             <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <div class="flex justify-between items-start mb-4">
@@ -66,15 +66,15 @@ const statusClass = (s: string) => ({
                     <span :class="['px-3 py-1 rounded-full text-sm capitalize', statusClass(booking.status)]">{{ booking.status.replace('_', ' ') }}</span>
                 </div>
 
-                <dl class="space-y-2 text-sm">
-                    <div class="flex gap-2"><dt class="text-gray-400 w-36">Worker</dt><dd class="text-white">{{ booking.worker_profile.user.name }}</dd></div>
-                    <div v-if="booking.worker_service" class="flex gap-2"><dt class="text-gray-400 w-36">Service</dt><dd class="text-white">{{ booking.worker_service.service_name }}</dd></div>
-                    <div class="flex gap-2"><dt class="text-gray-400 w-36">Description</dt><dd class="text-gray-300">{{ booking.job_description }}</dd></div>
-                    <div v-if="booking.location" class="flex gap-2"><dt class="text-gray-400 w-36">Location</dt><dd class="text-gray-300">{{ booking.location }}</dd></div>
-                    <div v-if="booking.scheduled_date" class="flex gap-2"><dt class="text-gray-400 w-36">Scheduled</dt><dd class="text-gray-300">{{ booking.scheduled_date }} {{ booking.scheduled_time }}</dd></div>
-                    <div v-if="booking.agreed_price" class="flex gap-2"><dt class="text-gray-400 w-36">Agreed Price</dt><dd class="text-white font-bold">K{{ booking.agreed_price }}</dd></div>
-                    <div v-if="booking.rejection_reason" class="flex gap-2"><dt class="text-gray-400 w-36">Rejection</dt><dd class="text-red-400">{{ booking.rejection_reason }}</dd></div>
-                    <div v-if="booking.worker_notes" class="flex gap-2"><dt class="text-gray-400 w-36">Worker notes</dt><dd class="text-gray-300">{{ booking.worker_notes }}</dd></div>
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                    <div class="flex gap-2"><dt class="text-gray-400 w-28 flex-shrink-0">Worker</dt><dd class="text-white">{{ booking.worker_profile.user.name }}</dd></div>
+                    <div v-if="booking.worker_service" class="flex gap-2"><dt class="text-gray-400 w-28 flex-shrink-0">Service</dt><dd class="text-white">{{ booking.worker_service.service_name }}</dd></div>
+                    <div v-if="booking.location" class="flex gap-2"><dt class="text-gray-400 w-28 flex-shrink-0">Location</dt><dd class="text-gray-300">{{ booking.location }}</dd></div>
+                    <div v-if="booking.scheduled_date" class="flex gap-2"><dt class="text-gray-400 w-28 flex-shrink-0">Scheduled</dt><dd class="text-gray-300">{{ booking.scheduled_date }} {{ booking.scheduled_time }}</dd></div>
+                    <div v-if="booking.agreed_price" class="flex gap-2"><dt class="text-gray-400 w-28 flex-shrink-0">Agreed Price</dt><dd class="text-white font-bold">K{{ booking.agreed_price }}</dd></div>
+                    <div class="flex gap-2 sm:col-span-2"><dt class="text-gray-400 w-28 flex-shrink-0">Description</dt><dd class="text-gray-300">{{ booking.job_description }}</dd></div>
+                    <div v-if="booking.rejection_reason" class="flex gap-2 sm:col-span-2"><dt class="text-gray-400 w-28 flex-shrink-0">Rejection</dt><dd class="text-red-400">{{ booking.rejection_reason }}</dd></div>
+                    <div v-if="booking.worker_notes" class="flex gap-2 sm:col-span-2"><dt class="text-gray-400 w-28 flex-shrink-0">Worker notes</dt><dd class="text-gray-300">{{ booking.worker_notes }}</dd></div>
                 </dl>
 
                 <!-- Actions -->

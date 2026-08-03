@@ -73,7 +73,7 @@ const rateLabel = (type: string) => ({ hourly: '/hr', per_job: '/job', per_day: 
             </nav>
         </template>
 
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
             <div class="flex justify-between items-center">
                 <h1 class="text-xl font-bold text-white">My Services</h1>
                 <button @click="showAdd = !showAdd" class="flex items-center gap-1.5 bg-brand-red hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
@@ -122,7 +122,7 @@ const rateLabel = (type: string) => ({ hourly: '/hr', per_job: '/job', per_day: 
                 <p>No services yet. Add your first service above.</p>
             </div>
 
-            <div class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                 <div v-for="s in services" :key="s.id" class="bg-gray-800 rounded-xl border border-gray-700 p-4">
                     <div v-if="editId !== s.id" class="flex justify-between items-start">
                         <div>

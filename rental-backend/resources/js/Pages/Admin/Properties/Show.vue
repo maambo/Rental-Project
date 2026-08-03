@@ -379,7 +379,7 @@ onUnmounted(() => { mapInstance?.remove(); });
                     </div>
 
                     <!-- ── RIGHT COLUMN ── -->
-                    <div class="space-y-4">
+                    <div class="space-y-4 lg:sticky lg:top-4 lg:self-start">
 
                         <!-- Actions -->
                         <div class="bg-light-bg rounded-xl overflow-hidden">
@@ -528,7 +528,7 @@ onUnmounted(() => { mapInstance?.remove(); });
     </AuthenticatedLayout>
 
     <!-- Lightbox -->
-    <div v-if="selectedImage" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90" @click="closeImage">
+    <div v-if="selectedImage" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90" @click="closeImage">
         <button @click="closeImage" class="absolute top-4 right-4 text-white hover:text-gray-300 transition">
             <XCircleIcon class="w-10 h-10" />
         </button>

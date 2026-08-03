@@ -58,11 +58,12 @@ const fmt = (n: number) => 'K' + Number(n).toLocaleString();
             <h2 class="text-xl font-semibold text-white">My Billing</h2>
         </template>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
             <div v-if="billings.data.length === 0" class="bg-gray-800 rounded-xl border border-gray-700 p-10 text-center text-gray-500">
                 No bills yet.
             </div>
 
+            <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
             <div v-for="b in billings.data" :key="b.id" class="bg-gray-800 rounded-xl border border-gray-700 p-5">
                 <div class="flex items-start justify-between gap-4">
                     <div>
@@ -115,6 +116,7 @@ const fmt = (n: number) => 'K' + Number(n).toLocaleString();
 
                 <a v-else-if="b.proof_of_payment" :href="'/storage/' + b.proof_of_payment" target="_blank"
                    class="inline-block text-xs text-blue-400 hover:underline mt-3">View submitted proof</a>
+            </div>
             </div>
 
             <div v-if="billings.links.length > 3" class="flex justify-center gap-1">

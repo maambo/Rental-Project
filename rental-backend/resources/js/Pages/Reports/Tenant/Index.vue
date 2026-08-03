@@ -40,7 +40,7 @@ const fmt = (n: number) => 'K' + Number(n).toLocaleString();
             <h2 class="text-xl font-semibold text-white">Payment History</h2>
         </template>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
             <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 flex flex-wrap items-end gap-3">
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">From</label>

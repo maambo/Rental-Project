@@ -38,8 +38,9 @@ const submit = () => {
             </nav>
         </template>
 
-        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <h1 class="text-xl font-bold text-white mb-1">Book {{ worker.user.name }}</h1>
                 <p class="text-gray-400 text-sm mb-6">{{ worker.category.icon }} {{ worker.category.name }}</p>
 
@@ -96,6 +97,27 @@ const submit = () => {
                         </Link>
                     </div>
                 </form>
+                </div>
+
+                <!-- Worker summary sidebar -->
+                <div class="space-y-4 lg:sticky lg:top-4 lg:self-start">
+                    <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                        <h2 class="text-sm font-semibold text-white mb-3">Worker</h2>
+                        <p class="text-white font-medium">{{ worker.user.name }}</p>
+                        <p class="text-gray-400 text-sm mt-0.5">{{ worker.category.icon }} {{ worker.category.name }}</p>
+                        <p v-if="worker.phone" class="text-gray-500 text-xs mt-2">{{ worker.phone }}</p>
+                    </div>
+
+                    <div v-if="services.length" class="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                        <h2 class="text-sm font-semibold text-white mb-3">Services &amp; Rates</h2>
+                        <div class="space-y-2">
+                            <div v-for="s in services" :key="s.id" class="flex items-center justify-between text-sm">
+                                <span class="text-gray-300">{{ s.service_name }}</span>
+                                <span class="text-brand-red font-semibold">K{{ s.base_rate }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </AuthenticatedLayout>

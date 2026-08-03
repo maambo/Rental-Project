@@ -111,8 +111,8 @@ class ReportingServiceTest extends TestCase
         $this->makeBilling($leaseA, ['Amount' => 2500]);
         $this->makeBilling($leaseB, ['Amount' => 3000]);
 
-        $from = now()->subMonth();
-        $to   = now()->addMonth();
+        $from = now()->subMonthNoOverflow();
+        $to   = now()->addMonthNoOverflow();
 
         $resultA = $this->service->landlordIncomeBreakdown($landlordA, $from, $to);
         $resultB = $this->service->landlordIncomeBreakdown($landlordB, $from, $to);
@@ -137,8 +137,8 @@ class ReportingServiceTest extends TestCase
         $this->makeBilling($leaseA, ['Amount' => 2000]);
         $this->makeBilling($leaseB, ['Amount' => 4000]);
 
-        $from = now()->subMonth();
-        $to   = now()->addMonth();
+        $from = now()->subMonthNoOverflow();
+        $to   = now()->addMonthNoOverflow();
 
         $detail = $this->service->landlordPropertyBillingDetail($landlord, $propertyA->id, $from, $to);
 
@@ -161,8 +161,8 @@ class ReportingServiceTest extends TestCase
         $this->makeBilling($leaseA, ['Amount' => 1500]);
         $this->makeBilling($leaseB, ['Amount' => 3000]);
 
-        $from = now()->subMonth();
-        $to   = now()->addMonth();
+        $from = now()->subMonthNoOverflow();
+        $to   = now()->addMonthNoOverflow();
 
         $historyA = $this->service->tenantPaymentHistory($tenantA, $from, $to);
         $historyB = $this->service->tenantPaymentHistory($tenantB, $from, $to);
@@ -187,7 +187,7 @@ class ReportingServiceTest extends TestCase
         $this->makeBilling($lease, [
             'status'         => 'paid',
             'Amount'         => 2000,
-            'billing_period' => now()->subMonth()->startOfMonth()->toDateString(),
+            'billing_period' => now()->subMonthNoOverflow()->startOfMonth()->toDateString(),
         ]);
 
         $result = $this->service->outstandingBalances();
@@ -216,7 +216,7 @@ class ReportingServiceTest extends TestCase
             'status'               => 'active',
             'billing_cycle'        => 'monthly',
             'starts_at'            => now(),
-            'ends_at'              => now()->addMonth(),
+            'ends_at'              => now()->addMonthNoOverflow(),
         ]);
 
         $from   = now()->subDay();

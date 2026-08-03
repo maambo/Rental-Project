@@ -67,7 +67,7 @@ const verificationLabels = {
             <h2 class="text-xl font-semibold text-white">Landlord Application Status</h2>
         </template>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
             <!-- Status Card -->
             <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
@@ -121,7 +121,7 @@ const verificationLabels = {
             <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <h3 class="text-lg font-semibold text-white mb-4">Uploaded Documents</h3>
 
-                <div class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="flex items-center justify-between p-3 bg-gray-900/40 rounded-lg">
                         <span class="text-gray-300">ID Document</span>
                         <a :href="`/storage/${application.id_document_url}`" target="_blank" class="text-brand-red hover:underline">View</a>

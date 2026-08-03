@@ -62,7 +62,7 @@ const fmt = (d: string | null) => d ? new Date(d).toLocaleDateString('en-GB', { 
 // Apply
 const applyNow = () => {
     if (!user.value) { window.location.href = route('login'); return; }
-    if (isOwner.value) { alert('You cannot apply to your own property.'); return; }
+    if (props.isOwner) { alert('You cannot apply to your own property.'); return; }
     window.location.href = route('properties.apply', props.property.id);
 };
 
@@ -71,7 +71,7 @@ const showTourModal = ref(false);
 const tourForm = useForm({ scheduled_at: '', notes: '' });
 const scheduleTour = () => {
     if (!user.value) { window.location.href = route('login'); return; }
-    if (isOwner.value) { alert('You cannot schedule a tour for your own property.'); return; }
+    if (props.isOwner) { alert('You cannot schedule a tour for your own property.'); return; }
     showTourModal.value = true;
 };
 const closeTourModal = () => { showTourModal.value = false; tourForm.reset(); };
@@ -455,7 +455,7 @@ const singlePropertyForMap = computed(() => [{
                     <!-- ══════════════════════════════════════
                          RIGHT COLUMN — OWNER view
                     ══════════════════════════════════════ -->
-                    <div v-if="isOwner" class="space-y-4">
+                    <div v-if="isOwner" class="space-y-4 lg:sticky lg:top-4 lg:self-start">
 
                         <!-- Management actions -->
                         <div class="bg-light-bg rounded-xl overflow-hidden">
@@ -549,7 +549,7 @@ const singlePropertyForMap = computed(() => [{
                     <!-- ══════════════════════════════════════
                          RIGHT COLUMN — TENANT view
                     ══════════════════════════════════════ -->
-                    <div v-else class="space-y-4">
+                    <div v-else class="space-y-4 lg:sticky lg:top-4 lg:self-start">
 
                         <!-- CTA card -->
                         <div class="bg-light-bg rounded-xl overflow-hidden">
@@ -649,6 +649,9 @@ const singlePropertyForMap = computed(() => [{
             <div class="px-5 py-5">
                 <p class="text-sm text-gray-400 mb-4">Pick a date and time to visit <span class="text-white font-medium">{{ property.title }}</span>.</p>
                 <form @submit.prevent="submitTourRequest" class="space-y-4">
+                    <div v-if="tourForm.errors.scheduled_at" class="rounded-md bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-400">
+                        {{ tourForm.errors.scheduled_at }}
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1">Date &amp; Time</label>
                         <input type="datetime-local" v-model="tourForm.scheduled_at" required
@@ -676,7 +679,7 @@ const singlePropertyForMap = computed(() => [{
     </div>
 
     <!-- Image Lightbox -->
-    <div v-if="selectedImage" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90" @click="closeImage">
+    <div v-if="selectedImage" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90" @click="closeImage">
         <button @click="closeImage" class="absolute top-4 right-4 text-white hover:text-gray-300 transition">
             <XCircleIcon class="w-10 h-10" />
         </button>

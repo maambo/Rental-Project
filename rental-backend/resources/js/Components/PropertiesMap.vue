@@ -45,7 +45,7 @@ const initMap = async (el: HTMLElement) => {
 
     const L = (await import('leaflet')).default;
     await import('leaflet/dist/leaflet.css');
-    const { MarkerClusterGroup } = await import('leaflet.markercluster');
+    await import('leaflet.markercluster');
     await import('leaflet.markercluster/dist/MarkerCluster.css');
     await import('leaflet.markercluster/dist/MarkerCluster.Default.css');
 

@@ -17,7 +17,7 @@ interface UtilityType      { id: number; name: string; icon: string | null; opti
 interface Property {
     id: number; title: string; description: string; terms_and_conditions: string | null; price: number;
     bedrooms: number; bathrooms: number; square_feet: number | null;
-    property_type: string; property_subtype: string; listing_type: string;
+    property_type: string; property_subtype: string; listing_type: string; approval_status: string;
     province_id: number; district_id: number; town_id: number;
     street_address: string; latitude: number; longitude: number;
     images: PropertyImage[];
@@ -149,7 +149,7 @@ const locationValue = computed({
 });
 
 const submit = () =>
-    form.post(route('landlord.properties.update', props.property.id), {
+    form.put(route('landlord.properties.update', props.property.id), {
         forceFormData: true,
     });
 

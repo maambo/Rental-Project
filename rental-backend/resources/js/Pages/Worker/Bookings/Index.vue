@@ -36,12 +36,12 @@ const statusClass = (s: string) => ({
             </nav>
         </template>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
             <h1 class="text-xl font-bold text-white">Booking Requests</h1>
 
             <div v-if="bookings.data.length === 0" class="text-center text-gray-400 py-20">No bookings yet.</div>
 
-            <div class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Link v-for="b in bookings.data" :key="b.id"
                     :href="route('worker.bookings.show', b.id)"
                     class="block bg-gray-800 rounded-xl border border-gray-700 hover:border-brand-red p-4 transition-colors">

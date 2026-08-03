@@ -189,7 +189,7 @@ const reject = () => {
                     </div>
 
                     <!-- Sidebar -->
-                    <div class="space-y-6">
+                    <div class="space-y-6 lg:sticky lg:top-4 lg:self-start">
 
                         <!-- Status Card -->
                         <div class="bg-light-bg rounded-xl overflow-hidden">

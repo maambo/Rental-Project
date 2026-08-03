@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TradeCategory;
 use App\Models\WorkerProfile;
+use App\Services\CatalogRetirementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class WorkerController extends Controller
 {
+    public function __construct(private readonly CatalogRetirementService $catalogService) {}
     public function index(Request $request)
     {
         $workers = WorkerProfile::with(['user', 'category', 'town'])
@@ -84,6 +86,12 @@ class WorkerController extends Controller
     public function toggleCategory(TradeCategory $tradeCategory)
     {
         $tradeCategory->update(['is_active' => !$tradeCategory->is_active]);
-        return back()->with('success', 'Category updated.');
+
+        if (! $tradeCategory->is_active) {
+            $count = $this->catalogService->retireTradeCategory($tradeCategory);
+            return back()->with('success', "Category retired. {$count} worker(s) notified.");
+        }
+
+        return back()->with('success', 'Category re-activated.');
     }
 }

@@ -178,7 +178,7 @@ const isActive = ['pending', 'under_review', 'payment_requested'].includes(props
             </div>
 
             <!-- Right: status + actions -->
-            <div class="space-y-6">
+            <div class="space-y-6 lg:sticky lg:top-4 lg:self-start">
 
                 <!-- Status timeline -->
                 <div class="bg-light-bg rounded-xl p-5">

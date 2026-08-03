@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import Sidebar from '@/Components/Sidebar.vue';
 import Toast from '@/Components/Toast.vue';
+import NotificationBell from '@/Components/NotificationBell.vue';
 import { Bars3Icon, XMarkIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import { Link } from '@inertiajs/vue3';
@@ -45,25 +46,24 @@ const showingSidebar = ref(false);
 
         <!-- Main Content Column -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Page Heading (Desktop/Shared) -->
-            <header
-                class="bg-gray-800 border-b border-gray-700"
-                v-if="header || $slots.header"
-            >
-                <div class="mx-auto px-4 py-6 sm:px-6 lg:px-8 flex items-center gap-4">
-                    <button v-show="!showingSidebar" @click="showingSidebar = true" class="p-2 rounded-md text-gray-400 hover:text-white focus:outline-none transition ease-in-out duration-150 z-50">
+            <!-- Page Heading -->
+            <header class="bg-gray-800 border-b border-gray-700">
+                <div class="mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center gap-4">
+                    <button v-show="!showingSidebar" @click="showingSidebar = true" class="p-2 rounded-md text-gray-400 hover:text-white focus:outline-none transition ease-in-out duration-150 z-50 lg:hidden">
                         <Bars3Icon class="h-6 w-6" />
                     </button>
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 flex-1 min-w-0">
                         <Link v-if="backUrl" :href="backUrl" class="text-gray-400 hover:text-white transition">
                             <ArrowLeftIcon class="w-6 h-6" />
                         </Link>
-                        <h2 v-if="header" class="font-semibold text-xl text-white">
+                        <h2 v-if="header" class="font-semibold text-xl text-white truncate">
                             {{ header }}
                         </h2>
                         <slot v-else name="header" />
                     </div>
+
+                    <NotificationBell />
                 </div>
             </header>
 

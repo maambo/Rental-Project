@@ -62,6 +62,19 @@ class WorkerProfile extends Model
     public function scopeVerified($q)  { return $q->where('is_verified', true); }
     public function scopeFeatured($q)  { return $q->where('is_featured', true); }
 
+    /**
+     * Profiles that may be shown and booked in the marketplace: active, verified,
+     * and — critically — still pointing at a trade category the admin hasn't
+     * retired. Without the category check, retiring a skill would leave those
+     * workers fully bookable under a skill that no longer exists.
+     */
+    public function scopeBookable($q)
+    {
+        return $q->active()
+            ->verified()
+            ->whereHas('category', fn ($c) => $c->where('is_active', true));
+    }
+
     public function scopeInCategory($q, int $categoryId)
     {
         return $q->where('trade_category_id', $categoryId);
@@ -79,6 +92,12 @@ class WorkerProfile extends Model
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    /** True when the admin has retired the trade category this profile uses. */
+    public function hasRetiredCategory(): bool
+    {
+        return ! ($this->category?->is_active ?? false);
+    }
 
     public function recalculateRating(): void
     {

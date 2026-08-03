@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\UtilityOption;
 use App\Models\UtilityType;
+use App\Services\CatalogRetirementService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class UtilityController extends Controller
 {
+    public function __construct(private readonly CatalogRetirementService $catalogService) {}
     public function index()
     {
         $utilities = UtilityType::with('options')->orderBy('sort_order')->get();
@@ -53,6 +55,7 @@ class UtilityController extends Controller
 
     public function destroy(UtilityType $utility)
     {
+        $this->catalogService->retireUtilityType($utility);
         $utility->update(['is_active' => false]);
 
         return back()->with('success', "Utility \"{$utility->name}\" hidden from landlord forms.");
@@ -83,6 +86,8 @@ class UtilityController extends Controller
     public function destroyOption(UtilityOption $option)
     {
         $label = $option->label;
+        $option->load('utilityType');
+        $this->catalogService->retireUtilityOption($option);
         $option->delete();
 
         return back()->with('success', "Option \"{$label}\" removed.");

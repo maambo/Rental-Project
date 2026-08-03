@@ -16,8 +16,7 @@ class WorkerController extends Controller
     public function index(Request $request)
     {
         $query = WorkerProfile::with(['user', 'category', 'town'])
-            ->active()
-            ->verified();
+            ->bookable();
 
         if ($request->filled('category')) {
             $query->inCategory((int) $request->category);
@@ -46,7 +45,9 @@ class WorkerController extends Controller
 
     public function show(WorkerProfile $workerProfile)
     {
+        // Retired trade category hides the profile just like deactivation does.
         abort_if(!$workerProfile->is_active || !$workerProfile->is_verified, 404);
+        abort_if($workerProfile->hasRetiredCategory(), 404);
 
         return Inertia::render('Marketplace/Workers/Show', [
             'worker'   => $workerProfile->load(['user', 'category', 'town', 'services', 'portfolioPhotos', 'reviews.client']),
