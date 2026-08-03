@@ -24,7 +24,7 @@ watch(() => page.props.flash, (flash: any) => {
             show.value = false;
         }, 3000);
     }
-}, { deep: true });
+}, { deep: true, immediate: true });
 
 const bgClass = computed(() => type.value === 'success' ? 'bg-green-900/60 border border-green-700/60' : 'bg-red-900/60 border border-red-700/60');
 const textClass = computed(() => type.value === 'success' ? 'text-green-200' : 'text-red-200');
