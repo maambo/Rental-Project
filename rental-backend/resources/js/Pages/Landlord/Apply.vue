@@ -1,9 +1,25 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
+import { reactive, computed } from 'vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { CheckCircleIcon, HomeIcon } from '@heroicons/vue/24/solid';
+import FileProgress from '@/Components/FileProgress.vue';
+import { CheckCircleIcon, HomeIcon, XCircleIcon } from '@heroicons/vue/24/solid';
+
+const MAX_MB = 5;
+const MAX_BYTES = MAX_MB * 1024 * 1024;
+
+type FileField = 'id_document' | 'proof_of_address' | 'tax_certificate' | 'selfie' | 'video_walkthrough' | 'business_registration';
+
+interface FileState {
+    name: string;
+    sizeMB: number;
+    pct: number;       // 0-100 capped at 100
+    tooLarge: boolean;
+}
+
+const fileStates = reactive<Partial<Record<FileField, FileState>>>({});
 
 const form = useForm({
     name: '',
@@ -16,7 +32,7 @@ const form = useForm({
     address: '',
     province: '',
     town: '',
-    tier: '', // kept for compatibility if needed, but we used verification_level in backend
+    tier: '',
     verification_level: 'basic',
     landlord_type: 'private_landlord',
     id_document: null,
@@ -50,20 +66,39 @@ const tiers = [
 
 const selectTier = (tierId: string) => {
     form.verification_level = tierId;
-    form.tier = tierId; // populate legacy field temporarily
+    form.tier = tierId;
 };
 
-const handleFileChange = (e: Event, field: 'id_document' | 'proof_of_address' | 'tax_certificate' | 'selfie' | 'video_walkthrough' | 'business_registration') => {
+const handleFileChange = (e: Event, field: FileField) => {
     const target = e.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        form[field] = target.files[0] as any;
+    if (!target.files || !target.files[0]) return;
+
+    const file = target.files[0];
+    const sizeMB = file.size / (1024 * 1024);
+    const tooLarge = file.size > MAX_BYTES;
+
+    fileStates[field] = {
+        name: file.name,
+        sizeMB,
+        pct: Math.min((file.size / MAX_BYTES) * 100, 100),
+        tooLarge,
+    };
+
+    if (!tooLarge) {
+        form[field] = file as any;
+    } else {
+        form[field] = null as any;
+        target.value = '';
     }
 };
 
+const hasOversizedFile = computed(() =>
+    Object.values(fileStates).some(s => s?.tooLarge)
+);
+
 const submit = () => {
-    form.post(route('landlord.apply.store'), {
-        forceFormData: true,
-    });
+    if (hasOversizedFile.value) return;
+    form.post(route('landlord.apply.store'), { forceFormData: true });
 };
 </script>
 
@@ -275,77 +310,74 @@ const submit = () => {
 
             <!-- Documents -->
             <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                <h3 class="text-lg font-semibold mb-6 text-white">4. Upload Documents</h3>
+                <h3 class="text-lg font-semibold mb-1 text-white">4. Upload Documents</h3>
+                <p class="text-xs text-gray-500 mb-6">Maximum file size: <span class="text-gray-300 font-medium">5 MB</span> per file. Accepted formats: PDF, JPG, PNG.</p>
 
                 <div class="grid grid-cols-1 gap-6">
-                    <!-- Basic Docs -->
+
+                    <!-- ID Document -->
                     <div>
                         <InputLabel value="ID Document (Passport/NRC) *" />
-                        <input type="file" @change="(e) => handleFileChange(e, 'id_document')" class="mt-1 block w-full text-sm text-gray-400
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-brand-red/10 file:text-brand-red
-                        hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" required />
-                        <InputError :message="form.errors.id_document" class="mt-2" />
+                        <input type="file" @change="(e) => handleFileChange(e, 'id_document')"
+                            class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red/10 file:text-brand-red hover:file:bg-brand-red/20"
+                            accept=".pdf,.jpg,.jpeg,.png" required />
+                        <FileProgress :state="fileStates.id_document" />
+                        <InputError :message="form.errors.id_document" class="mt-1" />
                     </div>
 
+                    <!-- Proof of Address -->
                     <div>
                         <InputLabel value="Proof of Address (Utility Bill) *" />
-                        <input type="file" @change="(e) => handleFileChange(e, 'proof_of_address')" class="mt-1 block w-full text-sm text-gray-400
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-brand-red/10 file:text-brand-red
-                        hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" required />
-                        <InputError :message="form.errors.proof_of_address" class="mt-2" />
+                        <input type="file" @change="(e) => handleFileChange(e, 'proof_of_address')"
+                            class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red/10 file:text-brand-red hover:file:bg-brand-red/20"
+                            accept=".pdf,.jpg,.jpeg,.png" required />
+                        <FileProgress :state="fileStates.proof_of_address" />
+                        <InputError :message="form.errors.proof_of_address" class="mt-1" />
                     </div>
 
-                    <!-- Selfie — always required -->
-                    <div class="border-t border-gray-700 pt-4 mt-4">
-                        <div>
-                            <InputLabel value="Selfie / Live Photo *" />
-                            <p class="text-xs text-gray-400 mb-2">A clear photo of your face — used to match your ID document.</p>
-                            <input type="file" required @change="(e) => handleFileChange(e, 'selfie')" class="mt-1 block w-full text-sm text-gray-400
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-full file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-brand-red/10 file:text-brand-red
-                            hover:file:bg-brand-red/20" accept=".jpg,.jpeg,.png" />
-                            <InputError :message="form.errors.selfie" class="mt-2" />
-                        </div>
+                    <!-- Selfie -->
+                    <div class="border-t border-gray-700 pt-4 mt-2">
+                        <InputLabel value="Selfie / Live Photo *" />
+                        <p class="text-xs text-gray-400 mb-2">A clear photo of your face — used to match your ID document.</p>
+                        <input type="file" required @change="(e) => handleFileChange(e, 'selfie')"
+                            class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red/10 file:text-brand-red hover:file:bg-brand-red/20"
+                            accept=".jpg,.jpeg,.png" />
+                        <FileProgress :state="fileStates.selfie" />
+                        <InputError :message="form.errors.selfie" class="mt-1" />
                     </div>
 
-                    <!-- Agent Docs -->
-                    <div v-if="form.landlord_type === 'agent'" class="border-t border-gray-700 pt-4 mt-4">
+                    <!-- Agent: Business Registration -->
+                    <div v-if="form.landlord_type === 'agent'" class="border-t border-gray-700 pt-4 mt-2">
                         <h4 class="font-medium text-white mb-4">Required for Agents</h4>
-                        <div>
-                            <InputLabel value="Business Registration/Pacra Certificate *" />
-                            <input type="file" @change="(e) => handleFileChange(e, 'business_registration')" class="mt-1 block w-full text-sm text-gray-400
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-full file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-brand-red/10 file:text-brand-red
-                            hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" />
-                            <InputError :message="form.errors.business_registration" class="mt-2" />
-                        </div>
+                        <InputLabel value="Business Registration / PACRA Certificate *" />
+                        <input type="file" @change="(e) => handleFileChange(e, 'business_registration')"
+                            class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red/10 file:text-brand-red hover:file:bg-brand-red/20"
+                            accept=".pdf,.jpg,.jpeg,.png" />
+                        <FileProgress :state="fileStates.business_registration" />
+                        <InputError :message="form.errors.business_registration" class="mt-1" />
                     </div>
 
+                    <!-- Tax Certificate -->
                     <div>
                         <InputLabel value="Tax Certificate (Optional)" />
-                        <input type="file" @change="(e) => handleFileChange(e, 'tax_certificate')" class="mt-1 block w-full text-sm text-gray-400
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-brand-red/10 file:text-brand-red
-                        hover:file:bg-brand-red/20" accept=".pdf,.jpg,.png" />
-                        <InputError :message="form.errors.tax_certificate" class="mt-2" />
+                        <input type="file" @change="(e) => handleFileChange(e, 'tax_certificate')"
+                            class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red/10 file:text-brand-red hover:file:bg-brand-red/20"
+                            accept=".pdf,.jpg,.jpeg,.png" />
+                        <FileProgress :state="fileStates.tax_certificate" />
+                        <InputError :message="form.errors.tax_certificate" class="mt-1" />
                     </div>
+
                 </div>
             </div>
 
+            <!-- Oversized global warning -->
+            <div v-if="hasOversizedFile" class="flex items-center gap-2 rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+                <XCircleIcon class="h-5 w-5 shrink-0" />
+                One or more files exceed the 5 MB limit. Please remove them before submitting.
+            </div>
+
             <div class="flex justify-end">
-                <PrimaryButton :disabled="form.processing">
+                <PrimaryButton :disabled="form.processing || hasOversizedFile">
                     Submit Application
                 </PrimaryButton>
             </div>

@@ -1,8 +1,23 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import FileProgress from '@/Components/FileProgress.vue';
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
-import { ref } from 'vue';
+import { ref, reactive, computed } from 'vue';
+
+const MAX_MB = 5;
+const MAX_BYTES = MAX_MB * 1024 * 1024;
+
+type FileField = 'id_document' | 'proof_of_address' | 'tax_certificate' | 'selfie' | 'video_walkthrough' | 'business_registration';
+
+interface FileState {
+    name: string;
+    sizeMB: number;
+    pct: number;
+    tooLarge: boolean;
+}
+
+const fileStates = reactive<Partial<Record<FileField, FileState>>>({});
 
 const props = defineProps<{
     application: any;
@@ -57,7 +72,12 @@ const selectTier = (tierId: string) => {
     form.verification_level = tierId;
 };
 
+const hasOversizedFile = computed(() =>
+    Object.values(fileStates).some(s => s?.tooLarge)
+);
+
 const submit = () => {
+    if (hasOversizedFile.value) return;
     form.transform((data) => ({
         ...data,
         _method: 'PUT',
@@ -66,10 +86,25 @@ const submit = () => {
     });
 };
 
-const handleFile = (field: string, event: Event) => {
+const handleFile = (field: FileField, event: Event) => {
     const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        (form as any)[field] = target.files[0];
+    if (!target.files || !target.files[0]) return;
+
+    const file = target.files[0];
+    const tooLarge = file.size > MAX_BYTES;
+
+    fileStates[field] = {
+        name: file.name,
+        sizeMB: file.size / (1024 * 1024),
+        pct: Math.min((file.size / MAX_BYTES) * 100, 100),
+        tooLarge,
+    };
+
+    if (!tooLarge) {
+        (form as any)[field] = file;
+    } else {
+        (form as any)[field] = null;
+        target.value = '';
     }
 };
 </script>
@@ -213,8 +248,9 @@ const handleFile = (field: string, event: Event) => {
 
                         <!-- Document Uploads -->
                         <div class="mb-8">
-                            <h3 class="text-lg font-semibold text-white mb-4">Documents (Optional - Update if needed)</h3>
-                            <p class="text-sm text-gray-400 mb-4">Leave blank to keep existing documents</p>
+                            <h3 class="text-lg font-semibold text-white mb-1">Documents (Optional - Update if needed)</h3>
+                            <p class="text-sm text-gray-400">Leave blank to keep existing documents</p>
+                            <p class="text-xs text-gray-500 mb-4">Maximum file size: <span class="text-gray-300 font-medium">5 MB</span> per file.</p>
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300">ID Document</label>
@@ -224,6 +260,7 @@ const handleFile = (field: string, event: Event) => {
                                         accept=".pdf,.jpg,.jpeg,.png"
                                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red file:text-white hover:file:bg-red-700"
                                     />
+                                    <FileProgress :state="fileStates.id_document" />
                                     <p class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.id_document_url}`" target="_blank" class="text-brand-red hover:underline">View Document</a></p>
                                 </div>
                                 <div>
@@ -234,6 +271,7 @@ const handleFile = (field: string, event: Event) => {
                                         accept=".pdf,.jpg,.jpeg,.png"
                                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red file:text-white hover:file:bg-red-700"
                                     />
+                                    <FileProgress :state="fileStates.proof_of_address" />
                                     <p class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.proof_of_address_url}`" target="_blank" class="text-brand-red hover:underline">View Document</a></p>
                                 </div>
 
@@ -248,6 +286,7 @@ const handleFile = (field: string, event: Event) => {
                                         file:text-sm file:font-semibold
                                         file:bg-brand-red file:text-white
                                         hover:file:bg-red-700" accept=".jpg,.png" />
+                                        <FileProgress :state="fileStates.selfie" />
                                         <p v-if="application.selfie_url" class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.selfie_url}`" target="_blank" class="text-brand-red hover:underline">View Selfie</a></p>
                                     </div>
                                 </div>
@@ -263,6 +302,7 @@ const handleFile = (field: string, event: Event) => {
                                         file:text-sm file:font-semibold
                                         file:bg-brand-red file:text-white
                                         hover:file:bg-red-700" accept=".pdf,.jpg,.png" />
+                                        <FileProgress :state="fileStates.business_registration" />
                                         <p v-if="application.business_registration_url" class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.business_registration_url}`" target="_blank" class="text-brand-red hover:underline">View Certificate</a></p>
                                     </div>
                                 </div>
@@ -275,8 +315,13 @@ const handleFile = (field: string, event: Event) => {
                                         accept=".pdf,.jpg,.jpeg,.png"
                                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-red file:text-white hover:file:bg-red-700"
                                     />
+                                    <FileProgress :state="fileStates.tax_certificate" />
                                     <p v-if="application.tax_certificate_url" class="mt-1 text-xs text-gray-500">Current: <a :href="`/storage/${application.tax_certificate_url}`" target="_blank" class="text-brand-red hover:underline">View Document</a></p>
                                 </div>
+                            </div>
+
+                            <div v-if="hasOversizedFile" class="mt-4 flex items-center gap-2 rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+                                One or more files exceed the 5 MB limit. Please remove them before submitting.
                             </div>
                         </div>
 
@@ -284,7 +329,7 @@ const handleFile = (field: string, event: Event) => {
                         <div class="flex items-center gap-4">
                             <button
                                 type="submit"
-                                :disabled="form.processing"
+                                :disabled="form.processing || hasOversizedFile"
                                 class="inline-flex items-center px-6 py-3 bg-brand-red border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red disabled:opacity-50"
                             >
                                 {{ form.processing ? 'Updating...' : 'Update Application' }}

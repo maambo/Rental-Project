@@ -257,8 +257,34 @@ describe('Tenant — Applying for a Property (full flow)', () => {
 });
 
 describe('Tenant — Register', () => {
+    it('offers a tenant and a landlord card before any form', () => {
+        cy.visit('/register');
+        cy.get('#name').should('not.exist');
+        cy.contains('button', /register as tenant/i).should('be.visible');
+        cy.contains('a', /register as landlord/i).should('be.visible');
+    });
+
+    it('sends the landlord card to the landlord application', () => {
+        cy.visit('/register');
+        cy.contains('a', /register as landlord/i).click();
+        cy.url().should('include', '/landlord/apply');
+    });
+
+    it('keeps the tenant step in the URL and restores the cards on back', () => {
+        cy.visit('/register?as=tenant');
+        cy.get('#name').should('be.visible');
+
+        cy.visit('/register');
+        cy.contains('button', /register as tenant/i).click();
+        cy.url().should('include', 'as=tenant');
+        cy.go('back');
+        cy.get('#name').should('not.exist');
+        cy.contains('button', /register as tenant/i).should('be.visible');
+    });
+
     it('shows the registration page', () => {
         cy.visit('/register');
+        cy.contains('button', /register as tenant/i).click();
         cy.get('#name').should('be.visible');
         cy.get('#email').should('be.visible');
         cy.get('#password').should('be.visible');
@@ -267,6 +293,7 @@ describe('Tenant — Register', () => {
     it('can register a new tenant account', () => {
         const stamp = Date.now();
         cy.visit('/register');
+        cy.contains('button', /register as tenant/i).click();
         cy.get('#name').type('New Test Tenant');
         cy.get('#email').type(`tenant_${stamp}@test.com`);
         cy.get('#password').type('password');

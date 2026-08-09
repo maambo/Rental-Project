@@ -429,6 +429,7 @@ describe('Full rental lifecycle flow', () => {
     // ── 9. Tenant registers and applies ──────────────────────────────────────
     it('9. Tenant registers and applies for the residential rent property', () => {
         cy.visit('/register');
+        cy.contains('button', /register as tenant/i).click();
         cy.get('#name').type('Flow Test Tenant');
         cy.get('#email').type('tenant@flowtest.com');
         cy.get('#password').type('password');

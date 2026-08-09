@@ -245,7 +245,41 @@ describe('Landlord Registration — Application status page', () => {
     });
 });
 
-// ─── 7. Success toast ─────────────────────────────────────────────────────────
+// ─── 7. Account actually created (can log in after registration) ─────────────
+
+describe('Landlord Registration — Account creation verified', () => {
+    it('newly registered landlord can log in with their credentials', () => {
+        const email    = `verify_${Date.now()}@regtest.com`;
+        const password = 'password123';
+
+        // 1. Submit the application form
+        fillAndSubmit({ email, password });
+        cy.url({ timeout: 15000 }).should('match', /application-status|landlord\/apply/);
+
+        // 2. Log out
+        cy.visit('/logout').then(() => {}).catch(() => {});
+        cy.request({ method: 'POST', url: '/logout', failOnStatusCode: false });
+        cy.clearCookies();
+
+        // 3. Log back in with the same credentials
+        cy.visit('/login');
+        cy.get('#email').clear().type(email);
+        cy.get('#password').clear().type(password);
+        cy.get('button[type=submit]').click();
+
+        // 4. Should land on dashboard — not stay on /login
+        cy.url({ timeout: 10000 }).should('not.include', '/login');
+        cy.get('body').should('not.contain', 'Server Error');
+    });
+
+    it('newly registered landlord is redirected to application-status (not full dashboard)', () => {
+        const email = `status_redirect_${Date.now()}@regtest.com`;
+        fillAndSubmit({ email });
+        cy.url({ timeout: 15000 }).should('include', 'application-status');
+    });
+});
+
+// ─── 8. Success toast ─────────────────────────────────────────────────────────
 
 describe('Landlord Registration — Success toast', () => {
     it('shows a success toast on the status page after a valid submission', () => {
