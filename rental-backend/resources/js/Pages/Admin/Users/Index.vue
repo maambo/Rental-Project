@@ -7,6 +7,9 @@ import TextInput from '@/Components/TextInput.vue';
 import { ref, watch } from 'vue';
 import { MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, UserPlusIcon, ArrowRightOnRectangleIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import { debounce } from 'lodash';
+import { useConfirm } from '@/composables/useConfirm';
+
+const { confirm } = useConfirm();
 
 const props = defineProps<{
     users: {
@@ -32,14 +35,23 @@ watch([search, role], debounce(() => {
     );
 }, 300));
 
-const deleteUser = (id: number) => {
-    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+const deleteUser = async (id: number) => {
+    if (await confirm({
+        title: 'Delete this user?',
+        message: 'This action cannot be undone.',
+        confirmText: 'Delete',
+    })) {
         router.delete(route('admin.users.destroy', id));
     }
 };
 
-const loginAs = (id: number) => {
-    if (confirm('Are you sure you want to log in as this user?')) {
+const loginAs = async (id: number) => {
+    if (await confirm({
+        title: 'Log in as this user?',
+        message: 'You will see the app exactly as they do.',
+        confirmText: 'Log In',
+        variant: 'primary',
+    })) {
         router.post(route('admin.users.login-as', id));
     }
 };

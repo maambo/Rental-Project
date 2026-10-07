@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, DefineComponent, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PageLoader from './Components/PageLoader.vue';
+import ConfirmDialog from './Components/ConfirmDialog.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -17,7 +18,7 @@ createInertiaApp({
             import.meta.glob<DefineComponent>('./Pages/**/*.vue'),
         ),
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h('div', [h(App, props), h(PageLoader)]) })
+        createApp({ render: () => h('div', [h(App, props), h(PageLoader), h(ConfirmDialog)]) })
             .use(plugin)
             .use(ZiggyVue)
             .mount(el);

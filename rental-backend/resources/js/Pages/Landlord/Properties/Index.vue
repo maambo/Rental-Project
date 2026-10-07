@@ -2,6 +2,9 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { PlusIcon, BuildingOfficeIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/vue/24/outline';
+import { useConfirm } from '@/composables/useConfirm';
+
+const { confirm } = useConfirm();
 
 const props = defineProps<{ properties: any[] }>();
 
@@ -17,8 +20,8 @@ const availabilityConfig: Record<string, { label: string; class: string }> = {
     sold:      { label: 'Sold',       class: 'bg-gray-500/20 text-gray-400 ring-1 ring-gray-500/30' },
 };
 
-const deleteProperty = (id: number) => {
-    if (confirm('Delete this property? This cannot be undone.')) {
+const deleteProperty = async (id: number) => {
+    if (await confirm('Delete this property? This cannot be undone.')) {
         router.delete(route('landlord.properties.destroy', id));
     }
 };
