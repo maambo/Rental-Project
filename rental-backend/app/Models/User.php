@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -31,12 +32,45 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'avatar_url',
+    ];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
         ];
+    }
+
+    // ── Accessors ─────────────────────────────────────────────────────────────
+
+    /**
+     * `avatar` holds one of two things: an absolute URL when the account came in
+     * through Google OAuth, or a relative disk path once the user uploads their
+     * own image. Resolve both to something an <img src> can use, and fall back to
+     * a generated initials avatar so the UI never renders a broken image.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar) {
+            return str_starts_with($this->avatar, 'http')
+                ? $this->avatar
+                : Storage::disk('public')->url($this->avatar);
+        }
+
+        return 'https://ui-avatars.com/api/?'.http_build_query([
+            'name'       => $this->name,
+            'background' => '374151',
+            'color'      => 'fff',
+            'size'       => 256,
+        ]);
+    }
+
+    public function hasUploadedAvatar(): bool
+    {
+        return $this->avatar && ! str_starts_with($this->avatar, 'http');
     }
 
     // ── Relationships ─────────────────────────────────────────────────────────

@@ -5,7 +5,7 @@ import Pagination from '@/Components/Pagination.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref, watch } from 'vue';
-import { MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, UserPlusIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, UserPlusIcon, ArrowRightOnRectangleIcon, EyeIcon } from '@heroicons/vue/24/outline';
 import { debounce } from 'lodash';
 
 const props = defineProps<{
@@ -103,9 +103,21 @@ const loginAs = (id: number) => {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-700">
-                        <tr v-for="user in users.data" :key="user.id" class="hover:bg-gray-700/40">
+                        <tr
+                            v-for="user in users.data"
+                            :key="user.id"
+                            class="hover:bg-gray-700/40 cursor-pointer"
+                            @click="router.visit(route('admin.users.show', user.id))"
+                        >
                             <td class="px-4 py-3">
-                                <div class="font-medium text-white">{{ user.name }}</div>
+                                <div class="flex items-center gap-3">
+                                    <img
+                                        :src="user.avatar_url"
+                                        :alt="user.name"
+                                        class="h-8 w-8 rounded-full object-cover bg-gray-700 flex-shrink-0"
+                                    />
+                                    <div class="font-medium text-white">{{ user.name }}</div>
+                                </div>
                             </td>
                             <td class="px-4 py-3">
                                 <div class="text-gray-400">{{ user.email }}</div>
@@ -125,8 +137,11 @@ const loginAs = (id: number) => {
                             <td class="px-4 py-3 text-gray-400">
                                 {{ new Date(user.created_at).toLocaleDateString() }}
                             </td>
-                            <td class="px-4 py-3 text-right">
+                            <td class="px-4 py-3 text-right" @click.stop>
                                 <div class="flex justify-end gap-3">
+                                    <Link :href="route('admin.users.show', user.id)" class="text-gray-400 hover:text-white" title="View Details">
+                                        <EyeIcon class="h-5 w-5" />
+                                    </Link>
                                     <button @click="loginAs(user.id)" class="text-green-400 hover:text-green-300" title="Login As User">
                                         <ArrowRightOnRectangleIcon class="h-5 w-5" />
                                     </button>

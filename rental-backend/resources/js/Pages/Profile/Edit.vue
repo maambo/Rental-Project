@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
+import UpdateAvatarForm from './Partials/UpdateAvatarForm.vue';
 import { Head } from '@inertiajs/vue3';
 
 defineProps<{
@@ -23,6 +24,10 @@ defineProps<{
 
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8 lg:col-span-2">
+                    <UpdateAvatarForm />
+                </div>
+
                 <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-8">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"

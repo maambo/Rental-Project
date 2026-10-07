@@ -40,6 +40,8 @@ class HandleInertiaRequests extends Middleware
                     'email'           => $user->email,
                     'role_id'         => $user->role_id,
                     'google_id'       => $user->google_id,
+                    'avatar'          => $user->avatar,
+                    'avatar_url'      => $user->avatar_url,
                     'hasWorkerProfile'=> fn () => $user->workerProfile()->exists(),
                     'unreadNotificationsCount' => fn () => $user->unreadNotifications()->count(),
                     'roleModel'       => $user->roleModel ? [

@@ -55,9 +55,11 @@ const isOpen = (key: string) => openGroups.value.has(key);
         <!-- User Info -->
         <div class="border-b border-gray-800 p-4 flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-light-bg text-brand-red flex-shrink-0">
-                    <UserIcon class="h-5 w-5" />
-                </div>
+                <img
+                    :src="user.avatar_url"
+                    :alt="user.name"
+                    class="h-9 w-9 rounded-full object-cover bg-light-bg flex-shrink-0"
+                />
                 <div class="overflow-hidden">
                     <p class="truncate text-sm font-medium text-white">{{ user.name }}</p>
                     <p class="truncate text-xs text-gray-500 capitalize">{{ role.replace(/_/g, ' ') }}</p>
