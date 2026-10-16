@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PublicHeader from '@/Components/PublicHeader.vue';
 import AppButton from '@/Components/AppButton.vue';
 import AuthDivider from '@/Components/AuthDivider.vue';
 import GoogleAuthButton from '@/Components/GoogleAuthButton.vue';
@@ -183,15 +184,11 @@ const submit = () => {
     <Head title="Register" />
 
     <div class="min-h-screen bg-dark-bg">
+        <PublicHeader />
+
         <!-- Header -->
         <div class="bg-gray-800 border-b border-gray-700">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div class="mb-4">
-                    <Link href="/" class="inline-flex items-center gap-2 text-gray-400 hover:text-brand-red transition">
-                        <HomeIcon class="h-6 w-6" />
-                        <span class="font-medium">Back to Home</span>
-                    </Link>
-                </div>
                 <h1 class="text-3xl font-bold text-white">
                     {{ step > 1 ? 'Register as Tenant' : 'Create Account' }}
                 </h1>

@@ -15,6 +15,10 @@ const links = [
     { label: 'Find Workers', href: () => route('marketplace.workers.index'), match: 'marketplace.workers.*' },
 ];
 
+// Contextual auth actions: hide the button for the page you're already on
+const onLogin = computed(() => route().current('login'));
+const onRegister = computed(() => route().current('register'));
+
 const navLink = (match: string) =>
     ['rounded-lg px-3 py-2 text-sm font-medium transition',
         route().current(match) ? 'text-white bg-gray-800' : 'text-gray-400 hover:text-white hover:bg-gray-800'];
@@ -41,13 +45,13 @@ const navLink = (match: string) =>
                     Dashboard
                 </Link>
                 <template v-else>
-                    <Link :href="route('login')"
+                    <Link v-if="!onLogin" :href="route('login')"
                           class="hidden rounded-full px-4 py-2 text-sm font-semibold text-gray-300 transition hover:text-white sm:block">
-                        Log in
+                        {{ onRegister ? 'Already have an account? Log in' : 'Log in' }}
                     </Link>
-                    <Link v-if="canRegister" :href="route('register')"
+                    <Link v-if="canRegister && !onRegister" :href="route('register')"
                           class="rounded-full bg-brand-red px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
-                        Register
+                        {{ onLogin ? 'Create account' : 'Register' }}
                     </Link>
                 </template>
 
