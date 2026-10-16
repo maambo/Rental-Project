@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
+import PublicHeader from '@/Components/PublicHeader.vue';
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import axios from 'axios';
 import {
@@ -256,16 +257,7 @@ onMounted(() => {
     <Head title="Browse Properties" />
 
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <!-- Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-                <Link :href="route('landing')" class="text-xl font-bold text-brand-red">RentalApp</Link>
-                <div class="flex items-center gap-3">
-                    <Link :href="route('login')" class="text-sm text-gray-600 dark:text-gray-300 hover:text-brand-red">Sign in</Link>
-                    <Link :href="route('register')" class="text-sm bg-brand-red text-white px-4 py-2 rounded-md hover:bg-red-700">Register</Link>
-                </div>
-            </div>
-        </header>
+        <PublicHeader />
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 

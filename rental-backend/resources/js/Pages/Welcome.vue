@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
+import PublicHeader from '@/Components/PublicHeader.vue';
 import DashboardCard from '@/Components/DashboardCard.vue';
 import { MapPinIcon, HomeIcon, ArrowRightIcon, EyeIcon, UsersIcon, ChartBarIcon, BuildingOfficeIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import { StarIcon } from '@heroicons/vue/24/solid';
@@ -46,41 +47,11 @@ function viewAllUrl() {
     <Head title="Welcome" />
 
     <div class="min-h-screen bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
+        <PublicHeader :can-register="canRegister" />
+
         <!-- Hero Section -->
         <div class="relative bg-gradient-to-br from-brand-red to-brand-orange text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24">
-                <!-- Navbar -->
-                <nav class="flex justify-between items-center mb-16">
-                    <div class="flex items-center gap-2">
-                        <HomeIcon class="h-8 w-8 text-white" />
-                        <span class="text-2xl font-bold tracking-wider">RENTALAPP</span>
-                    </div>
-                    <div v-if="canLogin" class="flex gap-4">
-                        <Link
-                            v-if="$page.props.auth.user"
-                            :href="route('dashboard')"
-                            class="rounded-full bg-white/20 px-6 py-2 text-sm font-semibold text-white ring-1 ring-white/50 transition hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                        >
-                            Dashboard
-                        </Link>
-                        <template v-else>
-                            <Link
-                                :href="route('login')"
-                                class="rounded-full bg-white/20 px-6 py-2 text-sm font-semibold text-white ring-1 ring-white/50 transition hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                v-if="canRegister"
-                                :href="route('register')"
-                                class="rounded-full bg-white px-6 py-2 text-sm font-semibold text-brand-red transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            >
-                                Register
-                            </Link>
-                        </template>
-                    </div>
-                </nav>
-
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
                 <!-- Hero Content -->
                 <div class="max-w-2xl">
                     <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">

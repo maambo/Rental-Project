@@ -2,10 +2,8 @@
 import { ref } from 'vue';
 import Sidebar from '@/Components/Sidebar.vue';
 import Toast from '@/Components/Toast.vue';
-import NotificationBell from '@/Components/NotificationBell.vue';
-import { Bars3Icon, XMarkIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
+import AppHeader from '@/Components/AppHeader.vue';
+import { XMarkIcon } from '@heroicons/vue/24/outline';
 
 defineProps<{
     header?: string;
@@ -46,26 +44,10 @@ const showingSidebar = ref(false);
 
         <!-- Main Content Column -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Page Heading -->
-            <header class="bg-gray-800 border-b border-gray-700">
-                <div class="mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center gap-4">
-                    <button v-show="!showingSidebar" @click="showingSidebar = true" class="p-2 rounded-md text-gray-400 hover:text-white focus:outline-none transition ease-in-out duration-150 z-50 lg:hidden">
-                        <Bars3Icon class="h-6 w-6" />
-                    </button>
-
-                    <div class="flex items-center gap-4 flex-1 min-w-0">
-                        <Link v-if="backUrl" :href="backUrl" class="text-gray-400 hover:text-white transition">
-                            <ArrowLeftIcon class="w-6 h-6" />
-                        </Link>
-                        <h2 v-if="header" class="font-semibold text-xl text-white truncate">
-                            {{ header }}
-                        </h2>
-                        <slot v-else name="header" />
-                    </div>
-
-                    <NotificationBell />
-                </div>
-            </header>
+            <AppHeader :title="header" :back-url="backUrl" @toggle-sidebar="showingSidebar = true">
+                <template v-if="$slots.header" #title><slot name="header" /></template>
+                <template v-if="$slots.actions" #actions><slot name="actions" /></template>
+            </AppHeader>
 
             <!-- Page Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-dark-bg p-6">
